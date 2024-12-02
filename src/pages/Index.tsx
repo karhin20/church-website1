@@ -1,62 +1,58 @@
-import { useState } from "react";
-import { ChatMessage } from "@/components/ChatMessage";
-import { ChatInput } from "@/components/ChatInput";
-
-interface Message {
-  text: string;
-  isBot: boolean;
-}
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Index = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      text: "Welcome to The Apostolic Church - Gh, Nii Boiman Central! How can I assist you today?",
-      isBot: true,
-    },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSendMessage = async (message: string) => {
-    // Add user message
-    setMessages((prev) => [...prev, { text: message, isBot: false }]);
-    setIsLoading(true);
-
-    // TODO: Integrate with backend
-    // For now, we'll just simulate a response
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: "This is a placeholder response. Backend integration is pending.",
-          isBot: true,
-        },
-      ]);
-      setIsLoading(false);
-    }, 1000);
-  };
-
   return (
-    <div className="flex flex-col h-screen bg-church-background">
+    <div className="min-h-screen bg-church-background">
       {/* Header */}
-      <header className="bg-church-primary text-white p-4 text-center">
-        <h1 className="text-xl font-bold">The Apostolic Church - Gh</h1>
-        <p className="text-sm text-church-secondary">Nii Boiman Central</p>
+      <header className="bg-church-primary text-white p-6">
+        <div className="container mx-auto">
+          <h1 className="text-3xl font-bold">The Apostolic Church - Gh</h1>
+          <p className="text-church-secondary mt-2">Nii Boiman Central</p>
+        </div>
       </header>
 
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message, index) => (
-          <ChatMessage
-            key={index}
-            message={message.text}
-            isBot={message.isBot}
-          />
-        ))}
-        {isLoading && <ChatMessage message="" isBot={true} isLoading={true} />}
-      </div>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {/* Welcome Section */}
+        <section className="mb-12 text-center">
+          <h2 className="text-2xl font-bold text-church-primary mb-4">Welcome to Our Church</h2>
+          <p className="text-church-text max-w-2xl mx-auto">
+            Join us in worship and fellowship as we grow together in faith and community.
+          </p>
+        </section>
 
-      {/* Input */}
-      <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
+        {/* Service Times */}
+        <section className="mb-12 bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-bold text-church-primary mb-4">Service Times</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="p-4 border rounded">
+              <h4 className="font-semibold">Sunday Service</h4>
+              <p>9:00 AM - 11:30 AM</p>
+            </div>
+            <div className="p-4 border rounded">
+              <h4 className="font-semibold">Wednesday Bible Study</h4>
+              <p>6:30 PM - 8:00 PM</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Location */}
+        <section className="mb-12 bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-bold text-church-primary mb-4">Location</h3>
+          <p>123 Church Street, Nii Boiman, Accra</p>
+          <p className="mt-2">Contact: +233 XX XXX XXXX</p>
+        </section>
+
+        {/* Chat Button */}
+        <div className="text-center mt-8">
+          <Link to="/chat">
+            <Button className="bg-church-primary hover:bg-church-primary/90 text-white px-8 py-4 rounded-full text-lg">
+              Chat with Us
+            </Button>
+          </Link>
+        </div>
+      </main>
     </div>
   );
 };
