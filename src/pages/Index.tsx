@@ -1,56 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Church, Users, Heart, MessageCircle, Menu, X, Play, Download, Calendar } from "lucide-react";
-import { useState } from "react";
+import { Church, Users, Heart, MessageCircle, Play, Download, Calendar } from "lucide-react";
+import { Navigation } from "@/components/sections/Navigation";
+import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 
 const Index = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
     <div className="min-h-screen bg-church-background">
-      {/* Navigation */}
-      <nav className="bg-church-primary text-white p-4 fixed w-full top-0 z-50 shadow-lg">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold flex items-center">
-            <Church className="mr-2 h-6 w-6 text-church-secondary" />
-            <span className="hidden sm:inline">The Apostolic Church - Gh</span>
-            <span className="sm:hidden">TAC-Gh</span>
-          </h1>
-          
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-white hover:text-church-secondary transition-colors"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-8">
-            <a href="#" className="hover:text-church-secondary transition-colors duration-200 font-medium">Home</a>
-            <a href="#" className="hover:text-church-secondary transition-colors duration-200 font-medium">About</a>
-            <a href="#" className="hover:text-church-secondary transition-colors duration-200 font-medium">Ministries</a>
-            <a href="#" className="hover:text-church-secondary transition-colors duration-200 font-medium">Contact</a>
-          </div>
-        </div>
-
-        {/* Mobile Menu Dropdown */}
-        {isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-church-primary/95 backdrop-blur-sm md:hidden z-50 animate-fade-in">
-            <div className="flex flex-col items-center py-6 space-y-6">
-              <a href="#" className="hover:text-church-secondary transition-colors duration-200 font-medium">Home</a>
-              <a href="#" className="hover:text-church-secondary transition-colors duration-200 font-medium">About</a>
-              <a href="#" className="hover:text-church-secondary transition-colors duration-200 font-medium">Ministries</a>
-              <a href="#" className="hover:text-church-secondary transition-colors duration-200 font-medium">Contact</a>
-            </div>
-          </div>
-        )}
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="relative h-screen bg-gradient-to-r from-church-primary to-purple-900 text-white mt-16">
@@ -108,6 +65,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Upcoming Events Section */}
+      <UpcomingEvents />
 
       {/* Latest Sermons Section */}
       <section className="py-24 bg-church-primary text-white">
