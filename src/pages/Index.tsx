@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Church, Users, Heart, MessageCircle, Menu, X } from "lucide-react";
+import { Church, Users, Heart, MessageCircle, Menu, X, Play, Download, Calendar } from "lucide-react";
 import { useState } from "react";
 
 const Index = () => {
@@ -105,6 +105,93 @@ const Index = () => {
             <p className="text-church-text leading-relaxed">
               Experience and share the transforming love of God in our community.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Latest Sermons Section */}
+      <section className="py-24 bg-church-primary text-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Latest Sermons</h2>
+          <p className="text-center text-church-accent mb-12">Listen to our most recent messages</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((sermon) => (
+              <div key={sermon} className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+                <h3 className="text-xl font-semibold mb-2">The Power of Faith</h3>
+                <p className="text-church-accent mb-4">Pastor John Doe • March {sermon}, 2024</p>
+                <div className="flex justify-between items-center">
+                  <Button variant="outline" className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
+                    <Play className="w-4 h-4 mr-2" /> Listen
+                  </Button>
+                  <Button variant="outline" className="bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10">
+                    <Download className="w-4 h-4 mr-2" /> Download
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Latest News Section */}
+      <section className="py-24 bg-church-background">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">Latest News</h2>
+          <p className="text-center text-church-text mb-12">Stay updated with our church community</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((news) => (
+              <div key={news} className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
+                <img 
+                  src={`https://images.unsplash.com/photo-1473177104440-${news}`} 
+                  alt="Church news" 
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-6">
+                  <div className="flex items-center text-church-secondary mb-2">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    <span className="text-sm">March {news}, 2024</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-church-primary">Community Outreach Success</h3>
+                  <p className="text-church-text mb-4">Join us in celebrating the success of our recent community outreach program...</p>
+                  <Button variant="link" className="text-church-primary hover:text-church-secondary p-0">
+                    Read More →
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section className="py-24 bg-church-accent/20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">Our Gallery</h2>
+          <p className="text-center text-church-text mb-12">Moments captured in our church community</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[
+              "1473177104440",
+              "1494891848038",
+              "1551038247",
+              "1524230572899",
+              "1433832597046",
+              "1493397212122",
+              "1466442929976",
+              "1492321936769"
+            ].map((imageId) => (
+              <div key={imageId} className="relative group overflow-hidden rounded-lg aspect-square">
+                <img
+                  src={`https://images.unsplash.com/photo-${imageId}`}
+                  alt="Church gallery"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-church-primary/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <Button variant="outline" className="text-white border-white hover:bg-white/20">
+                    View Image
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
