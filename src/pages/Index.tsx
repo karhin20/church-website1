@@ -14,7 +14,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-black/60"></div>
         <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4">
           <h2 className="text-sm uppercase tracking-wider mb-4 text-church-secondary font-semibold animate-fade-in">
-            Welcome to The Apostolic Church - Ghana, <br /> Nii Boiman Central Assembly
+            Welcome to The Apostolic Church - Ghana <br /> Nii Boiman Central Assembly
           </h2>
           <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight animate-fade-in delay-100">
             PERFECT CHURCH FOR<br />IMPERFECT PEOPLE
