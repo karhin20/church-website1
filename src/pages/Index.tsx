@@ -1,21 +1,50 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Church, Users, Heart, MessageCircle } from "lucide-react";
+import { Church, Users, Heart, MessageCircle, Menu, X } from "lucide-react";
+import { useState } from "react";
 
 const Index = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="bg-church-primary text-white p-4">
+      <nav className="bg-church-primary text-white p-4 relative">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold">The Apostolic Church - Gh</h1>
-          <div className="space-x-6">
+          
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden text-white"
+            onClick={toggleMenu}
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex space-x-6">
             <a href="#" className="hover:text-church-secondary">Home</a>
             <a href="#" className="hover:text-church-secondary">About</a>
             <a href="#" className="hover:text-church-secondary">Ministries</a>
             <a href="#" className="hover:text-church-secondary">Contact</a>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMenuOpen && (
+          <div className="absolute top-full left-0 right-0 bg-church-primary md:hidden z-50">
+            <div className="flex flex-col items-center py-4 space-y-4">
+              <a href="#" className="hover:text-church-secondary">Home</a>
+              <a href="#" className="hover:text-church-secondary">About</a>
+              <a href="#" className="hover:text-church-secondary">Ministries</a>
+              <a href="#" className="hover:text-church-secondary">Contact</a>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -23,7 +52,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4">
           <h2 className="text-sm uppercase tracking-wider mb-4">Welcome to The Apostolic Church</h2>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
             PERFECT CHURCH FOR<br />IMPERFECT PEOPLE
           </h1>
           <p className="max-w-2xl mb-8 text-lg">
