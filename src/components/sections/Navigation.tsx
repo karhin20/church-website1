@@ -13,8 +13,14 @@ export const Navigation = () => {
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-xl font-bold flex items-center">
           <Church className="mr-2 h-6 w-6 text-church-secondary" />
-          <span className="hidden sm:inline">The Apostolic Church - Gh</span>
-          <span className="sm:hidden">TAC-Gh</span>
+          <div className="flex flex-col items-start">
+            <span className="hidden sm:inline">The Apostolic Church - Gh</span>
+            <span className="sm:hidden">TAC-Gh</span>
+            <span className="text-sm text-church-secondary font-medium">
+              <span className="hidden sm:inline">Nii Boiman Central</span>
+              <span className="sm:hidden">NBC</span>
+            </span>
+          </div>
         </h1>
         
         <button 
