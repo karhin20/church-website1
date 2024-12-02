@@ -73,13 +73,15 @@ const Index = () => {
           <p className="text-center text-church-text mb-12">Stay updated with our latest announcements</p>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="aspect-video">
-              <iframe  
-                className="w-full h-full rounded-lg shadow-lg" 
-                src="https://www.youtube.com/embed/bDP4P3tYQ5Y" 
-                title="SUNDAY SERVICE LIVE" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; 
-                allowfullscreen></iframe> 
+              <iframe
+                className="w-full h-full rounded-lg shadow-lg"
+                src="https://www.youtube.com/embed/bDP4P3tYQ5Y"
+                title="SUNDAY SERVICE LIVE"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             </div>
+
             <div className="aspect-video">
               <iframe
                 className="w-full h-full rounded-lg shadow-lg"
