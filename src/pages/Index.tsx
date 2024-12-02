@@ -75,18 +75,18 @@ const Index = () => {
             <div className="aspect-video">
               <iframe
                 className="w-full h-full rounded-lg shadow-lg"
-                src="https://www.youtube.com/embed/bDP4P3tYQ5Y"
-                title="SUNDAY SERVICE LIVE"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+                 src="https://www.youtube.com/embed/EB1NpZejEUo" 
+                 title="Annual Fundraising" 
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                 allowFullScreen
               ></iframe>
             </div>
 
             <div className="aspect-video">
               <iframe
                 className="w-full h-full rounded-lg shadow-lg"
-               src="https://www.youtube.com/embed/qIQC245haqs" 
-                title="SUNDAY SERVICE LIVE" 
+                src="https://www.youtube.com/embed/qWySWBN_Wj0" 
+                title="Annual Harvest"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
