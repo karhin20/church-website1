@@ -25,7 +25,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         church: {
-          primary: "#1a1f2c",
+          primary: "#4C1D95",
           secondary: "#FCD34D",
           accent: "#DDD6FE",
           background: "#F8FAFC",

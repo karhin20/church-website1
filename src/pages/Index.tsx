@@ -11,12 +11,12 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-church-background">
       {/* Navigation */}
       <nav className="bg-church-primary text-white p-4 fixed w-full top-0 z-50 shadow-lg">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold flex items-center">
-            <Church className="mr-2 h-6 w-6" />
+            <Church className="mr-2 h-6 w-6 text-church-secondary" />
             <span className="hidden sm:inline">The Apostolic Church - Gh</span>
             <span className="sm:hidden">TAC-Gh</span>
           </h1>
@@ -72,7 +72,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-church-background">
         <div className="container mx-auto grid md:grid-cols-3 gap-12 px-4">
           {/* Worship */}
           <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-lg bg-white shadow-lg">
@@ -80,7 +80,7 @@ const Index = () => {
               <Church className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-church-primary">WORSHIP</h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-church-text leading-relaxed">
               Join us for spirit-filled worship services every Sunday and Wednesday.
             </p>
           </div>
@@ -91,7 +91,7 @@ const Index = () => {
               <Users className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-church-primary">CONNECT</h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-church-text leading-relaxed">
               Be part of our vibrant community through various fellowship programs.
             </p>
           </div>
@@ -102,7 +102,7 @@ const Index = () => {
               <Heart className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-church-primary">GOD'S LOVE</h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-church-text leading-relaxed">
               Experience and share the transforming love of God in our community.
             </p>
           </div>
