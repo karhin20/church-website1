@@ -3,7 +3,7 @@ import { ChatInput } from "@/components/ChatInput";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Church } from "lucide-react";
 
 interface Message {
   text: string;
@@ -40,16 +40,22 @@ const Chat = () => {
     <div className="flex flex-col h-screen bg-church-background">
       {/* Header */}
       <header className="bg-church-primary text-white p-4">
-        <div className="container mx-auto flex items-center">
-          <Link to="/">
-            <Button variant="ghost" className="text-white hover:text-church-secondary">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
-          <div className="ml-4">
-            <h1 className="text-xl font-bold">The Apostolic Church - Gh</h1>
-            <p className="text-sm text-church-secondary">Nii Boiman Central</p>
+        <div className="container mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <Link to="/" className="flex-shrink-0">
+              <Button variant="ghost" className="text-white hover:text-church-secondary p-0 sm:p-2">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Back to Home</span>
+                <span className="sm:hidden">Back</span>
+              </Button>
+            </Link>
+            <div className="flex items-center gap-3">
+              <Church className="h-6 w-6 text-church-secondary hidden sm:block" />
+              <div>
+                <h1 className="text-xl font-bold leading-tight">The Apostolic Church - Gh</h1>
+                <p className="text-sm text-church-secondary">Nii Boiman Central</p>
+              </div>
+            </div>
           </div>
         </div>
       </header>
