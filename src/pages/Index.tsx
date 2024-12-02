@@ -13,16 +13,16 @@ const Index = () => {
       <section className="relative h-screen bg-gradient-to-r from-church-primary to-purple-900 text-white mt-16">
         <div className="absolute inset-0 bg-black/60"></div>
         <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4">
-          <h2 className="text-sm uppercase tracking-wider mb-4 text-church-secondary font-semibold animate-fade-in">Welcome to The Apostolic Church</h2>
+          <h2 className="text-sm uppercase tracking-wider mb-4 text-church-secondary font-semibold animate-fade-in">Welcome to The Apostolic Church - Gh, Nii Boiman Central</h2>
           <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight animate-fade-in delay-100">
             PERFECT CHURCH FOR<br />IMPERFECT PEOPLE
           </h1>
           <p className="max-w-2xl mb-10 text-lg text-gray-200 animate-fade-in delay-200">
-            Join us in worship at Nii Boiman Central as we grow together in faith and community.
+            Join us in worship at Nii Boiman Central Auditorium as we grow together in faith and community.
           </p>
           <Link to="/chat" className="animate-fade-in delay-300">
             <Button className="bg-church-secondary hover:bg-church-secondary/90 text-church-primary px-8 py-6 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105">
-              Chat With Us
+              Chat with Aposor Kofi
             </Button>
           </Link>
         </div>
@@ -66,6 +66,23 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Announcements Section */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">Announcements</h2>
+          <p className="text-center text-church-text mb-12">Stay updated with our latest announcements</p>
+          <div className="max-w-3xl mx-auto aspect-video">
+            <iframe
+              className="w-full h-full rounded-lg shadow-lg"
+              src="https://www.youtube.com/embed/your-video-id"
+              title="Church Announcements"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
       {/* Upcoming Events Section */}
       <UpcomingEvents />
 
@@ -75,20 +92,42 @@ const Index = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Latest Sermons</h2>
           <p className="text-center text-church-accent mb-12">Listen to our most recent messages</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((sermon) => (
-              <div key={sermon} className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-                <h3 className="text-xl font-semibold mb-2">The Power of Faith</h3>
-                <p className="text-church-accent mb-4">Pastor John Doe • March {sermon}, 2024</p>
-                <div className="flex justify-between items-center">
-                  <Button variant="outline" className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
-                    <Play className="w-4 h-4 mr-2" /> Listen
-                  </Button>
-                  <Button variant="outline" className="bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10">
-                    <Download className="w-4 h-4 mr-2" /> Download
-                  </Button>
-                </div>
+            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+              <h3 className="text-xl font-semibold mb-2">The Power of Faith</h3>
+              <p className="text-church-accent mb-4">Pastor Ebo Ansah Awotwi • March 1, 2024</p>
+              <div className="flex justify-between items-center">
+                <Button variant="outline" className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
+                  <Play className="w-4 h-4 mr-2" /> Listen
+                </Button>
+                <Button variant="outline" className="bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10">
+                  <Download className="w-4 h-4 mr-2" /> Download
+                </Button>
               </div>
-            ))}
+            </div>
+            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+              <h3 className="text-xl font-semibold mb-2">Walking in Divine Grace</h3>
+              <p className="text-church-accent mb-4">Apostle J. K. Atinyo • March 2, 2024</p>
+              <div className="flex justify-between items-center">
+                <Button variant="outline" className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
+                  <Play className="w-4 h-4 mr-2" /> Listen
+                </Button>
+                <Button variant="outline" className="bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10">
+                  <Download className="w-4 h-4 mr-2" /> Download
+                </Button>
+              </div>
+            </div>
+            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
+              <h3 className="text-xl font-semibold mb-2">The Spirit of Excellence</h3>
+              <p className="text-church-accent mb-4">Pastor Richard Mensah • March 3, 2024</p>
+              <div className="flex justify-between items-center">
+                <Button variant="outline" className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
+                  <Play className="w-4 h-4 mr-2" /> Listen
+                </Button>
+                <Button variant="outline" className="bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10">
+                  <Download className="w-4 h-4 mr-2" /> Download
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
