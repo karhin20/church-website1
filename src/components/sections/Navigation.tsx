@@ -40,7 +40,7 @@ export const Navigation = () => {
           {/* Social Media Links - Always Visible */}
           <div className="flex items-center space-x-4">
             <a
-              href="https://facebook.com/tacniiboiman"
+              href="https://facebook.com/tac.niiboimancentral"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-church-secondary transition-colors"
@@ -48,7 +48,7 @@ export const Navigation = () => {
               <Facebook className="w-5 h-5" />
             </a>
             <a
-              href="https://youtube.com/@tacniiboiman"
+              href="https://youtube.com/@TAC-NIIBOIMAN"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-church-secondary transition-colors"
@@ -56,7 +56,7 @@ export const Navigation = () => {
               <Youtube className="w-5 h-5" />
             </a>
             <a
-              href="https://tiktok.com/@tacniiboiman"
+              href="https://tiktok.com/@niiboimanCENTRAL"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-church-secondary transition-colors"
