@@ -10,7 +10,7 @@ export const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Text */}
-          <Link to="/" className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-2">
             <img 
               src="/pictures/logo.png" 
               alt="TAC Logo" 
@@ -21,7 +21,7 @@ export const Navigation = () => {
                 <span className="hidden sm:inline">The Apostolic Church - Gh</span>
                 <span className="sm:hidden">TAC-Gh</span>
               </div>
-              <div className="text-xs text-church-secondary">
+              <div className="text-xs text-church-secondary font-bold">
                 <span className="hidden sm:inline">Nii Boiman Central</span>
                 <span className="sm:hidden">NBC</span>
               </div>
