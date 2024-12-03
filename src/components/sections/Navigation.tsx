@@ -14,7 +14,7 @@ export const Navigation = () => {
             <img 
               src="/pictures/logo.png" 
               alt="TAC Logo" 
-              className="h-12 w-auto"
+              className="h-9 w-auto"
             />
             <div className="text-white">
               <div className="font-bold text-sm leading-tight">

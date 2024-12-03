@@ -52,8 +52,7 @@ const Chat = () => {
             <div className="flex items-center gap-3">
               <Church className="h-6 w-6 text-church-secondary hidden sm:block" />
               <div>
-                <h1 className="text-xl font-bold leading-tight">Nii Boiman Central</h1>
-                <p className="text-sm text-church-secondary">Chat with Aposor Kofi</p>
+                <p className="text-sm text-church-secondary font-bold uppercase">Chat with Aposor Kofi, Your Church Buddy</p>
               </div>
             </div>
           </div>
