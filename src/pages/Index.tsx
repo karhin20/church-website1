@@ -1,23 +1,79 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Church, Users, Heart, MessageCircle, Play, Download, Calendar } from "lucide-react";
+import { 
+  Church, 
+  Users, 
+  Heart, 
+  MessageCircle, 
+  Play, 
+  Download, 
+  Calendar, 
+  Facebook, 
+  Youtube, 
+  Map, 
+  Phone, 
+  Mail 
+} from "lucide-react";
 import { Navigation } from "@/components/sections/Navigation";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
+import { useState, useEffect } from "react";
 
 const Index = () => {
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const banners = ["/pictures/banner1.jpg", "/pictures/banner2.jpg"];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-church-background">
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="relative h-screen bg-gradient-to-r from-church-primary to-purple-900 text-white mt-16">
-        <div className="absolute inset-0 bg-black/60"></div>
+      {/* Hero Section with Carousel */}
+      <section className="relative h-screen mt-16">
+        {banners.map((banner, index) => (
+          <div
+            key={banner}
+            className={`absolute inset-0 transition-opacity duration-500 ${
+              index === currentBanner ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{
+              backgroundImage: `url('${banner}')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-church-primary/90 to-purple-900/90"></div>
+          </div>
+        ))}
+
+        {/* Carousel Navigation Dots */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentBanner(index)}
+              className={`w-3 h-3 rounded-full transition-colors ${
+                index === currentBanner
+                  ? 'bg-church-secondary'
+                  : 'bg-white/50 hover:bg-white/75'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Hero Content */}
         <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4">
-          <h2 className="text-sm uppercase tracking-wider mb-4 text-church-secondary font-semibold animate-fade-in">
-            Welcome to The Apostolic Church - Ghana <br /> Nii Boiman Central Assembly
+          <h2 className="text-sm uppercase tracking-wider mb-4 text-white font-bold animate-fade-in">
+            Welcome to The Apostolic Church - Ghana <br /> One Fold, One Shepherd
           </h2>
-          <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight animate-fade-in delay-100">
-            PERFECT CHURCH FOR<br />IMPERFECT PEOPLE
+          <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight animate-fade-in delay-100 text-church-secondary">
+            NII BOIMAN<br />CENTRAL ASSEMBLY
           </h1>
           <p className="max-w-2xl mb-10 text-lg text-gray-200 animate-fade-in delay-200">
             Join us in worship at Nii Boiman Central Auditorium as we grow together in faith and community.
@@ -155,7 +211,7 @@ const Index = () => {
             {[1, 2, 3].map((news) => (
               <div key={news} className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
                 <img 
-                  src={`https://images.unsplash.com/photo-1473177104440-${news}`} 
+                  src={`/pictures/community${news}.jpg`} 
                   alt="Church news" 
                   className="w-full h-48 object-cover"
                 />
@@ -183,18 +239,18 @@ const Index = () => {
           <p className="text-center text-church-text mb-12">Moments captured in our church community</p>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
-              "1473177104440",
-              "1494891848038",
-              "1551038247",
-              "1524230572899",
-              "1433832597046",
-              "1493397212122",
-              "1466442929976",
-              "1492321936769"
-            ].map((imageId) => (
-              <div key={imageId} className="relative group overflow-hidden rounded-lg aspect-square">
+              "image1.jpg",
+              "image2.jpg",
+              "image3.jpg",
+              "image4.jpg",
+              "image5.jpg",
+              "image6.jpg",
+              "image7.jpg",
+              "image8.jpg"
+            ].map((image) => (
+              <div key={image} className="relative group overflow-hidden rounded-lg aspect-square">
                 <img
-                  src={`https://images.unsplash.com/photo-${imageId}`}
+                  src={`/pictures/${image}`}
                   alt="Church gallery"
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
@@ -208,6 +264,94 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Footer Section */}
+      <footer className="bg-church-primary text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-12">
+            {/* Contact Information */}
+            <div>
+              <h3 className="text-xl font-bold mb-6">Contact Us</h3>
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <Map className="w-5 h-5 mr-3 text-church-secondary" />
+                  <p>Nii Boiman West Road, Accra, Ghana</p>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="w-5 h-5 mr-3 text-church-secondary" />
+                  <p>+233 24 123 4567</p>
+                </div>
+                <div className="flex items-center">
+                  <Mail className="w-5 h-5 mr-3 text-church-secondary" />
+                  <p>info@tacniiboiman.org</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="text-xl font-bold mb-6">Quick Links</h3>
+              <div className="space-y-3">
+                <Link to="/about" className="block hover:text-church-secondary transition-colors">About Us</Link>
+                <Link to="/sermons" className="block hover:text-church-secondary transition-colors">Sermons</Link>
+                <Link to="/events" className="block hover:text-church-secondary transition-colors">Events</Link>
+                <Link to="/contact" className="block hover:text-church-secondary transition-colors">Contact</Link>
+              </div>
+            </div>
+
+            {/* Map and Social Links */}
+            <div>
+              <h3 className="text-xl font-bold mb-6">Location & Social Media</h3>
+              {/* Google Maps Embed */}
+              <div className="mb-6 rounded-lg overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.7358124867687!2d-0.2572909243561401!3d5.605986433143636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf9907a958ff31%3A0x6bf8d0c7685caae6!2sThe%20Apostolic%20Church%20Nii%20Boiman%20Assembly!5e0!3m2!1sen!2sgh!4v1733188166229!5m2!1sen!2sgh"
+                  width="100%"
+                  height="200"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+              {/* Social Media Links */}
+              <div className="flex space-x-4">
+                <a
+                  href="https://facebook.com/tacniiboiman"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-church-secondary text-church-primary p-2 rounded-full hover:bg-church-secondary/90 transition-colors"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://youtube.com/@tacniiboiman"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-church-secondary text-church-primary p-2 rounded-full hover:bg-church-secondary/90 transition-colors"
+                >
+                  <Youtube className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://tiktok.com/@tacniiboiman"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-church-secondary text-church-primary p-2 rounded-full hover:bg-church-secondary/90 transition-colors"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="border-t border-white/10 mt-12 pt-8 text-center">
+            <p>&copy; {new Date().getFullYear()} The Apostolic Church - Ghana, Nii Boiman Central Assembly. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
 
       {/* Chat Button (Fixed) */}
       <div className="fixed bottom-8 right-8">
