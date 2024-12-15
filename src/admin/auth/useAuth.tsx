@@ -21,19 +21,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const auth = getFirebaseAuth();
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setUser(user);
-      if (user) {
-        const role = await getUserRole(user.uid);
-        setUserRole(role);
-      } else {
-        setUserRole(null);
-      }
-      setLoading(false);
-    });
+    const init = async () => {
+      await initializeFirebase();
+      const auth = getFirebaseAuth();
+      const unsubscribe = auth.onAuthStateChanged(async (user) => {
+        setUser(user);
+        if (user) {
+          const role = await getUserRole(user.uid);
+          setUserRole(role);
+        } else {
+          setUserRole(null);
+        }
+        setLoading(false);
+      });
 
-    return unsubscribe;
+      return unsubscribe;
+    };
+
+    init();
   }, []);
 
   const value = {

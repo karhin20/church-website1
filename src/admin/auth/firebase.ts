@@ -61,7 +61,11 @@ class FirebaseService {
 const firebaseService = FirebaseService.getInstance();
 
 export const initializeFirebase = () => firebaseService.initialize();
-export const getFirebaseAuth = () => firebaseService.auth;
+export const getFirebaseAuth = () => {
+  const auth = firebaseService.auth;
+  console.log('Firebase Auth:', auth);
+  return auth;
+};
 export const getFirebaseFirestore = () => firebaseService.firestore;
 export const getFirebaseStorage = () => firebaseService.storage;
 export const isFirebaseInitialized = () => firebaseService.isInitialized(); 
