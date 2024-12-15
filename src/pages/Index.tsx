@@ -47,7 +47,7 @@ const Index = () => {
               backgroundPosition: 'center',
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-church-primary/70 to-purple-900/70"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-church-primary/80 to-purple-900/80"></div>
           </div>
         ))}
 
