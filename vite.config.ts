@@ -15,7 +15,7 @@ export default defineConfig({
     strictPort: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://backend-church.vercel.app',
         changeOrigin: true,
         secure: false,
       },
