@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ChatProvider } from '@/contexts/ChatContext';
@@ -33,23 +33,16 @@ const queryClient = new QueryClient({
 })
 
 function App() {
-  const [isInitialized, setIsInitialized] = useState(false);
-
   useEffect(() => {
     const init = async () => {
       try {
         await initializeFirebase();
-        setIsInitialized(true);
       } catch (error) {
         console.error('Failed to initialize Firebase:', error);
       }
     };
     init();
   }, []);
-
-  if (!isInitialized) {
-    return <div>Loading...</div>; // Or your loading component
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
