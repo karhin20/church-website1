@@ -1,37 +1,21 @@
-import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 interface ChatMessageProps {
   message: string;
-  isBot?: boolean;
+  isBot: boolean;
   isLoading?: boolean;
 }
 
-export const ChatMessage = ({ message, isBot = false, isLoading = false }: ChatMessageProps) => {
+export const ChatMessage = ({ message, isBot, isLoading }: ChatMessageProps) => {
   return (
-    <div
-      className={cn(
-        "flex w-full",
-        isBot ? "justify-start" : "justify-end"
-      )}
-    >
+    <div className={`flex ${isBot ? 'justify-start' : 'justify-end'}`}>
       <div
-        className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2 mb-2",
-          isBot
-            ? "bg-church-accent text-church-text rounded-tl-none"
-            : "bg-church-primary text-white rounded-tr-none"
-        )}
+        className={`max-w-[100%] rounded-lg p-3 font-bold ${
+          isBot ? 'bg-muted' : 'bg-primary text-primary-foreground'
+        }`}
       >
-        {isLoading ? (
-          <div className="flex space-x-1">
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:0.2s]" />
-            <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:0.4s]" />
-          </div>
-        ) : (
-          <p className="whitespace-pre-wrap">{message}</p>
-        )}
+        {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <strong>{message}</strong>}
       </div>
     </div>
   );
-};
+}; 
