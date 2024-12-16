@@ -65,11 +65,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  console.log('Initialized:', initialized);
-  console.log('Loading:', loading);
-  console.log('User:', user);
-  console.log('User Role:', userRole);
-
   return (
     <AuthContext.Provider value={value}>
       {children}
