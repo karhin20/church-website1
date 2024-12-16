@@ -53,7 +53,7 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <header className="bg-[#4C1D95] text-white p-4">
+      <header className="fixed top-0 left-0 right-0 bg-[#4C1D95] text-white p-4 z-10">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link to="/" className="flex-shrink-0">
@@ -76,54 +76,52 @@ const ChatInterface = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col">
-        <div className="overflow-y-auto p-4 space-y-4 flex-1">
-          {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-              <MessageSquare className="h-12 w-12 mb-4" />
-              <h3 className="font-semibold">Welcome to Church Chat!</h3>
-              <p>Start a conversation by typing a message below.</p>
-              <p className="mt-2 text-muted-foreground">"Ask, and it will be given to you; seek, and you will find; knock, and it will be opened to you." - Matthew 7:7</p>
-            </div>
-          ) : (
-            <>
-              {messages.map((message, index) => (
-                <ChatMessage
-                  key={index}
-                  content={message.content}
-                  isUser={message.isUser}
-                />
-              ))}
-              {isLoading && (
-                <ChatMessage
-                  content=""
-                  isUser={false}
-                  isLoading={true}
-                />
-              )}
-            </>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-4 border-t">
-          <div className="flex gap-2">
-            <Input
-              ref={inputRef}
-              placeholder="Type your message..."
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-              className="px-4"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
+      <div className="flex-1 pt-16 pb-16 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+            <MessageSquare className="h-12 w-12 mb-4" />
+            <h3 className="font-semibold">Welcome to Church Chat!</h3>
+            <p>Start a conversation by typing a message below.</p>
+            <p className="mt-2 text-muted-foreground">"Ask, and it will be given to you; seek, and you will find; knock, and it will be opened to you." - Matthew 7:7</p>
           </div>
-        </form>
+        ) : (
+          <>
+            {messages.map((message, index) => (
+              <ChatMessage
+                key={index}
+                content={message.content}
+                isUser={message.isUser}
+              />
+            ))}
+            {isLoading && (
+              <ChatMessage
+                content=""
+                isUser={false}
+                isLoading={true}
+              />
+            )}
+          </>
+        )}
+        <div ref={messagesEndRef} />
       </div>
+
+      <form onSubmit={handleSubmit} className="fixed bottom-0 left-0 right-0 p-4 border-t bg-background z-10">
+        <div className="flex gap-2">
+          <Input
+            ref={inputRef}
+            placeholder="Type your message..."
+            disabled={isLoading}
+            className="flex-1"
+          />
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+            className="px-4"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
