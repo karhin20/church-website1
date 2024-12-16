@@ -11,11 +11,7 @@ export const ProtectedRoute = ({
   children, 
   allowedRoles = [ROLES.ADMIN] 
 }: ProtectedRouteProps) => {
-  const { user, userRole, loading } = useAuth();
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const { user, userRole } = useAuth();
 
   if (!user || !userRole || !allowedRoles.includes(userRole)) {
     return <Navigate to="/login" />;

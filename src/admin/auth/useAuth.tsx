@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { getFirebaseAuth, initializeFirebase, isFirebaseInitialized } from './firebase';
 import { getUserRole } from './auth';
 import type { User } from 'firebase/auth';
-import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface AuthContextType {
   user: User | null;
@@ -63,8 +62,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   if (!initialized || loading) {
-    return <LoadingSpinner />;
+    return null;
   }
+
+  console.log('Initialized:', initialized);
+  console.log('Loading:', loading);
+  console.log('User:', user);
+  console.log('User Role:', userRole);
 
   return (
     <AuthContext.Provider value={value}>

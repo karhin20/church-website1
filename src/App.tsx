@@ -5,9 +5,6 @@ import { ChatProvider } from '@/contexts/ChatContext';
 import { AuthProvider } from '@/admin/auth/useAuth';
 import ChatInterface from '@/components/ChatInterface';
 import { initializeFirebase } from '@/admin/auth/firebase';
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Chat from "./pages/Chat";
@@ -23,14 +20,7 @@ import AnnouncementManager from '@/components/admin/AnnouncementManager';
 import GalleryManager from '@/components/admin/GalleryManager';
 
 // Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      cacheTime: 1000 * 60 * 30, // 30 minutes
-    },
-  },
-})
+const queryClient = new QueryClient();
 
 function App() {
   useEffect(() => {
@@ -68,7 +58,6 @@ function App() {
                 <Route path="sermons" element={<SermonManager />} />
                 <Route path="announcements" element={<AnnouncementManager />} />
                 <Route path="gallery" element={<GalleryManager />} />
-                <Route path="chat" element={<ChatInterface />} />
               </Route>
 
               {/* Member Dashboard */}
