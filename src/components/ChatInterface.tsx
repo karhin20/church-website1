@@ -83,8 +83,7 @@ const ChatInterface = () => {
             <h3 className="font-semibold">Welcome to Church Chat!</h3>
             <p>Start a conversation by typing a message below.</p>
             <p className="mt-2 text-muted-foreground">"Ask, and it will be given to you; seek, and you will find; knock, and it will be opened to you." - Matthew 7:7</p>
-            <p className="mt-1 text-muted-foreground">Feel free to ask any questions about faith, spirituality, or the teachings of Christ.</p>
-          </div>
+             </div>
         ) : (
           <>
             {messages.map((message, index) => (
