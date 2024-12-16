@@ -67,7 +67,7 @@ const ChatInterface = () => {
               <div>
                 <p className="text-base text-church-secondary font-extrabold">
                   I AM APOSOR KOFI<br />
-                  <span className="text-base text-church-secondary">Ask me faith questions.</span>
+                  <span className="text-base text-church-secondary">Ask me faith-based questions.</span>
                 </p>
               </div>
             </div>

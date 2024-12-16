@@ -5,7 +5,9 @@ const urlsToCache = [
   '/manifest.json',
   '/logo.png',
   '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/icons/icon-512x512.png',
+  '/static/js/bundle.js', // Add your JS bundle
+  '/static/css/main.css'  // Add your CSS files
 ];
 
 self.addEventListener('install', (event) => {
