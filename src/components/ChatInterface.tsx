@@ -66,7 +66,8 @@ const ChatInterface = () => {
               <Church className="h-6 w-6 text-secondary hidden sm:block" />
               <div>
                 <p className="text-base text-church-secondary font-extrabold">
-                  I AM APOSOR KOFI<br /> Here to assist with your faith-based questions.
+                  I AM APOSOR KOFI<br />
+                  <span className="text-base text-church-secondary">Your Church Assistant, ready to help with your faith questions.</span>
                 </p>
               </div>
             </div>
@@ -81,6 +82,8 @@ const ChatInterface = () => {
             <MessageSquare className="h-12 w-12 mb-4" />
             <h3 className="font-semibold">Welcome to Church Chat!</h3>
             <p>Start a conversation by typing a message below.</p>
+            <p className="mt-2 text-muted-foreground">"Ask, and it will be given to you; seek, and you will find; knock, and it will be opened to you." - Matthew 7:7</p>
+            <p className="mt-1 text-muted-foreground">Feel free to ask any questions about faith, spirituality, or the teachings of Christ.</p>
           </div>
         ) : (
           <>
