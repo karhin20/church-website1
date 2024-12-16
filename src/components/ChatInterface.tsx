@@ -66,7 +66,7 @@ const ChatInterface = () => {
               <Church className="h-6 w-6 text-secondary hidden sm:block" />
               <div>
                 <p className="text-base text-church-secondary font-extrabold">
-                  I AM APOSOR KOFI<br />Ask me church related questions
+                  I AM APOSOR KOFI<br /> Here to guide you through your faith-based inquiries and provide insightful answers.
                 </p>
               </div>
             </div>
