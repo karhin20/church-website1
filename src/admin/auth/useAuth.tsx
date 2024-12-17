@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   if (!initialized || loading) {
-    return null;
+    return <div>Loading...</div>;
   }
 
   return (
