@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { getFirebaseAuth, initializeFirebase, isFirebaseInitialized } from './firebase';
 import { getUserRole } from './auth';
 import type { User } from 'firebase/auth';
+import Loading from './Loading'; 
 
 interface AuthContextType {
   user: User | null;
@@ -10,12 +11,7 @@ interface AuthContextType {
   initialized: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  userRole: null,
-  loading: true,
-  initialized: false,
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -62,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   if (!initialized || loading) {
-    return <div>Loading...</div>;
+    return <Loading />; // Use the new Loading component
   }
 
   return (
