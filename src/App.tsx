@@ -1,67 +1,56 @@
-import { useEffect } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ChatProvider } from '@/contexts/ChatContext';
-import { AuthProvider } from '@/admin/auth/useAuth';
-import ChatInterface from '@/components/ChatInterface';
-import { initializeFirebase } from '@/admin/auth/firebase';
-import { Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Chat from "./pages/Chat";
-import { ProtectedRoute } from './admin/auth/ProtectedRoute';
-import { ROLES } from './admin/auth/auth';
-import SignUp from './pages/SignUp';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import AdminLayout from '@/components/layouts/AdminLayout';
-import DashboardOverview from '@/pages/admin/DashboardOverview';
-import SermonManager from '@/components/admin/SermonManager';
-import AnnouncementManager from '@/components/admin/AnnouncementManager';
-import GalleryManager from '@/components/admin/GalleryManager';
+import Loading from '@/admin/auth/Loading';
 
-// Create a client
+// Lazy load components that need Firebase
+const AuthProvider = lazy(() => import('@/admin/auth/useAuth').then(module => ({ default: module.AuthProvider })));
+const ChatProviderLazy = lazy(() => import('@/contexts/ChatContext').then(module => ({ default: module.ChatProvider })));
+const AdminLayout = lazy(() => import('@/components/layouts/AdminLayout'));
+const DashboardOverview = lazy(() => import('@/pages/admin/DashboardOverview'));
+const SermonManager = lazy(() => import('@/components/admin/SermonManager'));
+const AnnouncementManager = lazy(() => import('@/components/admin/AnnouncementManager'));
+const GalleryManager = lazy(() => import('@/components/admin/GalleryManager'));
+
+// Immediately load components that don't need Firebase
+import Index from "./pages/Index";
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import Chat from './pages/Chat';
+
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ChatProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/chat" element={<ChatInterface />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/login" element={<Login />} />
-              
-              {/* Admin Routes */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute allowedRoles={[ROLES.MEMBER,ROLES.ADMIN]}>
-                    <AdminLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<DashboardOverview />} />
-                <Route path="sermons" element={<SermonManager />} />
-                <Route path="announcements" element={<AnnouncementManager />} />
-                <Route path="gallery" element={<GalleryManager />} />
-              </Route>
+      <Router>
+        <ChatProviderLazy>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/chat" element={<Chat />} />
 
-              {/* Member Dashboard */}
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute allowedRoles={[ROLES.MEMBER, ROLES.ADMIN]}>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-            </Routes>
-          </Router>
-        </ChatProvider>
-      </AuthProvider>
+            {/* Protected routes */}
+            <Route path="/admin/*" element={
+              <Suspense fallback={<Loading />}>
+                <AuthProvider>
+                  <AdminLayout />
+                </AuthProvider>
+              </Suspense>
+            }>
+              <Route index element={<DashboardOverview />} />
+              <Route path="sermons" element={<SermonManager />} />
+              <Route path="announcements" element={<AnnouncementManager />} />
+              <Route path="gallery" element={<GalleryManager />} />
+            </Route>
+
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ChatProviderLazy>
+      </Router>
     </QueryClientProvider>
   );
 }

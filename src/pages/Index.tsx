@@ -12,15 +12,18 @@ import {
   Youtube, 
   Map, 
   Phone, 
-  Mail 
+  Mail, 
+  X
 } from "lucide-react";
 import { Navigation } from "@/components/sections/Navigation";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { useState, useEffect } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const Index = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
   const banners = ["/pictures/banner1.jpg", "/pictures/banner2.jpg"];
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -248,7 +251,11 @@ const Index = () => {
               "image7.jpg",
               "image8.jpg"
             ].map((image) => (
-              <div key={image} className="relative group overflow-hidden rounded-lg aspect-square">
+              <div 
+                key={image} 
+                className="relative group overflow-hidden rounded-lg aspect-square cursor-pointer"
+                onClick={() => setSelectedImage(`/pictures/${image}`)}
+              >
                 <img
                   src={`/pictures/${image}`}
                   alt="Church gallery"
@@ -264,6 +271,27 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Image Modal */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden bg-transparent border-0">
+          {selectedImage && (
+            <div className="relative w-full h-full">
+              <img
+                src={selectedImage}
+                alt="Gallery preview"
+                className="w-full h-full object-contain"
+              />
+              <Button
+                className="absolute top-2 right-2 bg-black/50 hover:bg-black/75 text-white rounded-full p-2"
+                onClick={() => setSelectedImage(null)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Footer Section */}
       <footer className="bg-church-primary text-white py-16">

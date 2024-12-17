@@ -66,7 +66,7 @@ const ChatInterface = () => {
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link to="/" className="flex-shrink-0">
-            <Button variant="ghost" className="text-white hover:text-church-secondary p-0 sm:p-2">
+              <Button variant="ghost" className="text-white hover:text-church-secondary p-0 sm:p-2">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 <span>Back to Home</span>
               </Button>
