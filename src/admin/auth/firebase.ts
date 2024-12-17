@@ -26,7 +26,7 @@ class FirebaseService {
     if (this.initialized) return;
 
     try {
-      const response = await fetch('https://backend-church.vercel.app/api/auth/config', {
+      const response = await fetch('/api/auth/config', {
         method: 'POST',
         credentials: 'include',
         headers: {

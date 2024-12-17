@@ -15,11 +15,14 @@ export default defineConfig({
     strictPort: false,
     proxy: {
       '/api': {
-        target: 'https://backend-church.vercel.app',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },
     },
   },
   base: '/',
+  optimizeDeps: {
+    include: ['react', 'react-dom']
+  }
 });

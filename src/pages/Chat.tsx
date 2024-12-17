@@ -24,7 +24,7 @@ const Chat = () => {
       setMessages((prev) => [...prev, { text: message, isBot: false }]);
       setIsLoading(true);
 
-      const response = await fetch('https://backend-church.vercel.app/api/chat/send', {
+      const response = await fetch('/api/chat/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ const Chat = () => {
 
   const handleResetChat = async () => {
     try {
-      await fetch('https://backend-church.vercel.app/api/chat/reset', {
+      await fetch('/api/chat/reset', {
         method: 'POST',
       });
       setMessages([

@@ -49,6 +49,12 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --church-primary: 76, 29, 149;    /* RGB values for #4C1D95 */
+    --church-secondary: 255, 215, 0;  /* RGB values for #FFD700 */
+    --church-accent: 229, 231, 235;   /* RGB values for #E5E7EB */
+    --church-background: 249, 250, 251; /* RGB values for #F9FAFB */
+    --church-text: 31, 41, 55;        /* RGB values for #1F2937 */
   }
 
   .dark {
@@ -98,4 +104,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Add these utility classes if needed */
+.bg-church-gradient {
+  background: linear-gradient(to right, rgb(var(--church-primary) / 0.9), rgb(0 0 0 / 0.75));
+}
+
+.text-church-gold {
+  color: rgb(var(--church-secondary));
 }

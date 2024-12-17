@@ -24,7 +24,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       setMessages(prev => [...prev, { content, isUser: true }]);
 
       // Send message to our backend API
-      const response = await fetch('https://backend-church.vercel.app/chat/send', {
+      const response = await fetch('http://localhost:5000/chat/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useChat } from '@/contexts/ChatContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,11 @@ const ChatInterface = () => {
   const { messages, sendMessage, isLoading } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,14 +47,18 @@ const ChatInterface = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const input = inputRef.current;
-    if (input && input.value.trim() && !isLoading) {
-      await sendMessage(input.value);
-      input.value = '';
+    if (inputValue.trim() && !isLoading) {
+      await sendMessage(inputValue);
+      setInputValue("");
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
     }
   };
 
-
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -109,6 +118,8 @@ const ChatInterface = () => {
         <div className="flex gap-2">
           <Input
             ref={inputRef}
+            value={inputValue}
+            onChange={handleInputChange}
             placeholder="Type your message..."
             disabled={isLoading}
             className="flex-1"

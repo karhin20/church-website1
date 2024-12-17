@@ -47,7 +47,7 @@ const Index = () => {
               backgroundPosition: 'center',
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-church-primary/80 to-purple-900/80"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-church-primary/90 to-black/75"></div>
           </div>
         ))}
 
@@ -90,7 +90,7 @@ const Index = () => {
       <section className="py-24 bg-church-background">
         <div className="container mx-auto grid md:grid-cols-3 gap-12 px-4">
           {/* Worship */}
-          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-lg bg-white shadow-lg">
+          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-xl bg-white shadow-lg border border-gray-100">
             <div className="flex justify-center mb-6">
               <Church className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
             </div>
@@ -101,7 +101,7 @@ const Index = () => {
           </div>
 
           {/* Connect */}
-          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-lg bg-white shadow-lg">
+          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-xl bg-white shadow-lg border border-gray-100">
             <div className="flex justify-center mb-6">
               <Users className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
             </div>
@@ -112,7 +112,7 @@ const Index = () => {
           </div>
 
           {/* God's Love */}
-          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-lg bg-white shadow-lg">
+          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-xl bg-white shadow-lg border border-gray-100">
             <div className="flex justify-center mb-6">
               <Heart className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
             </div>
