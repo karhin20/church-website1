@@ -37,6 +37,20 @@ const ChatInterface = () => {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    const handleFocus = () => {
+      setTimeout(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+      }, 100);
+    };
+
+    inputRef.current?.addEventListener('focus', handleFocus);
+    
+    return () => {
+      inputRef.current?.removeEventListener('focus', handleFocus);
+    };
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -61,7 +75,7 @@ const ChatInterface = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-[100dvh] bg-background max-w-4xl mx-auto">
       <header className="bg-[#4C1D95] text-white p-4">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
