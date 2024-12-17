@@ -37,20 +37,6 @@ const ChatInterface = () => {
     inputRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    const handleFocus = () => {
-      setTimeout(() => {
-        window.scrollTo(0, document.body.scrollHeight);
-      }, 100);
-    };
-
-    inputRef.current?.addEventListener('focus', handleFocus);
-    
-    return () => {
-      inputRef.current?.removeEventListener('focus', handleFocus);
-    };
-  }, []);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -128,10 +114,7 @@ const ChatInterface = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <form 
-        onSubmit={handleSubmit} 
-        className="p-4 border-t transition-all duration-300 focus-within:pb-32 md:focus-within:pb-4"
-      >
+      <form onSubmit={handleSubmit} className="p-4 border-t">
         <div className="flex gap-2">
           <Input
             ref={inputRef}
