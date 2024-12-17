@@ -23,17 +23,6 @@ import GalleryManager from '@/components/admin/GalleryManager';
 const queryClient = new QueryClient();
 
 function App() {
-  useEffect(() => {
-    const init = async () => {
-      try {
-        await initializeFirebase();
-      } catch (error) {
-        console.error('Failed to initialize Firebase:', error);
-      }
-    };
-    init();
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
