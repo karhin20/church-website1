@@ -70,7 +70,7 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background max-w-4xl mx-auto">
-      <header className="fixed top-0 left-0 w-full h-auto bg-[#4C1D95] text-white p-4">
+       <header className="bg-[#4C1D95] text-white p-4">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link to="/" className="flex-shrink-0">
