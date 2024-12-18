@@ -11,8 +11,8 @@ export default defineConfig({
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'serviceWorkerRegistration.ts',
-      injectRegister: false, // We're using our own registration
-      manifest: false, // We'll use our own manifest.json from public folder
+      injectRegister: false, 
+      manifest: false, 
       injectManifest: {
         injectionPoint: undefined
       }
