@@ -60,6 +60,13 @@ const ChatInterface = () => {
     setInputValue(e.target.value);
   };
 
+  const handleInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    if (window.innerWidth <= 768) {
+      e.preventDefault();
+      inputRef.current?.focus();
+    }
+  };
+
   return (
     <div className="flex flex-col h-[100dvh] bg-background max-w-4xl mx-auto">
       <header className="bg-[#4C1D95] text-white p-4">
@@ -120,6 +127,7 @@ const ChatInterface = () => {
             ref={inputRef}
             value={inputValue}
             onChange={handleInputChange}
+            onClick={handleInputClick}
             placeholder="Type your message..."
             disabled={isLoading}
             className="flex-1"
