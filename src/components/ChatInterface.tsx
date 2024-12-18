@@ -32,10 +32,13 @@ const ChatInterface = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState("");
+  const [firstMessageSent, setFirstMessageSent] = useState(false);
 
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (!firstMessageSent) {
+      inputRef.current?.focus();
+    }
+  }, [firstMessageSent]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -50,9 +53,7 @@ const ChatInterface = () => {
     if (inputValue.trim() && !isLoading) {
       await sendMessage(inputValue);
       setInputValue("");
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
+      setFirstMessageSent(true);
     }
   };
 
@@ -61,7 +62,7 @@ const ChatInterface = () => {
   };
 
   const handleInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 768 && firstMessageSent) {
       e.preventDefault();
       inputRef.current?.focus();
     }
@@ -69,7 +70,7 @@ const ChatInterface = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background max-w-4xl mx-auto">
-      <header className="bg-[#4C1D95] text-white p-4">
+      <header className="fixed top-0 left-0 w-full h-auto bg-[#4C1D95] text-white p-2">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link to="/" className="flex-shrink-0">
@@ -81,13 +82,11 @@ const ChatInterface = () => {
             <div className="flex items-center gap-3">
               <Church className="h-6 w-6 text-secondary hidden sm:block" />
               <div>
-                <p className="text-base text-church-secondary font-extrabold">
-                  I AM APOSOR KOFI<br />
-                  <span className="text-base text-church-secondary">Your AI church friend.</span>
+                <p className="text-base text-church-secondary">
+                  <span>I am APOSOR KOFI, your AI church friend </span>
                 </p>
               </div>
             </div>
-
           </div>
         </div>
       </header>
