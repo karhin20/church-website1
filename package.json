@@ -70,6 +70,8 @@
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.9.0",
@@ -82,8 +84,7 @@
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.0.1",
     "vite": "latest",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@typescript-eslint/parser": "latest"
+    "vite-plugin-pwa": "^0.21.1"
   },
   "engines": {
     "node": ">=18.18.0"
