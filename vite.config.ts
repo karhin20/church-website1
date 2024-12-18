@@ -8,13 +8,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      strategies: 'injectManifest',
+      registerType: 'autoUpdate',
       srcDir: 'src',
-      filename: 'sw.ts',
+      filename: 'sw.js',
       injectRegister: 'auto',
       manifest: {
-        name: 'Your App Name',
-        short_name: 'App',
+        name: 'TAC-NBC',
+        short_name: 'TAC-NBC',
         theme_color: '#ffffff',
         icons: [
           {
