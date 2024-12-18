@@ -10,11 +10,27 @@ export default defineConfig({
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src',
-      filename: 'serviceWorkerRegistration.ts',
-      injectRegister: false, 
-      manifest: false, 
+      filename: 'sw.ts',
+      injectRegister: 'auto',
+      manifest: {
+        name: 'Your App Name',
+        short_name: 'App',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: '/icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      },
       injectManifest: {
-        injectionPoint: undefined
+        injectionPoint: 'self.__WB_MANIFEST'
       }
     })
   ],
