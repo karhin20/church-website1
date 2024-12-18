@@ -1,11 +1,12 @@
 {
-  "name": "TAC-GH Nii Boiman Central",
-  "short_name": "TAC NBC",
-  "description": "The Apostolic Church Ghana - Nii Boiman Central Assembly",
-  "start_url": "/",
-  "display": "standalone",
+  "name": "TAC-GH, Nii Boiman Central",
+  "short_name": "TAC-NBC",
+  "description": "Connect with us, chat with our christian-based AI chatbot.",
+  "theme_color": "#4C1D95",
   "background_color": "#ffffff",
-  "theme_color": "#1a1a1a",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
