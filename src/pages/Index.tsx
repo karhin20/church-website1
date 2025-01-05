@@ -20,6 +20,7 @@ import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import easterSermon from '@/assets/audio/EASTER CONVENTION (CLIMAX) __ MESSAGE BY_ APOSTLE DR. J. K. ATINYO __ 31st March, 2024.mp3';
+import gloryConference from '@/assets/audio/ebo ansah catch the glory.mp3';
 
 const Index = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -157,19 +158,37 @@ const Index = () => {
           <p className="text-center text-church-accent mb-12">Listen to our most recent messages</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2">The Power of Faith</h3>
-              <p className="text-church-accent mb-4">Pastor Ebo Ansah Awotwi • March 1, 2024</p>
-              <div className="flex justify-between items-center">
-                <Button variant="outline" className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
-                  <Play className="w-4 h-4 mr-2" /> Listen
-                </Button>
-                <Button variant="outline" className="bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10">
-                  <Download className="w-4 h-4 mr-2" /> Download
+              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Catch The Glory Conference 2024</h3>
+              <p className="text-church-accent mb-4">Pastor Ebo Ansah Awotwi • March 2024</p>
+              <div className="mt-4">
+                <audio 
+                  controls 
+                  className="w-full"
+                  src={gloryConference}
+                  preload="metadata"
+                >
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+              <div className="mt-4">
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10"
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = gloryConference;
+                    link.download = 'CATCH THE GLORY CONFERENCE 2024 - Pastor Ebo Awotwi.mp3';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-2" /> Download Audio
                 </Button>
               </div>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2">Walking in Divine Grace</h3>
+              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Benefit of the Resurrection</h3>
               <p className="text-church-accent mb-4">Apostle J. K. Atinyo • March 31, 2024</p>
               <div className="mt-4">
                 <audio 
@@ -199,7 +218,7 @@ const Index = () => {
               </div>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2">Giving</h3>
+              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Giving</h3>
               <p className="text-church-accent mb-4">Pastor Richard Mensah </p>
               <div className="mt-4">
                 <iframe 
@@ -213,6 +232,21 @@ const Index = () => {
                 ></iframe>
               </div>
             </div>
+          </div>
+          
+          <div className="flex justify-center mt-12">
+            <a 
+              href="https://open.spotify.com/show/7LOx7uSxQbVdE0PiADRClU" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              <Button 
+                className="bg-church-secondary text-church-primary hover:bg-church-secondary/90 px-8 py-6 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2"
+              >
+                <Play className="w-5 h-5" />
+                Listen to More Sermons
+              </Button>
+            </a>
           </div>
         </div>
       </section>
