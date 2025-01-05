@@ -18,7 +18,7 @@ export const Navigation = () => {
             />
             <div className="text-white">
               <div className="font-bold text-sm leading-tight">
-                <span className="hidden sm:inline">The Apostolic Church - Gh</span>
+                <span className="hidden sm:inline">The Apostolic Church-Ghana</span>
                 <span className="sm:hidden">TAC-GH</span>
               </div>
               <div className="text-xs text-church-secondary font-bold">

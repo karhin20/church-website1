@@ -19,6 +19,7 @@ import { Navigation } from "@/components/sections/Navigation";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import easterSermon from '@/assets/audio/EASTER CONVENTION (CLIMAX) __ MESSAGE BY_ APOSTLE DR. J. K. ATINYO __ 31st March, 2024.mp3';
 
 const Index = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -132,22 +133,12 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">Announcements</h2>
           <p className="text-center text-church-text mb-12">Stay updated with our latest announcements</p>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="aspect-video">
+          <div className="flex justify-center">
+            <div className="aspect-video w-full max-w-3xl">
               <iframe
                 className="w-full h-full rounded-lg shadow-lg"
-                 src="https://www.youtube.com/embed/EB1NpZejEUo" 
-                 title="Annual Fundraising" 
-                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                 allowFullScreen
-              ></iframe>
-            </div>
-
-            <div className="aspect-video">
-              <iframe
-                className="w-full h-full rounded-lg shadow-lg"
-                src="https://www.youtube.com/embed/qWySWBN_Wj0" 
-                title="Annual Harvest"
+                src="https://www.youtube.com/embed/G051e0dSoW4" 
+                title="ANNOUNCEMENT, 5th January, 2025" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
@@ -179,26 +170,47 @@ const Index = () => {
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
               <h3 className="text-xl font-semibold mb-2">Walking in Divine Grace</h3>
-              <p className="text-church-accent mb-4">Apostle J. K. Atinyo • March 2, 2024</p>
-              <div className="flex justify-between items-center">
-                <Button variant="outline" className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
-                  <Play className="w-4 h-4 mr-2" /> Listen
-                </Button>
-                <Button variant="outline" className="bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10">
-                  <Download className="w-4 h-4 mr-2" /> Download
+              <p className="text-church-accent mb-4">Apostle J. K. Atinyo • March 31, 2024</p>
+              <div className="mt-4">
+                <audio 
+                  controls 
+                  className="w-full"
+                  src={easterSermon}
+                  preload="metadata"
+                >
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+              <div className="mt-4">
+                <Button 
+                  variant="outline" 
+                  className="w-full bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10"
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = easterSermon;
+                    link.download = 'EASTER CONVENTION - Apostle Dr. J. K. Atinyo.mp3';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-2" /> Download Audio
                 </Button>
               </div>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2">The Spirit of Excellence</h3>
-              <p className="text-church-accent mb-4">Pastor Richard Mensah • March 3, 2024</p>
-              <div className="flex justify-between items-center">
-                <Button variant="outline" className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
-                  <Play className="w-4 h-4 mr-2" /> Listen
-                </Button>
-                <Button variant="outline" className="bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10">
-                  <Download className="w-4 h-4 mr-2" /> Download
-                </Button>
+              <h3 className="text-xl font-semibold mb-2">Giving</h3>
+              <p className="text-church-accent mb-4">Pastor Richard Mensah </p>
+              <div className="mt-4">
+                <iframe 
+                  id="spotify-sermon"
+                  src="https://creators.spotify.com/pod/show/ahwc/embed/episodes/GIVING---Pastor-Richard-Mensah-e18o9d0/a-a6mqmn6" 
+                  height="102px" 
+                  width="400px" 
+                  frameBorder="0" 
+                  scrolling="no"
+                  className="w-full"
+                ></iframe>
               </div>
             </div>
           </div>

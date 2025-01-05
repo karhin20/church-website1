@@ -53,5 +53,6 @@ export default defineConfig({
   base: '/',
   optimizeDeps: {
     include: ['react', 'react-dom']
-  }
+  },
+  assetsInclude: ['**/*.mp3']
 });
