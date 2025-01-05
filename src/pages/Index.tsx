@@ -175,14 +175,14 @@ const Index = () => {
               </div>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Walking in Divine Grace</h3>
+              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Benefits of the Resurrection</h3>
               <p className="text-church-accent mb-4">Apostle J. K. Atinyo • March 31, 2024</p>
               <div className="mt-4">
                 <iframe 
                   style={{ borderRadius: "12px" }} 
                   src="https://open.spotify.com/embed/episode/7d6UO6EFVuWsxYtZ8Eg4if?utm_source=generator&theme=0" 
                   width="100%" 
-                  height="300"
+                  height="152" 
                   frameBorder="0" 
                   allowFullScreen 
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
