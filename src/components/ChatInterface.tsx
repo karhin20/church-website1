@@ -79,8 +79,6 @@ const ChatInterface = () => {
                 <span>Back to Home</span>
               </Button>
             </Link>
-            <div className="flex items-center gap-3">
-              <Church className="h-6 w-6 text-secondary hidden sm:block" />
               <div className="flex items-center gap-3">
               <Church className="h-6 w-6 text-secondary hidden sm:block" />
               <div>
@@ -88,7 +86,6 @@ const ChatInterface = () => {
                   I am APOSOR KOFI, your AI church friend.
                 </p>
               </div>
-            </div>
             </div>
           </div>
         </div>

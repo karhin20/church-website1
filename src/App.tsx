@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Loading from '@/admin/auth/Loading';
+import { PWAPrompt } from '@/components/PWAPrompt'
 
 // Lazy load components that need Firebase
 const AuthProvider = lazy(() => import('@/admin/auth/useAuth').then(module => ({ default: module.AuthProvider })));
@@ -49,6 +50,7 @@ function App() {
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <PWAPrompt />
         </ChatProviderLazy>
       </Router>
     </QueryClientProvider>

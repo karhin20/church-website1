@@ -72,9 +72,9 @@ const Index = () => {
 
         {/* Hero Content */}
         <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4">
-          <h2 className="text-sm uppercase tracking-wider mb-4 text-white font-bold animate-fade-in">
+          <h4 className="text-xs md:text-sm uppercase tracking-wider mb-4 text-white font-bold animate-fade-in">
             Welcome to The Apostolic Church - Ghana
-          </h2>
+          </h4>
           <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight animate-fade-in delay-100 text-church-secondary">
             NII BOIMAN<br />CENTRAL ASSEMBLY
           </h1>
