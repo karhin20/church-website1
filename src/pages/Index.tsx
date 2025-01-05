@@ -19,8 +19,8 @@ import { Navigation } from "@/components/sections/Navigation";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import easterSermon from '@/assets/audio/EASTER CONVENTION (CLIMAX) __ MESSAGE BY_ APOSTLE DR. J. K. ATINYO __ 31st March, 2024.mp3';
-import gloryConference from '@/assets/audio/ebo ansah catch the glory.mp3';
+import easterSermon from '@/assets/audio/easter-sermon.mp3';
+import gloryConference from '@/assets/audio/glory-conference.mp3';
 
 const Index = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -157,78 +157,52 @@ const Index = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Latest Sermons</h2>
           <p className="text-center text-church-accent mb-12">Listen to our most recent messages</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Spotify Embed Card */}
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
               <h3 className="text-xl font-semibold mb-2 text-church-secondary">Catch The Glory Conference 2024</h3>
-              <p className="text-church-accent mb-4">Pastor Ebo Ansah Awotwi • March 2024</p>
+              <p className="text-church-accent mb-4">Pastor Ebo Ansah Awotwi • August 18, 2024</p>
               <div className="mt-4">
-                <audio 
-                  controls 
-                  className="w-full"
-                  src={gloryConference}
-                  preload="metadata"
-                >
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-              <div className="mt-4">
-                <Button 
-                  variant="outline" 
-                  className="w-full bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10"
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = gloryConference;
-                    link.download = 'CATCH THE GLORY CONFERENCE 2024 - Pastor Ebo Awotwi.mp3';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                >
-                  <Download className="w-4 h-4 mr-2" /> Download Audio
-                </Button>
+                <iframe 
+                  style={{ borderRadius: "12px" }} 
+                  src="https://open.spotify.com/embed/episode/67CLMcQs480MW8eCxB3Rb8?utm_source=generator&theme=0" 
+                  width="100%" 
+                  height="152" 
+                  frameBorder="0" 
+                  allowFullScreen 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy"
+                ></iframe>
               </div>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Benefit of the Resurrection</h3>
+              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Benefits of the Resurrection</h3>
               <p className="text-church-accent mb-4">Apostle J. K. Atinyo • March 31, 2024</p>
               <div className="mt-4">
-                <audio 
-                  controls 
-                  className="w-full"
-                  src={easterSermon}
-                  preload="metadata"
-                >
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-              <div className="mt-4">
-                <Button 
-                  variant="outline" 
-                  className="w-full bg-transparent border-church-secondary text-church-secondary hover:bg-church-secondary/10"
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = easterSermon;
-                    link.download = 'EASTER CONVENTION - Apostle Dr. J. K. Atinyo.mp3';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                >
-                  <Download className="w-4 h-4 mr-2" /> Download Audio
-                </Button>
+                <iframe 
+                  style={{ borderRadius: "12px" }} 
+                  src="https://open.spotify.com/embed/episode/7d6UO6EFVuWsxYtZ8Eg4if?utm_source=generator&theme=0" 
+                  width="100%" 
+                  height="152" 
+                  frameBorder="0" 
+                  allowFullScreen 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy"
+                ></iframe>
               </div>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
               <h3 className="text-xl font-semibold mb-2 text-church-secondary">Giving</h3>
-              <p className="text-church-accent mb-4">Pastor Richard Mensah </p>
+              <p className="text-church-accent mb-4">Pastor Richard Mensah • </p>
               <div className="mt-4">
                 <iframe 
-                  id="spotify-sermon"
-                  src="https://creators.spotify.com/pod/show/ahwc/embed/episodes/GIVING---Pastor-Richard-Mensah-e18o9d0/a-a6mqmn6" 
-                  height="102px" 
-                  width="400px" 
+                  style={{ borderRadius: "12px" }} 
+                  src="https://open.spotify.com/embed/episode/7p8Rx4HEvxZGASkPszA4QO?utm_source=generator&theme=0" 
+                  width="100%" 
+                  height="152" 
                   frameBorder="0" 
-                  scrolling="no"
-                  className="w-full"
+                  allowFullScreen 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy"
                 ></iframe>
               </div>
             </div>

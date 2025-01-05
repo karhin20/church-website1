@@ -54,5 +54,12 @@ export default defineConfig({
   optimizeDeps: {
     include: ['react', 'react-dom']
   },
-  assetsInclude: ['**/*.mp3']
+  assetsInclude: ['**/*.mp3'],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
+  }
 });
