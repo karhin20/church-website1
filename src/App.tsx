@@ -1,5 +1,8 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Loading from '@/admin/auth/Loading';
 import { PWAPrompt } from '@/components/PWAPrompt'
@@ -13,17 +16,23 @@ const SermonManager = lazy(() => import('@/components/admin/SermonManager'));
 const AnnouncementManager = lazy(() => import('@/components/admin/AnnouncementManager'));
 const GalleryManager = lazy(() => import('@/components/admin/GalleryManager'));
 
-// Immediately load components that don't need Firebase
+
+
+import HymnPage from "./pages/HymnPage";
 import Index from "./pages/Index";
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import Chat from './pages/Chat';
+import HymnHome from "./pages/hymnHome";
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+      <Toaster />
+      <Sonner />
       <Router>
         <ChatProviderLazy>
           <Routes>
@@ -31,7 +40,10 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/chat" element={<Chat />} />
+            <Route path="/chat" element={<Chat />} />            
+            <Route path="/hymn/:number" element={<HymnPage />} />
+            <Route path='/hymns' element={<HymnHome />}/>
+
 
             {/* Protected routes */}
             <Route path="/admin/*" element={
@@ -53,6 +65,7 @@ function App() {
           <PWAPrompt />
         </ChatProviderLazy>
       </Router>
+    </TooltipProvider>
     </QueryClientProvider>
   );
 }

@@ -6,11 +6,12 @@ import { AnnouncementsSection } from "@/components/sections/AnnouncementsSection
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { SermonsSection } from "@/components/sections/SermonsSection";
 import { FooterSection } from "@/components/sections/FooterSection";
-import { Calendar, MessageCircle } from "lucide-react";
+import { Calendar, MessageCircle, Music4 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 
 const Index = () => {
   
@@ -20,7 +21,25 @@ const Index = () => {
       <Navigation />
       <HeroSection />
       <FeaturesSection />
+
+
       {/*<LiveServiceSection />*/}
+
+     
+      {/* Hymn Section with Full-Width Background */}
+      <div className="bg-church-primary pb-16 p-4"> 
+        <div className="max-w-md mx-auto mt-12 p-6 pb-8 bg-white rounded-lg shadow-lg text-center"> 
+          <Music4 className="w-14 h-14 text-yellow-500 mx-auto mb-4" /> 
+          <h3 className="text-2xl font-bold text-church-primary mb-2">TAC Hymnal</h3>
+          <p className="text-lg text-church-text mb-4">Explore our rich collection of spiritual hymns.</p> 
+          <Link to="/hymns">
+            <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-xl py-3 px-6 rounded-lg">
+              View Hymns
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       <AnnouncementsSection />
       <UpcomingEvents />
       <SermonsSection />
