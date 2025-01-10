@@ -13,13 +13,16 @@ import {
   Map, 
   Phone, 
   Mail, 
-  X
+  X,
+  MicVocal
 } from "lucide-react";
 import { Navigation } from "@/components/sections/Navigation";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { RedCirclePlayer } from '@/components/RedCirclePlayer';
+import React from 'react';
+import { LiveService } from '../components/LiveService';
 
 const Index = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -125,6 +128,26 @@ const Index = () => {
               Experience and share the transforming love of God in our community.
             </p>
           </div>
+        </div>
+      </section>
+      <section className="my-8">
+        <div className="container mx-auto px-4">
+          <div className="live-service p-4 rounded-lg shadow-md flex items-center">
+            <MicVocal className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4" />
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4"> Live Service</h2>
+          </div>
+          <iframe 
+            height="150" 
+            width="100%" 
+            style={{ border: 'none' }} 
+            scrolling="no" 
+            data-name="pb-iframe-player" 
+            src="https://www.podbean.com/live-player/?channel_id=WXPoH0puz9" 
+            referrerPolicy="no-referrer-when-downgrade" 
+            allow="autoplay" 
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            allowFullScreen
+          ></iframe>
         </div>
       </section>
 
@@ -390,26 +413,6 @@ const Index = () => {
           </Button>
         </Link>
       </div>
-
-      <section className="my-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="live-service p-4 bg-white rounded-lg shadow-md">
-            <h3 className="text-lg font-bold">Live Service</h3>
-            <iframe 
-              height="150" 
-              width="100%" 
-              style={{ border: 'none' }} 
-              scrolling="no" 
-              data-name="pb-iframe-player" 
-              src="https://www.podbean.com/live-player/?channel_id=WXPoH0puz9" 
-              referrerPolicy="no-referrer-when-downgrade" 
-              allow="autoplay" 
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
