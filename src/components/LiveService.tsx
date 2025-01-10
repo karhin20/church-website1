@@ -14,6 +14,11 @@ export const LiveService = () => {
         src="https://www.podbean.com/live-player/?channel_id=WXPoH0puz9" 
         allowFullScreen
       ></iframe>
+      <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+        <h4 className="text-md font-semibold">Contribute to God's Work</h4>
+        <p>MOMO NUMBER: <strong>0597672546</strong></p>
+        <p>ACCOUNT NAME: <strong>THE TAC AHWC NII BOIMAN</strong></p>
+      </div>
     </div>
   );
 }; 

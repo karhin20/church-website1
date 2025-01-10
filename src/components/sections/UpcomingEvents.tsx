@@ -4,22 +4,22 @@ import { Button } from "@/components/ui/button";
 export const UpcomingEvents = () => {
   const events = [
     {
-      date: "March 24",
-      time: "9:00 AM",
+      date: "Every Sunday",
+      time: "7:00 AM",
       title: "Sunday Service",
       description: "Join us for our weekly Sunday worship service"
     },
     {
-      date: "March 26",
-      time: "6:30 PM",
-      title: "Prayer Meeting",
-      description: "Mid-week prayer and Bible study session"
+      date: "Wednesdays",
+      time: "6:00 PM",
+      title: "Mid-Week Service",
+      description: "Bible study session"
     },
     {
       date: "March 30",
-      time: "10:00 AM",
-      title: "Youth Conference",
-      description: "Annual youth conference with guest speakers"
+      time: "6:00 PM",
+      title: "Youth Ministry Service",
+      description: "Weekly Special Youth Service"
     }
   ];
 

@@ -1,260 +1,120 @@
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { 
-  Church, 
-  Users, 
-  Heart, 
-  MessageCircle, 
-  Play, 
-  Download, 
-  Calendar, 
-  Facebook, 
-  Youtube, 
-  Map, 
-  Phone, 
-  Mail, 
-  X,
-  MicVocal
-} from "lucide-react";
 import { Navigation } from "@/components/sections/Navigation";
+import { HeroSection } from "@/components/sections/HeroSection";
+import { FeaturesSection } from "@/components/sections/FeaturesSection";
+import { LiveServiceSection } from "@/components/sections/LiveServiceSection";
+import { AnnouncementsSection } from "@/components/sections/AnnouncementsSection";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
-import { useState, useEffect } from "react";
+import { SermonsSection } from "@/components/sections/SermonsSection";
+import { FooterSection } from "@/components/sections/FooterSection";
+import { Calendar, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { RedCirclePlayer } from '@/components/RedCirclePlayer';
-import React from 'react';
-import { LiveService } from '../components/LiveService';
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const Index = () => {
-  const [currentBanner, setCurrentBanner] = useState(0);
-  const banners = ["/pictures/banner1.jpg", "/pictures/banner2.jpg"];
+  
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentBanner((prev) => (prev + 1) % banners.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <div className="min-h-screen bg-church-background">
       <Navigation />
-
-      {/* Hero Section with Carousel */}
-      <section className="relative h-screen mt-16">
-        {banners.map((banner, index) => (
-          <div
-            key={banner}
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              index === currentBanner ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{
-              backgroundImage: `url('${banner}')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-church-primary/90 to-black/75"></div>
-          </div>
-        ))}
-
-        {/* Carousel Navigation Dots */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-          {banners.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentBanner(index)}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                index === currentBanner
-                  ? 'bg-church-secondary'
-                  : 'bg-white/50 hover:bg-white/75'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4">
-          <h4 className="text-xs md:text-sm uppercase tracking-wider mb-4 text-white font-bold animate-fade-in">
-            Welcome to The Apostolic Church - Ghana
-          </h4>
-          <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight animate-fade-in delay-100 text-church-secondary">
-            NII BOIMAN<br />CENTRAL ASSEMBLY
-          </h1>
-          <p className="max-w-2xl mb-10 text-lg text-gray-200 animate-fade-in delay-200">
-            Join us in worship at Nii Boiman Central Auditorium as we grow together in faith and community.
-          </p>
-          <Link to="/chat" className="animate-fade-in delay-300">
-            <Button className="bg-church-secondary hover:bg-church-secondary/90 text-church-primary px-8 py-6 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105">
-              Chat with Aposor Kofi
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 bg-church-background">
-        <div className="container mx-auto grid md:grid-cols-3 gap-12 px-4">
-          {/* Worship */}
-          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-xl bg-white shadow-lg border border-gray-100">
-            <div className="flex justify-center mb-6">
-              <Church className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
-            </div>
-            <h3 className="text-2xl font-bold mb-4 text-church-primary">WORSHIP</h3>
-            <p className="text-church-text leading-relaxed">
-              Join us for spirit-filled worship services every Sunday and Wednesday.
-            </p>
-          </div>
-
-          {/* Connect */}
-          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-xl bg-white shadow-lg border border-gray-100">
-            <div className="flex justify-center mb-6">
-              <Users className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
-            </div>
-            <h3 className="text-2xl font-bold mb-4 text-church-primary">CONNECT</h3>
-            <p className="text-church-text leading-relaxed">
-              Be part of our vibrant community through various fellowship programs.
-            </p>
-          </div>
-
-          {/* God's Love */}
-          <div className="text-center group hover:scale-105 transition-transform duration-300 p-8 rounded-xl bg-white shadow-lg border border-gray-100">
-            <div className="flex justify-center mb-6">
-              <Heart className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
-            </div>
-            <h3 className="text-2xl font-bold mb-4 text-church-primary">GOD'S LOVE</h3>
-            <p className="text-church-text leading-relaxed">
-              Experience and share the transforming love of God in our community.
-            </p>
-          </div>
-        </div>
-      </section>
-      <section className="my-8">
-        <div className="max-w-3xl mx-auto shadow-md">
-          <div className="live-service p-4 flex items-center">
-            <MicVocal className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4" />
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4"> Live Service</h2>
-          </div>
-          <iframe 
-            height="150" 
-            width="100%" 
-            style={{ border: 'none' }} 
-            scrolling="no" 
-            data-name="pb-iframe-player" 
-            src="https://www.podbean.com/live-player/?channel_id=WXPoH0puz9" 
-            referrerPolicy="no-referrer-when-downgrade" 
-            allow="autoplay" 
-            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-            allowFullScreen
-          ></iframe>
-        </div>
-      </section>
-
-      {/* Announcements Section */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">Announcements</h2>
-          <p className="text-center text-church-text mb-12">Stay updated with our latest announcements</p>
-          <div className="flex justify-center">
-            <div className="aspect-video w-full max-w-3xl">
-              <iframe
-                className="w-full h-full rounded-lg shadow-lg"
-                src="https://www.youtube.com/embed/G051e0dSoW4" 
-                title="ANNOUNCEMENT, 5th January, 2025" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Upcoming Events Section */}
+      <HeroSection />
+      <FeaturesSection />
+      {/*<LiveServiceSection />*/}
+      <AnnouncementsSection />
       <UpcomingEvents />
-
-      {/* Latest Sermons Section */}
-      <section className="py-24 bg-church-primary text-white">
+      <SermonsSection />
+       {/* Latest News Section */}
+       <section className="py-24 bg-church-background">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Latest Sermons</h2>
-          <p className="text-center text-church-accent mb-12">Listen to our most recent messages</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">
+            Latest News
+          </h2>
+          <p className="text-center text-church-text mb-12">
+            Stay updated with our church community
+          </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Spotify Embed Card */}
-            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Catch The Glory Conference 2024</h3>
-              <p className="text-church-accent mb-4">Pastor Ebo Ansah Awotwi • August 18, 2024</p>
-              <div className="mt-4">
-                <RedCirclePlayer 
-                  audioUrl="https://stream.redcircle.com/episodes/da3067b9-91b1-4e75-aae0-435b666eef57/stream.mp3"
-                  speakerImage="https://media.redcircle.com/images/2025/1/6/9/6335cc53-7413-49ec-98fd-ac27ee37e753_18619985-1736112364643-8b27f46b06a0e.jpg?d=440x440"
-                />
-              </div>
-            </div>
-            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Benefits of the Resurrection</h3>
-              <p className="text-church-accent mb-4">Apostle J. K. Atinyo • March 31, 2024</p>
-              <div className="mt-4">
-                <RedCirclePlayer 
-                  audioUrl="https://stream.redcircle.com/episodes/362dda22-9b34-4bf3-8fda-9ce42481f30b/stream.mp3"
-                  speakerImage="https://media.redcircle.com/images/2025/1/6/9/288911b1-7f78-451b-9257-310b6ac14b64_18619985-1736111878446-25f831a598b9.jpg?d=440x440"
-                />
-              </div>
-            </div>
-            <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-              <h3 className="text-xl font-semibold mb-2 text-church-secondary">Giving</h3>
-              <p className="text-church-accent mb-4">Pastor Richard Mensah • </p>
-              <div className="mt-4">
-                <RedCirclePlayer 
-                  audioUrl="https://stream.redcircle.com/episodes/ed209ace-ab9f-43ac-a02b-9d8ed651e20b/stream.mp3"
-                  speakerImage="https://media.redcircle.com/images/2025/1/6/9/de5a1819-c6ff-42c4-a171-f2ec3c478fb2_18619985-1634160731906-274fa4dcd87fa.jpg?d=440x440"
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex justify-center mt-12">
-            <a 
-              href="https://open.spotify.com/show/7LOx7uSxQbVdE0PiADRClU" 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              <Button 
-                className="bg-church-secondary text-church-primary hover:bg-church-secondary/90 px-8 py-6 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2"
-              >
-                <Play className="w-5 h-5" />
-                Listen to More Sermons
-              </Button>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Latest News Section */}
-      <section className="py-24 bg-church-background">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">Latest News</h2>
-          <p className="text-center text-church-text mb-12">Stay updated with our church community</p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((news) => (
-              <div key={news} className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
-                <img 
-                  src={`/pictures/community${news}.jpg`} 
-                  alt="Church news" 
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center text-church-secondary mb-2">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    <span className="text-sm">March {news}, 2024</span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2 text-church-primary">Community Outreach Success</h3>
-                  <p className="text-church-text mb-4">Join us in celebrating the success of our recent community outreach program...</p>
-                  <Button variant="link" className="text-church-primary hover:text-church-secondary p-0">
-                    Read More →
-                  </Button>
+            {/* News Item 1 */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
+              <img
+                src="/pictures/community1.jpg"
+                alt="Church news"
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-6">
+                <div className="flex items-center text-church-secondary mb-2">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <span className="text-sm">March 10, 2024</span>
                 </div>
+                <h3 className="text-xl font-semibold mb-2 text-church-primary">
+                  Children Ministry Center Construction Commenced
+                </h3>
+                <p className="text-church-text mb-4">
+                We are excited to announce the commencement of the contruction of our new Children Ministry...,
+                </p>
+                <Button
+                  variant="link"
+                  className="text-church-primary hover:text-church-secondary p-0"
+                >
+                  Read More →
+                </Button>
               </div>
-            ))}
+            </div>
+
+            {/* News Item 2 */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
+              <img
+                src="/pictures/community2.jpg"
+                alt="Church news"
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-6">
+                <div className="flex items-center text-church-secondary mb-2">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <span className="text-sm">December 19, 2024</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-church-primary">
+                  Successful Community Outreach
+                </h3>
+                <p className="text-church-text mb-4">
+                  Join us in celebrating the success of our recent community
+                  outreach program...
+                </p>
+                <Button
+                  variant="link"
+                  className="text-church-primary hover:text-church-secondary p-0"
+                >
+                  Read More →
+                </Button>
+              </div>
+            </div>
+
+            {/* News Item 3 */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
+              <img
+                src="/pictures/community3.jpg"
+                alt="Church news"
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-6">
+                <div className="flex items-center text-church-secondary mb-2">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <span className="text-sm">January 09, 2025</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-church-primary">
+                  National 21 days Fasting and Prayers Ongoing
+                </h3>
+                <p className="text-church-text mb-4">
+                  A time to seek the face of God as the year commences ...
+                </p>
+                <Button
+                  variant="link"
+                  className="text-church-primary hover:text-church-secondary p-0"
+                >
+                  Read More →
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -316,94 +176,7 @@ const Index = () => {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Footer Section */}
-      <footer className="bg-church-primary text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Contact Information */}
-            <div>
-              <h3 className="text-xl font-bold mb-6">Contact Us</h3>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Map className="w-5 h-5 mr-3 text-church-secondary" />
-                  <p>Nii Boiman West Road, Accra, Ghana</p>
-                </div>
-                <div className="flex items-center">
-                  <Phone className="w-5 h-5 mr-3 text-church-secondary" />
-                  <p>+233 24 123 4567</p>
-                </div>
-                <div className="flex items-center">
-                  <Mail className="w-5 h-5 mr-3 text-church-secondary" />
-                  <p>ahwcniiboiman@gmail.com</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-xl font-bold mb-6">Quick Links</h3>
-              <div className="space-y-3">
-                <Link to="/about" className="block hover:text-church-secondary transition-colors">About Us</Link>
-                <Link to="/sermons" className="block hover:text-church-secondary transition-colors">Sermons</Link>
-                <Link to="/events" className="block hover:text-church-secondary transition-colors">Events</Link>
-                <Link to="/contact" className="block hover:text-church-secondary transition-colors">Contact</Link>
-              </div>
-            </div>
-
-            {/* Map and Social Links */}
-            <div>
-              <h3 className="text-xl font-bold mb-6">Location & Social Media</h3>
-              {/* Google Maps Embed */}
-              <div className="mb-6 rounded-lg overflow-hidden">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.7358124867687!2d-0.2572909243561401!3d5.605986433143636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf9907a958ff31%3A0x6bf8d0c7685caae6!2sThe%20Apostolic%20Church%20Nii%20Boiman%20Assembly!5e0!3m2!1sen!2sgh!4v1733188166229!5m2!1sen!2sgh"
-                  width="100%"
-                  height="200"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
-              </div>
-              {/* Social Media Links */}
-              <div className="flex space-x-4">
-                <a
-                  href="https://facebook.com/tacniiboiman"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-church-secondary text-church-primary p-2 rounded-full hover:bg-church-secondary/90 transition-colors"
-                >
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a
-                  href="https://youtube.com/@tacniiboiman"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-church-secondary text-church-primary p-2 rounded-full hover:bg-church-secondary/90 transition-colors"
-                >
-                  <Youtube className="w-5 h-5" />
-                </a>
-                <a
-                  href="https://tiktok.com/@tacniiboiman"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-church-secondary text-church-primary p-2 rounded-full hover:bg-church-secondary/90 transition-colors"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Copyright */}
-          <div className="border-t border-white/10 mt-12 pt-8 text-center">
-            <p>&copy; {new Date().getFullYear()} The Apostolic Church - Ghana, Nii Boiman Central Assembly. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <FooterSection />
 
       {/* Chat Button (Fixed) */}
       <div className="fixed bottom-8 right-8">
