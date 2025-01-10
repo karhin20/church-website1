@@ -19,8 +19,7 @@ import { Navigation } from "@/components/sections/Navigation";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import easterSermon from '@/assets/audio/easter-sermon.mp3';
-import gloryConference from '@/assets/audio/glory-conference.mp3';
+import { RedCirclePlayer } from '@/components/RedCirclePlayer';
 
 const Index = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -162,48 +161,30 @@ const Index = () => {
               <h3 className="text-xl font-semibold mb-2 text-church-secondary">Catch The Glory Conference 2024</h3>
               <p className="text-church-accent mb-4">Pastor Ebo Ansah Awotwi • August 18, 2024</p>
               <div className="mt-4">
-                <iframe 
-                  style={{ borderRadius: "12px" }} 
-                  src="https://open.spotify.com/embed/episode/67CLMcQs480MW8eCxB3Rb8?utm_source=generator&theme=0" 
-                  width="100%" 
-                  height="152" 
-                  frameBorder="0" 
-                  allowFullScreen 
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                  loading="lazy"
-                ></iframe>
+                <RedCirclePlayer 
+                  audioUrl="https://stream.redcircle.com/episodes/da3067b9-91b1-4e75-aae0-435b666eef57/stream.mp3"
+                  speakerImage="https://media.redcircle.com/images/2025/1/6/9/6335cc53-7413-49ec-98fd-ac27ee37e753_18619985-1736112364643-8b27f46b06a0e.jpg?d=440x440"
+                />
               </div>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
               <h3 className="text-xl font-semibold mb-2 text-church-secondary">Benefits of the Resurrection</h3>
               <p className="text-church-accent mb-4">Apostle J. K. Atinyo • March 31, 2024</p>
               <div className="mt-4">
-                <iframe 
-                  style={{ borderRadius: "12px" }} 
-                  src="https://open.spotify.com/embed/episode/7d6UO6EFVuWsxYtZ8Eg4if?utm_source=generator&theme=0" 
-                  width="100%" 
-                  height="152" 
-                  frameBorder="0" 
-                  allowFullScreen 
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                  loading="lazy"
-                ></iframe>
+                <RedCirclePlayer 
+                  audioUrl="https://stream.redcircle.com/episodes/362dda22-9b34-4bf3-8fda-9ce42481f30b/stream.mp3"
+                  speakerImage="https://media.redcircle.com/images/2025/1/6/9/288911b1-7f78-451b-9257-310b6ac14b64_18619985-1736111878446-25f831a598b9.jpg?d=440x440"
+                />
               </div>
             </div>
             <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
               <h3 className="text-xl font-semibold mb-2 text-church-secondary">Giving</h3>
               <p className="text-church-accent mb-4">Pastor Richard Mensah • </p>
               <div className="mt-4">
-                <iframe 
-                  style={{ borderRadius: "12px" }} 
-                  src="https://open.spotify.com/embed/episode/7p8Rx4HEvxZGASkPszA4QO?utm_source=generator&theme=0" 
-                  width="100%" 
-                  height="152" 
-                  frameBorder="0" 
-                  allowFullScreen 
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                  loading="lazy"
-                ></iframe>
+                <RedCirclePlayer 
+                  audioUrl="https://stream.redcircle.com/episodes/ed209ace-ab9f-43ac-a02b-9d8ed651e20b/stream.mp3"
+                  speakerImage="https://media.redcircle.com/images/2025/1/6/9/de5a1819-c6ff-42c4-a171-f2ec3c478fb2_18619985-1634160731906-274fa4dcd87fa.jpg?d=440x440"
+                />
               </div>
             </div>
           </div>
@@ -409,6 +390,26 @@ const Index = () => {
           </Button>
         </Link>
       </div>
+
+      <section className="my-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="live-service p-4 bg-white rounded-lg shadow-md">
+            <h3 className="text-lg font-bold">Live Service</h3>
+            <iframe 
+              height="150" 
+              width="100%" 
+              style={{ border: 'none' }} 
+              scrolling="no" 
+              data-name="pb-iframe-player" 
+              src="https://www.podbean.com/live-player/?channel_id=WXPoH0puz9" 
+              referrerPolicy="no-referrer-when-downgrade" 
+              allow="autoplay" 
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
