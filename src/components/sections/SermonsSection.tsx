@@ -11,8 +11,8 @@ export const SermonsSection = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Sermon 1 */}
           <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-            <h4 className="text-lg font-semibold mb-2 text-church-secondary">Catch The Glory Conference 2024</h4> {/* Reduced size to text-lg */}
-            <p className="text-church-accent mb-4 text-sm">Pastor Ebo Ansah Awotwi • August 18, 2024</p> {/* Reduced size to text-sm */}
+            <h4 className="text-lg font-semibold mb-2 text-church-secondary">Catch The Glory Conference 2024</h4>
+            <p className="text-church-accent mb-4 text-sm">Pastor Ebo Ansah Awotwi • August 18, 2024</p> 
             <div className="mt-4">
               <RedCirclePlayer 
                 audioUrl="https://stream.redcircle.com/episodes/da3067b9-91b1-4e75-aae0-435b666eef57/stream.mp3"
@@ -23,8 +23,8 @@ export const SermonsSection = () => {
 
           {/* Sermon 2 */}
           <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-            <h4 className="text-lg font-semibold mb-2 text-church-secondary">Benefits of the Resurrection A</h4> {/* Reduced size to text-lg */}
-            <p className="text-church-accent mb-4 text-sm">Apostle J. K. Atinyo • March 31, 2024</p> {/* Reduced size to text-sm */}
+            <h4 className="text-lg font-semibold mb-2 text-church-secondary">Benefits of the Resurrection A</h4> 
+            <p className="text-church-accent mb-4 text-sm">Apostle J. K. Atinyo • March 31, 2024</p>
             <div className="mt-4">
               <RedCirclePlayer 
                 audioUrl="https://stream.redcircle.com/episodes/362dda22-9b34-4bf3-8fda-9ce42481f30b/stream.mp3"
@@ -35,8 +35,8 @@ export const SermonsSection = () => {
 
           {/* Sermon 3 */}
           <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-            <h4 className="text-lg font-semibold mb-2 text-church-secondary">Giving</h4> {/* Reduced size to text-lg */}
-            <p className="text-church-accent mb-4 text-sm">Pastor Richard Mensah</p> {/* Reduced size to text-sm */}
+            <h4 className="text-lg font-semibold mb-2 text-church-secondary">Giving</h4> 
+            <p className="text-church-accent mb-4 text-sm">Pastor Richard Mensah</p> 
             <div className="mt-4">
               <RedCirclePlayer 
                 audioUrl="https://stream.redcircle.com/episodes/ed209ace-ab9f-43ac-a02b-9d8ed651e20b/stream.mp3"

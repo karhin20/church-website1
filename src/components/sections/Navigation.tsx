@@ -56,7 +56,7 @@ export const Navigation = () => {
               <Youtube className="w-5 h-5" />
             </a>
             <a
-              href="https://tiktok.com/@niiboimanCENTRAL"
+              href="https://www.tiktok.com/@niiboimanCENTRAL"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-church-secondary transition-colors"
