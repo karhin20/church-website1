@@ -37,18 +37,18 @@ const HymnPage = () => {
         <div className="space-y-8">
           {hymn.stanzas.map((stanza, index) => (
             <div key={index} className="space-y-1">
-              <div className="text-sm font-serif text-muted-foreground">
-                Verse {index + 1}
+              <div className="text-xl text-church-primary font-bold font-serif">
+                 {index + 1}
               </div>
-              <p className="whitespace-pre-line leading-relaxed">
+              <p className="whitespace-pre-line leading-relaxed font-semibold text-xl">
                 {stanza}
               </p>
               {index === 0 && hymn.chorus && (
                 <div className="mt-4 pl-6 border-l-2 border-primary/20">
-                  <div className="text-sm font-serif text-muted-foreground mb-1">
+                  <div className="text-xl text-church-primary text-bold font-serif">
                     Chorus
                   </div>
-                  <p className="whitespace-pre-line leading-relaxed">
+                  <p className="whitespace-pre-line leading-relaxed text-xl">
                     {hymn.chorus.join("\n")}
                   </p>
                 </div>
