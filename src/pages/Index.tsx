@@ -131,8 +131,8 @@ const Index = () => {
         </div>
       </section>
       <section className="my-8">
-        <div className="container mx-auto px-4">
-          <div className="live-service p-4 rounded-lg shadow-md flex items-center">
+        <div className="max-w-3xl mx-auto shadow-md">
+          <div className="live-service p-4 flex items-center">
             <MicVocal className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4" />
             <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4"> Live Service</h2>
           </div>
@@ -335,7 +335,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 mr-3 text-church-secondary" />
-                  <p>info@tacniiboiman.org</p>
+                  <p>ahwcniiboiman@gmail.com</p>
                 </div>
               </div>
             </div>
