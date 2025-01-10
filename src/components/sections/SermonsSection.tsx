@@ -23,7 +23,7 @@ export const SermonsSection = () => {
 
           {/* Sermon 2 */}
           <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm">
-            <h4 className="text-lg font-semibold mb-2 text-church-secondary">Benefits of the Resurrection Part 1</h4> {/* Reduced size to text-lg */}
+            <h4 className="text-lg font-semibold mb-2 text-church-secondary">Benefits of the Resurrection A</h4> {/* Reduced size to text-lg */}
             <p className="text-church-accent mb-4 text-sm">Apostle J. K. Atinyo • March 31, 2024</p> {/* Reduced size to text-sm */}
             <div className="mt-4">
               <RedCirclePlayer 
