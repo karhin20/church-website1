@@ -52,7 +52,7 @@ const NumPad = ({ onNumberSubmit }: NumPadProps) => {
           variant="outline"
           className="p-6 text-xl font-serif hover:bg-destructive hover:text-destructive-foreground transition-colors"
         >
-          C
+          Reset
         </Button>
         <Button
           onClick={() => handleNumberClick("0")}
@@ -66,7 +66,7 @@ const NumPad = ({ onNumberSubmit }: NumPadProps) => {
           variant="outline"
           className="p-6 text-xl font-serif hover:bg-primary hover:text-primary-foreground transition-colors"
         >
-          →
+          Enter
         </Button>
       </div>
     </div>

@@ -30,7 +30,7 @@ const HymnPage = () => {
       
       <div className="space-y-6">
         <div className="text-center">
-          <div className="text-lg text-muted-foreground font-serif">Hymn {hymn.number}</div>
+          <div className="text-lg text-muted-foreground font-Microsoft Sans Serif">Hymn {hymn.number}</div>
           <h1 className="text-3xl font-serif font-semibold">{hymn.title}</h1>
         </div>
         

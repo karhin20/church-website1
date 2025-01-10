@@ -31,7 +31,7 @@ export const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-white hover:text-church-secondary transition-colors">Home</Link>
-            <Link to="/about" className="text-white hover:text-church-secondary transition-colors">About</Link>
+            <Link to="/hymns" className="text-white hover:text-church-secondary transition-colors">TAC Hymns</Link>
             <Link to="/sermons" className="text-white hover:text-church-secondary transition-colors">Sermons</Link>
             <Link to="/events" className="text-white hover:text-church-secondary transition-colors">Events</Link>
             <Link to="/contact" className="text-white hover:text-church-secondary transition-colors">Contact</Link>
@@ -95,11 +95,11 @@ export const Navigation = () => {
               Home
             </Link>
             <Link 
-              to="/about" 
+              to="/hymns" 
               className="text-white hover:text-church-secondary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              About
+              TAC Hymns
             </Link>
             <Link 
               to="/sermons" 
