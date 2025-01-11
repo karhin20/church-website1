@@ -37,14 +37,6 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  server: {
-    port: 3000,
-  },
-  base: '/',
-  optimizeDeps: {
-    include: ['react', 'react-dom']
-  },
-  assetsInclude: ['**/*.mp3'],
   build: {
     outDir: 'dist',
     sourcemap: true,
