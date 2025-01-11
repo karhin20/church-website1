@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tac-nbc-v1';
+const CACHE_NAME = 'tac-nbc-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,23 +6,15 @@ const urlsToCache = [
   '/logo.png',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  '/static/js/bundle.js', // Add your JS bundle
-  '/static/css/index.css'  // Add your CSS files
+  '/static/js/bundle.js',
+  '/static/css/index.css',
+  '/src/data/hymns.ts'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open('my-cache').then((cache) => {
-      return cache.addAll([
-        '/',
-        '/index.html',
-        '/src/main.tsx',
-        '/icons/icon-192x192.png',
-        '/icons/icon-512x512.png',
-        '/static/css/index.css',
-        '/static/js/bundle.js'
-        // Add other assets you want to cache
-      ]);
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache);
     })
   );
 });
@@ -30,6 +22,17 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
+      if (event.request.url.includes('hymns')) {
+        return response || 
+          fetch(event.request).then((fetchResponse) => {
+            const responseToCache = fetchResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+            return fetchResponse;
+          });
+      }
+      
       return response || fetch(event.request);
     })
   );
@@ -45,4 +48,14 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+});
+
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match('/index.html');
+      })
+    );
+  }
 }); 

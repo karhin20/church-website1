@@ -60,6 +60,8 @@ export default defineConfig({
       output: {
         manualChunks: undefined
       }
-    }
+    },
+    outDir: 'dist',
+    sourcemap: true,
   }
 });
