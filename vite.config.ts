@@ -11,6 +11,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       srcDir: 'src',
       filename: 'sw.js',
+      strategies: 'injectManifest',
       injectRegister: 'auto',
       manifest: {
         name: 'TAC-NBC',
@@ -18,19 +19,16 @@ export default defineConfig({
         theme_color: '#ffffff',
         icons: [
           {
-            src: '/icon-192x192.png',
+            src: '/icons/icon-192x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon-512x512.png',
+            src: '/icons/icon-512x512.png',
             sizes: '512x512',
             type: 'image/png'
           }
         ]
-      },
-      injectManifest: {
-        injectionPoint: 'self.__WB_MANIFEST'
       }
     })
   ],
@@ -48,12 +46,13 @@ export default defineConfig({
   },
   assetsInclude: ['**/*.mp3'],
   build: {
+    outDir: 'dist',
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: undefined
       }
     },
-    outDir: 'dist',
-    sourcemap: true,
+    chunkSizeWarningLimit: 1600
   }
 });
