@@ -11,7 +11,6 @@ export default defineConfig({
       registerType: 'autoUpdate',
       srcDir: 'src',
       filename: 'sw.js',
-      strategies: 'injectManifest',
       injectRegister: 'auto',
       manifest: {
         name: 'TAC-NBC',
@@ -39,12 +38,11 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks: undefined
       }
-    },
-    chunkSizeWarningLimit: 1600
+    }
   }
 });

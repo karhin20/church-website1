@@ -1,5 +1,5 @@
 [build]
-  command = "CI= npm run build"
+  command = "npm ci && npm run build"
   publish = "dist"
 
 [[redirects]]
@@ -9,5 +9,5 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  NPM_FLAGS = "--legacy-peer-deps"
+  NPM_FLAGS = "--legacy-peer-deps --no-optional"
   VITE_API_URL = "https://backend-church.vercel.app" 
