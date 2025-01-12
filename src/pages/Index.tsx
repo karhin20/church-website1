@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 
 const Index = () => {
@@ -28,16 +29,39 @@ const Index = () => {
      
       {/* Hymn Section with Full-Width Background */}
       <div className="bg-church-primary pb-16 p-4"> 
-        <div className="max-w-md mx-auto mt-12 p-6 pb-8 bg-white rounded-lg shadow-lg text-center"> 
-          <Music4 className="w-14 h-14 text-yellow-500 mx-auto mb-4" /> 
-          <h3 className="text-2xl font-bold text-church-primary mb-2">TAC Hymnal</h3>
+        <motion.div 
+          className="max-w-md mx-auto mt-12 p-6 pb-8 bg-white rounded-lg shadow-lg text-center"
+          whileHover={{ scale: 1.05 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 50 }}
+          viewport={{ once: false }}
+          transition={{
+            type: "spring",
+            stiffness: 100,
+            damping: 15,
+            duration: 0.6
+          }}
+        >
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <Music4 className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
+          </motion.div>
+          <h3 className="text-2xl font-bold text-church-primary mb-2">TAC Hymns</h3>
           <p className="text-lg text-church-text mb-4">Explore our rich collection of spiritual hymns.</p> 
           <Link to="/hymns">
             <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-xl py-3 px-6 rounded-lg">
               View Hymns
             </Button>
           </Link>
-        </div>
+        </motion.div>
       </div>
 
       <AnnouncementsSection />
@@ -46,94 +70,75 @@ const Index = () => {
        {/* Latest News Section */}
        <section className="py-24 bg-church-background">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">
-            Latest News
-          </h2>
-          <p className="text-center text-church-text mb-12">
-            Stay updated with our church community
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false }}
+            transition={{
+              type: "spring",
+              stiffness: 100,
+              damping: 15,
+              duration: 0.6
+            }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-church-primary mb-4">
+              Latest News
+            </h2>
+            <p className="text-center text-church-text mb-12">
+              Stay updated with our church community
+            </p>
+          </motion.div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* News Item 1 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
-              <img
-                src="/pictures/community1.jpg"
-                alt="Church news"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex items-center text-church-secondary mb-2">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <span className="text-sm">March 10, 2024</span>
+            {/* News Items with staggered animations */}
+            {[1, 2, 3].map((index) => (
+              <motion.div
+                key={index}
+                className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false }}
+                transition={{
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 15,
+                  duration: 0.6,
+                  delay: index * 0.1
+                }}
+              >
+                <img
+                  src={`/pictures/community${index}.jpg`}
+                  alt="Church news"
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-6">
+                  <div className="flex items-center text-church-secondary mb-2">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    <span className="text-sm">
+                      {index === 1 ? "March 10, 2024" :
+                       index === 2 ? "December 19, 2024" :
+                       "January 09, 2025"}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-church-primary">
+                    {index === 1 ? "Children Ministry Center Construction Commenced" :
+                     index === 2 ? "Successful Community Outreach" :
+                     "National 21 days Fasting and Prayers Ongoing"}
+                  </h3>
+                  <p className="text-church-text mb-4">
+                    {index === 1 ? "We are excited to announce the commencement of the contruction of our new Children Ministry..." :
+                     index === 2 ? "Join us in celebrating the success of our recent community outreach program..." :
+                     "A time to seek the face of God as the year commences ..."}
+                  </p>
+                  <Button
+                    variant="link"
+                    className="text-church-primary hover:text-church-secondary p-0"
+                  >
+                    Read More →
+                  </Button>
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-church-primary">
-                  Children Ministry Center Construction Commenced
-                </h3>
-                <p className="text-church-text mb-4">
-                We are excited to announce the commencement of the contruction of our new Children Ministry...,
-                </p>
-                <Button
-                  variant="link"
-                  className="text-church-primary hover:text-church-secondary p-0"
-                >
-                  Read More →
-                </Button>
-              </div>
-            </div>
-
-            {/* News Item 2 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
-              <img
-                src="/pictures/community2.jpg"
-                alt="Church news"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex items-center text-church-secondary mb-2">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <span className="text-sm">December 19, 2024</span>
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-church-primary">
-                  Successful Community Outreach
-                </h3>
-                <p className="text-church-text mb-4">
-                  Join us in celebrating the success of our recent community
-                  outreach program...
-                </p>
-                <Button
-                  variant="link"
-                  className="text-church-primary hover:text-church-secondary p-0"
-                >
-                  Read More →
-                </Button>
-              </div>
-            </div>
-
-            {/* News Item 3 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden group hover:scale-105 transition-transform duration-300">
-              <img
-                src="/pictures/community3.jpg"
-                alt="Church news"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex items-center text-church-secondary mb-2">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  <span className="text-sm">January 09, 2025</span>
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-church-primary">
-                  National 21 days Fasting and Prayers Ongoing
-                </h3>
-                <p className="text-church-text mb-4">
-                  A time to seek the face of God as the year commences ...
-                </p>
-                <Button
-                  variant="link"
-                  className="text-church-primary hover:text-church-secondary p-0"
-                >
-                  Read More →
-                </Button>
-              </div>
-            </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
