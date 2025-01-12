@@ -8,7 +8,7 @@ export const AnnouncementsSection = () => {
           <div className="aspect-video w-full max-w-3xl">
             <iframe
               className="w-full h-full rounded-lg shadow-lg"
-              src="https://www.youtube.com/embed/G051e0dSoW4" 
+              src="https://www.youtube.com/embed/Bjkn_l_IwAg" 
               title="ANNOUNCEMENT, 5th January, 2025" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
