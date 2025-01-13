@@ -3,32 +3,36 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from './ui/button'
 import { Download, X } from 'lucide-react'
 
-// Move deferredPrompt to window scope to avoid conflicts
-declare global {
-  interface Window {
-    deferredPrompt: any;
-  }
-}
+let deferredPrompt: any = null
 
 export function PWAPrompt() {
   const [showPrompt, setShowPrompt] = useState(false)
   
   useEffect(() => {
+    // Check if app is already installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches
     const hasDeclined = localStorage.getItem('pwa-declined')
     
-    setShowPrompt(false)
+    // Show prompt immediately if not installed and hasn't declined
+    if (!isInstalled && !hasDeclined) {
+      setShowPrompt(true)
+    }
 
     const handler = (e: Event) => {
       e.preventDefault()
-      window.deferredPrompt = e // Store in window scope
-      if (!hasDeclined && !isInstalled) {
+      deferredPrompt = e
+      // Always show prompt unless explicitly declined
+      if (!hasDeclined) {
         setShowPrompt(true)
       }
     }
 
+    // Listen for install prompt
     window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler)
+    }
   }, [])
 
   const handleInstall = async () => {

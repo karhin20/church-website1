@@ -67,7 +67,7 @@ const HymnHome = () => {
           <NumPad onNumberSubmit={handleNumberSubmit} />
         </motion.div>
       </div>
-      <ChatButton />
+      
     </div>
   );
 };

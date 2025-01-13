@@ -164,10 +164,10 @@ export default function BiblePage() {
           </select>
         </div>
 
-        {/* Sticky Book and Chapter Selection */}
-        <div className="sticky top-[64px] z-[5] bg-church-gradient p-4 rounded-lg shadow-lg flex flex-wrap gap-4 mb-6">
+        {/* Sticky Book and Chapter Selection - Reduced widths */}
+        <div className="sticky top-[64px] z-[5] bg-church-gradient p-4 rounded-lg shadow-lg flex flex-wrap gap-2 mb-6">
           <select
-            className="p-2 rounded text-lg min-w-[200px] bg-white/90"
+            className="p-2 rounded text-lg w-[150px] sm:w-[200px] bg-white/90"
             value={selectedBook}
             onChange={(e) => setSelectedBook(e.target.value)}
             style={{ color: `rgb(var(--church-primary))` }}
@@ -180,7 +180,7 @@ export default function BiblePage() {
           </select>
 
           <select
-            className="p-2 rounded text-lg bg-white/90"
+            className="p-2 rounded text-lg w-[120px] bg-white/90"
             value={chapter}
             onChange={(e) => setChapter(Number(e.target.value))}
             style={{ color: `rgb(var(--church-primary))` }}
