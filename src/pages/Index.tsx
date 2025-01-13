@@ -6,7 +6,7 @@ import { AnnouncementsSection } from "@/components/sections/AnnouncementsSection
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { SermonsSection } from "@/components/sections/SermonsSection";
 import { FooterSection } from "@/components/sections/FooterSection";
-import { Calendar, MessageCircle, Music4 } from "lucide-react";
+import { Calendar, MessageCircle, Music4, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
