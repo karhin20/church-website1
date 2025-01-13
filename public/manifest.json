@@ -2,7 +2,7 @@
   "name": "TAC-NBC",
   "short_name": "TAC-NBC",
   "description": "Connect with us, chat with our christian-based AI chatbot.",
-  "theme_color": "#4C1D95",
+  "theme_color": "#000000",
   "background_color": "#ffffff",
   "display": "standalone",
   "start_url": "/",

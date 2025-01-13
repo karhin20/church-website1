@@ -9,20 +9,16 @@ export function PWAPrompt() {
   const [showPrompt, setShowPrompt] = useState(false)
   
   useEffect(() => {
-    // Check if app is already installed
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches
-    const hasDeclined = localStorage.getItem('pwa-declined')
-    
-    // Show prompt immediately if not installed and hasn't declined
-    if (!isInstalled && !hasDeclined) {
-      setShowPrompt(true)
-    }
-
     const handler = (e: Event) => {
       e.preventDefault()
       deferredPrompt = e
-      // Always show prompt unless explicitly declined
-      if (!hasDeclined) {
+      
+      // Check if app is already installed
+      const isInstalled = window.matchMedia('(display-mode: standalone)').matches
+      const hasDeclined = localStorage.getItem('pwa-declined')
+      
+      // Show prompt if not installed and hasn't declined
+      if (!isInstalled && !hasDeclined) {
         setShowPrompt(true)
       }
     }
@@ -36,14 +32,14 @@ export function PWAPrompt() {
   }, [])
 
   const handleInstall = async () => {
-    if (window.deferredPrompt) {
+    if (deferredPrompt) {
       setShowPrompt(false)
       try {
-        await window.deferredPrompt.prompt()
-        const { outcome } = await window.deferredPrompt.userChoice
+        await deferredPrompt.prompt()
+        const { outcome } = await deferredPrompt.userChoice
         
         if (outcome === 'accepted') {
-          window.deferredPrompt = null
+          deferredPrompt = null
         } else {
           localStorage.setItem('pwa-declined', 'true')
         }
@@ -52,12 +48,7 @@ export function PWAPrompt() {
         showManualInstallInstructions()
       }
     } else {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-      
-      if (isIOS || isSafari || !window.matchMedia('(display-mode: browser)').matches) {
-        showManualInstallInstructions()
-      }
+      showManualInstallInstructions()
     }
   }
 
