@@ -1,9 +1,27 @@
 import { Facebook, Youtube, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleNavigation = (sectionId: string) => {
+    setIsMenuOpen(false); // Close mobile menu
+    
+    // If we're not on the home page, navigate to home first
+    if (location.pathname !== '/') {
+      navigate('/', { state: { scrollTo: sectionId } });
+      return;
+    }
+
+    // If we're already on the home page, scroll to the section
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-church-primary z-50">
@@ -31,10 +49,26 @@ export const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-white hover:text-church-secondary transition-colors">Home</Link>
+            <Link to="/bible" className="text-white hover:text-church-secondary transition-colors">BIBLE</Link>
             <Link to="/hymns" className="text-white hover:text-church-secondary transition-colors">TAC Hymns</Link>
-            <Link to="/sermons" className="text-white hover:text-church-secondary transition-colors">Sermons</Link>
-            <Link to="/events" className="text-white hover:text-church-secondary transition-colors">Events</Link>
-            <Link to="/contact" className="text-white hover:text-church-secondary transition-colors">Contact</Link>
+            <button 
+              onClick={() => handleNavigation('sermons')} 
+              className="text-white hover:text-church-secondary transition-colors"
+            >
+              Sermons
+            </button>
+            <button 
+              onClick={() => handleNavigation('events')} 
+              className="text-white hover:text-church-secondary transition-colors"
+            >
+              Events
+            </button>
+            <button 
+              onClick={() => handleNavigation('contact')} 
+              className="text-white hover:text-church-secondary transition-colors"
+            >
+              Contact
+            </button>
           </div>
 
           {/* Social Media Links - Always Visible */}
@@ -95,33 +129,37 @@ export const Navigation = () => {
               Home
             </Link>
             <Link 
+              to="/bible" 
+              className="text-white hover:text-church-secondary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              BIBLE
+            </Link>
+            <Link 
               to="/hymns" 
               className="text-white hover:text-church-secondary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               TAC Hymns
             </Link>
-            <Link 
-              to="/sermons" 
-              className="text-white hover:text-church-secondary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+            <button 
+              onClick={() => handleNavigation('sermons')} 
+              className="text-white hover:text-church-secondary transition-colors text-left"
             >
               Sermons
-            </Link>
-            <Link 
-              to="/events" 
-              className="text-white hover:text-church-secondary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+            </button>
+            <button 
+              onClick={() => handleNavigation('events')} 
+              className="text-white hover:text-church-secondary transition-colors text-left"
             >
               Events
-            </Link>
-            <Link 
-              to="/contact" 
-              className="text-white hover:text-church-secondary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
+            </button>
+            <button 
+              onClick={() => handleNavigation('contact')} 
+              className="text-white hover:text-church-secondary transition-colors text-left"
             >
               Contact
-            </Link>
+            </button>
           </div>
         </div>
       </div>

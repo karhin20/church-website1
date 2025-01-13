@@ -13,21 +13,7 @@ export function register() {
   }
 }
 
-let deferredPrompt: any;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e; // Stash the event
-});
-
-// Function to show the install prompt
-const showInstallPrompt = async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-    }
-    deferredPrompt = null; // Clear the deferredPrompt variable
-  }
-};  
+// Remove these as they're now handled in PWAPrompt.tsx
+// let deferredPrompt: any;
+// window.addEventListener('beforeinstallprompt'...
+// const showInstallPrompt...  

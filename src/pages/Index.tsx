@@ -9,13 +9,27 @@ import { FooterSection } from "@/components/sections/FooterSection";
 import { Calendar, MessageCircle, Music4, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { ChatButton } from "@/components/ChatButton";
 
 
 const Index = () => {
-  
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check if we have a section to scroll to
+    if (location.state?.scrollTo) {
+      const element = document.getElementById(location.state.scrollTo);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100); // Small delay to ensure the page is loaded
+      }
+    }
+  }, [location]);
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   return (
     <div className="min-h-screen bg-church-background">
@@ -65,8 +79,12 @@ const Index = () => {
       </div>
 
       <AnnouncementsSection />
-      <UpcomingEvents />
-      <SermonsSection />
+      <div id="events">
+        <UpcomingEvents />
+      </div>
+      <div id="sermons">
+        <SermonsSection />
+      </div>
        {/* Latest News Section */}
        <section className="py-24 bg-church-background">
         <div className="container mx-auto px-4">
@@ -200,16 +218,12 @@ const Index = () => {
           )}
         </DialogContent>
       </Dialog>
-      <FooterSection />
-
-      {/* Chat Button (Fixed) */}
-      <div className="fixed bottom-8 right-8">
-        <Link to="/chat">
-          <Button className="bg-church-secondary hover:bg-church-secondary/90 text-church-primary rounded-full p-4 shadow-lg hover:scale-110 transition-all duration-300">
-            <MessageCircle className="w-6 h-6" />
-          </Button>
-        </Link>
+      <div id="contact">
+        <FooterSection />
       </div>
+
+      {/* ChatButton */}
+      <ChatButton />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { hymns } from "@/data/hymns";
 import { useToast } from "@/components/ui/use-toast";
 import { Navigation } from "@/components/sections/Navigation";
 import { motion } from 'framer-motion';
+import { ChatButton } from "@/components/ChatButton";
 
 const HymnHome = () => {
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ const HymnHome = () => {
           <NumPad onNumberSubmit={handleNumberSubmit} />
         </motion.div>
       </div>
+      <ChatButton />
     </div>
   );
 };

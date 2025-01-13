@@ -106,11 +106,124 @@
   }
 }
 
-/* Add these utility classes if needed */
+/* Selection toolbar background */
 .bg-church-gradient {
   background: linear-gradient(to right, rgb(var(--church-primary) / 0.9), rgb(0 0 0 / 0.75));
 }
 
 .text-church-gold {
   color: rgb(var(--church-secondary));
+
+  .fetch-bible {
+    --fb-red-letter: rgb(var(--church-primary));
+  }
+  
+  .fetch-bible .verse {
+    transition: background-color 0.3s ease;
+    padding: 2px 0;
+    border-radius: 4px;
+  }
+  
+  .fetch-bible .verse.bg-primary\/20 {
+    padding: 2px 4px;
+    background-color: rgb(var(--church-primary) / 0.2);
+  }
+  
+  /* Style adjustments for the fetch-bible content */
+  .fetch-bible.prose {
+    color: inherit;
+    font-size: 1.1rem;
+    line-height: 1.75;
+  }
+  
+  .fetch-bible.prose .chapter {
+    color: rgb(var(--church-primary));
+    font-size: 1.5em;
+    margin-bottom: 1em;
+  }
 }
+
+/* Update the fetch-bible styles */
+.fetch-bible {
+  --fb-red-letter: rgb(var(--church-primary));
+}
+
+.fetch-bible .verse {
+  transition: background-color 0.3s ease;
+  padding: 2px 0;
+  border-radius: 4px;
+  font-size: 1.25rem;
+}
+
+/* Style adjustments for the fetch-bible content */
+.fetch-bible.prose {
+  color: rgb(var(--church-text));
+  font-size: 1.25rem;
+  line-height: 1.85;
+}
+
+.fetch-bible.prose .chapter {
+  color: rgb(var(--church-primary));
+  font-size: 2.5em;
+  margin-bottom: 1em;
+  text-align: center;
+}
+
+/* Style verse numbers */
+.fetch-bible .verse::before {
+  color: rgb(var(--church-primary));
+  font-size: 1em;
+  font-weight: 600;
+  padding-right: 0.5em;
+}
+
+/* Style range inputs */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: rgb(var(--church-accent));
+  border-radius: 4px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: rgb(var(--church-primary));
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: rgb(var(--church-primary));
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Add these styles for the select dropdowns */
+select option {
+  padding: 8px;
+  cursor: pointer;
+}
+
+select option:checked {
+  background-color: rgb(var(--church-primary));
+  color: white;
+}
+
+select option:hover {
+  background-color: rgb(var(--church-primary) / 0.1);
+}
+
+/* Style the select when opened */
+select:focus {
+  outline: 2px solid rgb(var(--church-primary) / 0.5);
+  outline-offset: 2px;
+}
+

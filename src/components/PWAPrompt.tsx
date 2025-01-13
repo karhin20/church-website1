@@ -3,60 +3,57 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from './ui/button'
 import { Download, X } from 'lucide-react'
 
-let deferredPrompt: any = null
+// Move deferredPrompt to window scope to avoid conflicts
+declare global {
+  interface Window {
+    deferredPrompt: any;
+  }
+}
 
 export function PWAPrompt() {
   const [showPrompt, setShowPrompt] = useState(false)
   
   useEffect(() => {
-    // Check if app is already installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches
     const hasDeclined = localStorage.getItem('pwa-declined')
     
-    // Show prompt immediately if not installed and hasn't declined
-    if (!isInstalled && !hasDeclined) {
-      setShowPrompt(true)
-    }
+    setShowPrompt(false)
 
     const handler = (e: Event) => {
       e.preventDefault()
-      deferredPrompt = e
-      // Always show prompt unless explicitly declined
-      if (!hasDeclined) {
+      window.deferredPrompt = e // Store in window scope
+      if (!hasDeclined && !isInstalled) {
         setShowPrompt(true)
       }
     }
 
-    // Listen for install prompt
     window.addEventListener('beforeinstallprompt', handler)
-
-    // Show prompt after 3 seconds if no install prompt was triggered
-    const timer = setTimeout(() => {
-      if (!deferredPrompt && !isInstalled && !hasDeclined) {
-        setShowPrompt(true)
-      }
-    }, 3000)
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler)
-      clearTimeout(timer)
-    }
+    return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
 
   const handleInstall = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt()
-      const { outcome } = await deferredPrompt.userChoice
-
-      if (outcome === 'accepted') {
-        deferredPrompt = null
-        setShowPrompt(false)
+    if (window.deferredPrompt) {
+      setShowPrompt(false)
+      try {
+        await window.deferredPrompt.prompt()
+        const { outcome } = await window.deferredPrompt.userChoice
+        
+        if (outcome === 'accepted') {
+          window.deferredPrompt = null
+        } else {
+          localStorage.setItem('pwa-declined', 'true')
+        }
+      } catch (error) {
+        console.error('Install prompt error:', error)
+        showManualInstallInstructions()
       }
     } else {
-      // If no install prompt, provide manual instructions
-      setShowPrompt(false)
-      // Show manual install instructions modal
-      showManualInstallInstructions()
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+      
+      if (isIOS || isSafari || !window.matchMedia('(display-mode: browser)').matches) {
+        showManualInstallInstructions()
+      }
     }
   }
 
@@ -73,14 +70,22 @@ export function PWAPrompt() {
     
     let instructions = ''
     if (isIOS && isSafari) {
-      instructions = 'Tap the share button and select "Add to Home Screen"'
+      instructions = '1. Tap the share button (rectangle with arrow)\n' +
+                    '2. Scroll down and select "Add to Home Screen"\n' +
+                    '3. Tap "Add" to confirm'
     } else if (navigator.userAgent.includes('Chrome')) {
-      instructions = 'Open Chrome menu and select "Install TAC-NBC"'
+      instructions = '1. Click the menu (three dots) in Chrome\n' +
+                    '2. Select "Install TAC-NBC"\n' +
+                    '3. Click "Install" to confirm'
     } else {
-      instructions = 'Use the browser menu to install this app to your device'
+      instructions = 'To install:\n' +
+                    '1. Open your browser menu\n' +
+                    '2. Look for "Add to Home Screen" or "Install"\n' +
+                    '3. Follow the prompts to install'
     }
 
-    alert(`To install our app: ${instructions}`)
+    // Use a more user-friendly alert or modal
+    alert('Install Instructions:\n\n' + instructions)
   }
 
   return (

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tac-nbc-v1';
+const CACHE_NAME = 'tac-nbc-v2';
 const urlsToCache = [
   '/',
   '/index.html',
