@@ -24,7 +24,8 @@ const ALLOWED_LANGUAGES = {
   'fra': 'français',
   'hau': 'Hausa',
   'ewe': 'Eʋegbe',
-  'twi': 'Twi'
+  'twi': 'Twi' ,
+  'Heb': 'עברית'
 };
 
 export default function BiblePage() {
@@ -180,7 +181,7 @@ export default function BiblePage() {
           </select>
 
           <select
-            className="p-2 rounded text-lg w-[120px] bg-white/90"
+            className="p-2 rounded text-lg w-[140px] bg-white/90"
             value={chapter}
             onChange={(e) => setChapter(Number(e.target.value))}
             style={{ color: `rgb(var(--church-primary))` }}
