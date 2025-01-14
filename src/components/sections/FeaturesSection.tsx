@@ -49,11 +49,31 @@ export const FeaturesSection = () => {
       <div className="container mx-auto grid md:grid-cols-3 gap-12 px-4">
         {/* Verse of the Day */}
         <motion.div 
-          className="text-center p-8 rounded-xl bg-white shadow-lg border border-gray-100"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.3 }}
+          className="p-6 pb-8 bg-white rounded-lg shadow-lg text-center"
+          whileHover={{ scale: 1.05 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 50 }}
+          viewport={{ once: false }}
+          transition={{
+            type: "spring",
+            stiffness: 100,
+            damping: 15,
+            duration: 0.6
+          }}
         >
-          <h3 className="text-2xl font-bold mb-4 text-church-primary">VERSE OF THE DAY</h3>
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <Share2 className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
+          </motion.div>
+          <h3 className="text-2xl font-bold text-church-primary mb-2">VERSE OF THE DAY</h3>
           {verseOfDay && (
             <div className="space-y-4">
               <p className="text-lg italic text-church-text leading-relaxed">
@@ -63,49 +83,76 @@ export const FeaturesSection = () => {
                 {verseOfDay.random_verse.book} {verseOfDay.random_verse.chapter}:{verseOfDay.random_verse.verse} 
                 <span className="ml-2">({verseOfDay.translation.name})</span>
               </p>
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+              <Button
+                onClick={handleShare}
+                className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-xl py-3 px-6 rounded-lg"
               >
-                <Button
-                  onClick={handleShare}
-                  className="mt-4 flex items-center text-church-primary gap-2 mx-auto"
-                  variant="outline"
-                >
-                  <Share2 className="w-4 h-4 text-church-primary"/>
-                  Share Verse
-                </Button>
-              </motion.div>
+                Share Verse
+              </Button>
             </div>
           )}
         </motion.div>
 
         {/* Connect */}
         <motion.div 
-          className="text-center group p-8 rounded-xl bg-white shadow-lg border border-gray-100"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.3 }}
+          className="p-6 pb-8 bg-white rounded-lg shadow-lg text-center"
+          whileHover={{ scale: 1.05 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 50 }}
+          viewport={{ once: false }}
+          transition={{
+            type: "spring",
+            stiffness: 100,
+            damping: 15,
+            duration: 0.6
+          }}
         >
-          <div className="flex justify-center mb-6">
-            <Users className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
-          </div>
-          <h3 className="text-2xl font-bold mb-4 text-church-primary">CONNECT</h3>
-          <p className="text-church-text leading-relaxed">
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <Users className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
+          </motion.div>
+          <h3 className="text-2xl font-bold text-church-primary mb-2">CONNECT</h3>
+          <p className="text-lg text-church-text mb-4">
             Be part of our vibrant community through various fellowship programs.
           </p>
         </motion.div>
 
         {/* God's Love */}
         <motion.div 
-          className="text-center group p-8 rounded-xl bg-white shadow-lg border border-gray-100"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.3 }}
+          className="p-6 pb-8 bg-white rounded-lg shadow-lg text-center"
+          whileHover={{ scale: 1.05 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 50 }}
+          viewport={{ once: false }}
+          transition={{
+            type: "spring",
+            stiffness: 100,
+            damping: 15,
+            duration: 0.6
+          }}
         >
-          <div className="flex justify-center mb-6">
-            <Heart className="w-16 h-16 text-church-secondary group-hover:text-church-primary transition-colors duration-300" />
-          </div>
-          <h3 className="text-2xl font-bold mb-4 text-church-primary">GOD'S LOVE</h3>
-          <p className="text-church-text leading-relaxed">
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <Heart className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
+          </motion.div>
+          <h3 className="text-2xl font-bold text-church-primary mb-2">GOD'S LOVE</h3>
+          <p className="text-lg text-church-text mb-4">
             Experience and share the transforming love of God in our community.
           </p>
         </motion.div>
