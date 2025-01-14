@@ -1,4 +1,4 @@
-import { Users, Heart, Share2 } from "lucide-react";
+import { Users, Heart, Share2, BookOpenText } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -71,7 +71,7 @@ export const FeaturesSection = () => {
               ease: "easeInOut"
             }}
           >
-            <Share2 className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
+            <BookOpenText className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
           </motion.div>
           <h3 className="text-2xl font-bold text-church-primary mb-2">VERSE OF THE DAY</h3>
           {verseOfDay && (
@@ -83,12 +83,15 @@ export const FeaturesSection = () => {
                 {verseOfDay.random_verse.book} {verseOfDay.random_verse.chapter}:{verseOfDay.random_verse.verse} 
                 <span className="ml-2">({verseOfDay.translation.name})</span>
               </p>
-              <Button
-                onClick={handleShare}
-                className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-xl py-3 px-6 rounded-lg"
-              >
-                Share Verse
-              </Button>
+              <div className="mt-4">
+                <Button
+                  onClick={handleShare}
+                  className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-3 px-6 rounded-lg flex items-center gap-2 mx-auto"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share Verse
+                </Button>
+              </div>
             </div>
           )}
         </motion.div>
