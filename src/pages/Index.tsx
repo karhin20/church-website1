@@ -6,7 +6,7 @@ import { AnnouncementsSection } from "@/components/sections/AnnouncementsSection
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { SermonsSection } from "@/components/sections/SermonsSection";
 import { FooterSection } from "@/components/sections/FooterSection";
-import { Calendar, MessageCircle, Music4, X, Book } from "lucide-react";
+import { Calendar, MessageCircle, Music4, X, BookPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Link, useLocation } from "react-router-dom";
@@ -103,7 +103,7 @@ const Index = () => {
                 ease: "easeInOut"
               }}
             >
-              <Book className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
+              <BookPlus className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
             </motion.div>
             <h3 className="text-2xl font-bold text-church-primary mb-2">THE BIBLE</h3>
             <p className="text-lg text-church-text mb-4">Read and study the Word of God in multiple languages.</p> 

@@ -58,6 +58,7 @@ export const HeroSection = () => {
         <p className="max-w-2xl mb-10 text-lg text-gray-200 animate-fade-in delay-200">
           Join us in worship at Nii Boiman Central Auditorium as we grow together in faith and community.
         </p>
+
         <Link to="/chat" className="animate-fade-in delay-300">
           <Button className="bg-church-secondary hover:bg-church-secondary/90 text-church-primary px-8 py-6 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105">
             Chat with Aposor Kofi

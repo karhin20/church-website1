@@ -132,7 +132,7 @@ export default function BiblePage() {
       <Navigation />
       <div className="mt-[100px]">
         <h1 className="text-3xl font-bold mb-6" style={{ color: `rgb(var(--church-primary))`, marginTop: '100px' , textAlign: 'center'}}>
-          THE BIBLE
+          READ THE BIBLE
         </h1>
         
         {/* Language and Translation Selection */}
@@ -167,7 +167,7 @@ export default function BiblePage() {
         {/* Sticky Book and Chapter Selection - Reduced widths */}
         <div className="sticky top-[64px] z-[5] bg-church-gradient p-4 rounded-lg shadow-lg flex flex-wrap gap-2 mb-6">
           <select
-            className="p-2 rounded text-lg w-[150px] sm:w-[200px] bg-white/90"
+            className="p-2 rounded text-lg w-[120px] sm:w-[200px] bg-white/90"
             value={selectedBook}
             onChange={(e) => setSelectedBook(e.target.value)}
             style={{ color: `rgb(var(--church-primary))` }}
