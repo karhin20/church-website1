@@ -51,7 +51,7 @@ export const LiveServiceSection = () => {
         </div>
       </motion.div>
 
-      {isLive ? (
+    
         <div className="container mx-auto px-4 mb-16">
           {/* Optional Video Streaming Section - Uncomment and configure as needed */}
           {/* 
@@ -110,9 +110,7 @@ export const LiveServiceSection = () => {
             </div>
           </div>
         </div>
-      ) : (
-        <NotLiveMessage />
-      )}
+
 
       {/* Hymn and Bible Section */}
       <div className="bg-church-primary py-16 px-4">

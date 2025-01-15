@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/sections/Navigation";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { FeaturesSection } from "@/components/sections/FeaturesSection";
+import { LiveServiceSection } from "@/components/sections/LiveServiceSection";
 import { AnnouncementsSection } from "@/components/sections/AnnouncementsSection";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { SermonsSection } from "@/components/sections/SermonsSection";
@@ -36,6 +37,10 @@ const Index = () => {
       <HeroSection />
       <FeaturesSection />
 
+
+      <LiveServiceSection />
+
+     
       {/* Hymn and Bible Section with Full-Width Background */}
       <div className="bg-church-primary pb-16 p-4"> 
         <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
