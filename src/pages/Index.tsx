@@ -1,7 +1,6 @@
 import { Navigation } from "@/components/sections/Navigation";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { FeaturesSection } from "@/components/sections/FeaturesSection";
-import { LiveServiceSection } from "@/components/sections/LiveServiceSection";
 import { AnnouncementsSection } from "@/components/sections/AnnouncementsSection";
 import { UpcomingEvents } from "@/components/sections/UpcomingEvents";
 import { SermonsSection } from "@/components/sections/SermonsSection";
@@ -9,7 +8,7 @@ import { FooterSection } from "@/components/sections/FooterSection";
 import { Calendar, MessageCircle, Music4, X, BookPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChatButton } from "@/components/ChatButton";
@@ -37,10 +36,6 @@ const Index = () => {
       <HeroSection />
       <FeaturesSection />
 
-
-      <LiveServiceSection />
-
-     
       {/* Hymn and Bible Section with Full-Width Background */}
       <div className="bg-church-primary pb-16 p-4"> 
         <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">

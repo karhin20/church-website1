@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Loading from '@/admin/auth/Loading';
 import { PWAPrompt } from '@/components/PWAPrompt';
+import { LiveServiceSection } from "@/components/sections/LiveServiceSection";
 
 // Lazy load components that need Firebase
 const AuthProvider = lazy(() => import('@/admin/auth/useAuth').then(module => ({ default: module.AuthProvider })));
@@ -42,6 +43,7 @@ function App() {
             <Route path="/hymn/:number" element={<HymnPage />} />
             <Route path="/hymns" element={<HymnHome />} />
             <Route path="/bible" element={<BiblePage />} />
+            <Route path="/live" element={<LiveServiceSection />} />
 
             {/* Protected routes */}
             <Route path="/admin/*" element={

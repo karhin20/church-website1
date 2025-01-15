@@ -1,4 +1,4 @@
-import { Facebook, Youtube, Menu, X } from "lucide-react";
+import { Facebook, Youtube, Menu, X, Radio } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -69,9 +69,16 @@ export const Navigation = () => {
             >
               Contact
             </button>
+            <Link 
+              to="/live" 
+              className="flex items-center px-4 py-2 text-sm hover:bg-accent rounded-md text-church-secondary"
+            >
+              <Radio className="w-4 h-4 mr-2" />
+              Live Service
+            </Link>
           </div>
 
-          {/* Social Media Links - Always Visible */}
+          {/* Social Media Links */}
           <div className="flex items-center space-x-4">
             <a
               href="https://facebook.com/tac.niiboimancentral"
@@ -160,6 +167,13 @@ export const Navigation = () => {
             >
               Contact
             </button>
+            <Link 
+              to="/live" 
+              className="flex items-center hover:bg-accent rounded-md text-church-secondary"
+            >
+              <Radio className="w-4 h-4 mr-2" />
+              Live Service
+            </Link>
           </div>
         </div>
       </div>

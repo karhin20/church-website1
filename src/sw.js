@@ -1,48 +1,73 @@
 const CACHE_NAME = 'tac-nbc-v2';
-const urlsToCache = [
+const HYMN_CACHE = 'tac-nbc-hymns';
+const GALLERY_CACHE = 'tac-nbc-gallery';
+
+// Separate cache lists
+const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/logo.png',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  '/static/js/bundle.js', // Add your JS bundle
-  '/static/css/index.css'  // Add your CSS files
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open('my-cache').then((cache) => {
-      return cache.addAll([
-        '/',
-        '/index.html',
-        '/src/main.tsx',
-        '/icons/icon-192x192.png',
-        '/icons/icon-512x512.png',
-        '/static/css/index.css',
-        '/static/js/bundle.js'
-        // Add other assets you want to cache
-      ]);
-    })
+    Promise.all([
+      caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)),
+      caches.open(HYMN_CACHE),
+      caches.open(GALLERY_CACHE)
+    ])
   );
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // Cache-first strategy for hymns and gallery
+  if (url.pathname.includes('/hymns') || url.pathname.includes('/gallery')) {
+    const cacheName = url.pathname.includes('/hymns') ? HYMN_CACHE : GALLERY_CACHE;
+    
+    event.respondWith(
+      caches.match(event.request)
+        .then(cachedResponse => cachedResponse || fetch(event.request)
+          .then(response => {
+            const responseClone = response.clone();
+            caches.open(cacheName)
+              .then(cache => cache.put(event.request, responseClone));
+            return response;
+          })
+        )
+    );
+    return;
+  }
+
+  // Network-first strategy for other content
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then(response => {
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME)
+          .then(cache => cache.put(event.request, responseClone));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
-      );
-    })
+    Promise.all([
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames
+            .filter(name => name !== CACHE_NAME && 
+                          name !== HYMN_CACHE && 
+                          name !== GALLERY_CACHE)
+            .map(name => caches.delete(name))
+        );
+      })
+    ])
   );
 }); 

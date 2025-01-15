@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Radio, ArrowRight } from "lucide-react";
 
 export const HeroSection = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -59,11 +60,24 @@ export const HeroSection = () => {
           Join us in worship at Nii Boiman Central Auditorium as we grow together in faith and community.
         </p>
 
-        <Link to="/chat" className="animate-fade-in delay-300">
-          <Button className="bg-church-secondary hover:bg-church-secondary/90 text-church-primary px-8 py-6 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105">
-            Chat with Aposor Kofi
-          </Button>
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center animate-fade-in delay-300">
+          <Link to="/chat">
+            <Button className="bg-church-secondary hover:bg-church-secondary/90 text-church-primary px-8 py-6 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105">
+              Chat with Aposor Kofi
+            </Button>
+          </Link>
+
+         * <Link to="/live">
+            <Button 
+              variant="ghost" 
+              className="text-white hover:bg-transparent hover:text-church-secondary text-3xl flex items-center"
+            >
+              <Radio className="w-10 h-10 text-church-secondary animate-pulse" />
+              <span className="animate-pulse">Live Service</span>
+              <ArrowRight className="w-6 h-6 text-church-secondary mr-2 animate-pulse" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   );

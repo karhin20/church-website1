@@ -73,7 +73,7 @@ export const FeaturesSection = () => {
           >
             <BookOpenText className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
           </motion.div>
-          <h3 className="text-2xl font-bold text-church-primary mb-2">VERSE OF THE DAY</h3>
+          <h3 className="text-2xl font-bold text-church-primary mb-2">KNOW YOUR BIBLE</h3>
           {verseOfDay && (
             <div className="space-y-4">
               <p className="text-lg italic text-church-text leading-relaxed">
