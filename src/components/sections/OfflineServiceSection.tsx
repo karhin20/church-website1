@@ -104,12 +104,6 @@ export const OfflineServiceSection = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Button
-                className="bg-church-primary text-white hover:bg-church-secondary transition-colors"
-                asChild
-              >
-                <Link to="/">Return Home</Link>
-              </Button>
             </motion.div>
           </motion.div>
 
