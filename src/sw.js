@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tac-nbc-v2';
+const CACHE_NAME = 'tac-nbc-v3';
 const HYMN_CACHE = 'tac-nbc-hymns';
 const IMAGE_CACHE = 'tac-nbc-images';
 

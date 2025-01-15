@@ -38,7 +38,7 @@ const Index = () => {
       <FeaturesSection />
 
 
-      <LiveServiceSection />
+      {/*<LiveServiceSection />*/}
 
      
       {/* Hymn and Bible Section with Full-Width Background */}
