@@ -169,7 +169,7 @@ export const Navigation = () => {
             </button>
             <Link 
               to="/live" 
-              className="flex items-center hover:bg-accent rounded-md text-church-secondary"
+              className="flex items-center text-sm hover:bg-accent rounded-md text-church-secondary"
             >
               <Radio className="w-4 h-4 mr-2" />
               Live Service
