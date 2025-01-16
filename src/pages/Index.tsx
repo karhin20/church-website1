@@ -107,11 +107,18 @@ const Index = () => {
             </motion.div>
             <h3 className="text-2xl font-bold text-church-primary mb-2">THE BIBLE</h3>
             <p className="text-lg text-church-text mb-4">Read and study the Word of God in multiple languages.</p> 
-            <Link to="/bible">
-              <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-xl py-3 px-6 rounded-lg">
-                Read Bible
-              </Button>
-            </Link>
+            <div className="flex gap-2 justify-center">
+              <Link to="/bible">
+                <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-2 px-4 rounded-lg">
+                  Read Bible
+                </Button>
+              </Link>
+              <Link to="/verse-reader">
+                <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-2 px-4 rounded-lg">
+                  Read a Verse
+                </Button>
+              </Link>
+            </div>
           </motion.div>
         </div>
       </div>

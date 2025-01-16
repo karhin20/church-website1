@@ -162,29 +162,45 @@ export const OfflineServiceSection = () => {
 
             {/* Bible Card */}
             <motion.div 
-              variants={itemVariants}
-              className="p-6 pb-8 bg-white rounded-lg shadow-lg text-center"
-              whileHover={{ 
-                scale: 1.05,
-                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+            className="p-6 pb-8 bg-white rounded-lg shadow-lg text-center"
+            whileHover={{ scale: 1.05 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 50 }}
+            viewport={{ once: false }}
+            transition={{
+              type: "spring",
+              stiffness: 100,
+              damping: 15,
+              duration: 0.6
+            }}
+          >
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut"
               }}
             >
-              <motion.div
-                animate={{
-                  y: [0, -5, 0],
-                  transition: { duration: 2, repeat: Infinity, delay: 0.5 }
-                }}
-              >
-                <BookPlus className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
-              </motion.div>
-              <h3 className="text-2xl font-bold text-church-primary mb-2">THE BIBLE</h3>
-              <p className="text-lg text-church-text mb-4">Read and study the Word of God in multiple languages.</p> 
+              <BookPlus className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
+            </motion.div>
+            <h3 className="text-2xl font-bold text-church-primary mb-2">THE BIBLE</h3>
+            <p className="text-lg text-church-text mb-4">Read and study the Word of God in multiple languages.</p> 
+            <div className="flex gap-2 justify-center">
               <Link to="/bible">
-                <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-xl py-3 px-6 rounded-lg">
+                <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-2 px-4 rounded-lg">
                   Read Bible
                 </Button>
               </Link>
-            </motion.div>
+              <Link to="/verse-reader">
+                <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-2 px-4 rounded-lg">
+                  Read a Verse
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
           </div>
         </motion.div>
         <div>

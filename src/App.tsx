@@ -25,6 +25,7 @@ import SignUp from './pages/SignUp';
 import Chat from './pages/Chat';
 import HymnHome from './pages/hymnHome';
 import BiblePage from './pages/Bible';
+import VerseReader from "@/pages/VerseReader";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,8 @@ function App() {
 
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
+
+            <Route path="/verse-reader" element={<VerseReader />} />
           </Routes>
           <PWAPrompt />
         </ChatProviderLazy>

@@ -12,6 +12,7 @@ interface VerseOfDay {
 
 export const FeaturesSection = () => {
   const [verseOfDay, setVerseOfDay] = useState<VerseOfDay | null>(null);
+  const [isImageOpen, setIsImageOpen] = useState(false); // State to manage image modal
 
   useEffect(() => {
     const fetchVerseOfDay = async () => {
@@ -46,6 +47,14 @@ export const FeaturesSection = () => {
     }
   };
 
+  const handleImageClick = () => {
+    setIsImageOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsImageOpen(false);
+  };
+
   return (
     <section className="py-24 bg-church-background">
       <div className="container mx-auto grid md:grid-cols-3 gap-12 px-4">
@@ -66,41 +75,35 @@ export const FeaturesSection = () => {
           {verseOfDay && (
             <>
               <h3 className="text-2xl font-bold text-church-primary mb-2">Verse of the Day</h3>
-              {verseOfDay.images.length > 0 ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <img 
-                    src={verseOfDay.images[0]} 
-                    alt="Verse of the Day" 
-                    className="w-full h-auto mb-4 rounded-lg" 
-                  />
-                </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, x: -50 }} // Start from the left
-                  animate={{ opacity: 1, x: 0 }} // Fade in and slide to the center
-                  transition={{ duration: 0.6 }}
-                  className="space-y-4"
-                >
-                  <p className="text-lg italic text-church-text leading-relaxed">
-                    "{verseOfDay.passage}"
-                  </p>
-                  <p className="text-sm font-medium text-church-secondary">
-                    {verseOfDay.citation} <span className="ml-2">({verseOfDay.version})</span>
-                  </p>
-                </motion.div>
-              )}
-              <div className="mt-4">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }} // Start from the left
+                animate={{ opacity: 1, x: 0 }} // Fade in and slide to the center
+                transition={{ duration: 0.6 }}
+                className="space-y-4"
+              >
+                <p className="text-lg italic text-church-text leading-relaxed">
+                  "{verseOfDay.passage}"
+                </p>
+                <p className="text-sm font-medium text-church-secondary">
+                  {verseOfDay.citation} <span className="ml-2">({verseOfDay.version})</span>
+                </p>
+              </motion.div>
+              <div className="mt-4 flex justify-center gap-2">
                 <Button
                   onClick={handleShare}
-                  className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-3 px-6 rounded-lg flex items-center gap-2 mx-auto"
+                  className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-3 px-6 rounded-lg flex items-center gap-2"
                 >
                   <Share2 className="w-4 h-4" />
                   Share Verse
                 </Button>
+                {verseOfDay.images.length > 0 && (
+                  <Button
+                    onClick={handleImageClick}
+                    className="bg-church-secondary text-white hover:bg-church-primary transition-colors text-sm py-3 px-6 rounded-lg flex items-center gap-2"
+                  >
+                    View Image
+                  </Button>
+                )}
               </div>
             </>
           )}
@@ -170,6 +173,20 @@ export const FeaturesSection = () => {
           </p>
         </motion.div>
       </div>
+
+      {/* Fullscreen Image Modal */}
+      {isImageOpen && verseOfDay?.images.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="relative">
+            <button onClick={closeImageModal} className="absolute top-2 right-2 text-white text-2xl">✖</button>
+            <img 
+              src={verseOfDay.images[0]} 
+              alt="Verse of the Day" 
+              className="max-w-full max-h-full object-contain" 
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }; 
