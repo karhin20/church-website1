@@ -45,8 +45,8 @@ function App() {
             <Route path="/hymn/:number" element={<HymnPage />} />
             <Route path="/hymns" element={<HymnHome />} />
             <Route path="/bible" element={<BiblePage />} />
-            <Route path="/notlive" element={<OfflineServiceSection />} />
-            <Route path="/live" element={<LiveServiceSection />} />
+            <Route path="/live" element={<OfflineServiceSection />} />
+            <Route path="/notlive" element={<LiveServiceSection />} />
 
             {/* Protected routes */}
             <Route path="/admin/*" element={
