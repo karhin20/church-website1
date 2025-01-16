@@ -13,7 +13,7 @@ const STATIC_ASSETS = [
 ];
 
 // List of image extensions to cache
-const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'];
+const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.PNG'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

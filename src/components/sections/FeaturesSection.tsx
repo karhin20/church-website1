@@ -3,32 +3,34 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
-interface BibleVerse {
-  random_verse: {
-    book: string;
-    chapter: number;
-    verse: number;
-    text: string;
-  };
-  translation: {
-    name: string;
-  };
+interface VerseOfDay {
+  citation: string;
+  passage: string;
+  images: string[];
+  version: string;
 }
 
 export const FeaturesSection = () => {
-  const [verseOfDay, setVerseOfDay] = useState<BibleVerse | null>(null);
+  const [verseOfDay, setVerseOfDay] = useState<VerseOfDay | null>(null);
 
   useEffect(() => {
-    fetch('https://bible-api.com/data/web/random/NT')
-      .then(res => res.json())
-      .then(data => setVerseOfDay(data))
-      .catch(err => console.error('Error fetching verse:', err));
+    const fetchVerseOfDay = async () => {
+      try {
+        const response = await fetch('https://backend-church.vercel.app/api/verse-of-the-day'); // Your API endpoint
+        const data = await response.json();
+        setVerseOfDay(data);
+      } catch (error) {
+        console.error('Error fetching verse of the day:', error);
+      }
+    };
+
+    fetchVerseOfDay();
   }, []);
 
   const handleShare = async () => {
     if (!verseOfDay) return;
 
-    const shareText = `${verseOfDay.random_verse.text.trim()}\n\n${verseOfDay.random_verse.book} ${verseOfDay.random_verse.chapter}:${verseOfDay.random_verse.verse} (${verseOfDay.translation.name})\n\n#NiiBoimanCentralApp`;
+    const shareText = `${verseOfDay.citation}: "${verseOfDay.passage}"\n\n#NiiBoimanCentralApp`;
 
     try {
       if (navigator.share) {
@@ -61,28 +63,35 @@ export const FeaturesSection = () => {
             duration: 0.6
           }}
         >
-          <motion.div
-            animate={{
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            <BookOpenText className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
-          </motion.div>
-          <h3 className="text-2xl font-bold text-church-primary mb-2">KNOW YOUR BIBLE</h3>
           {verseOfDay && (
-            <div className="space-y-4">
-              <p className="text-lg italic text-church-text leading-relaxed">
-                "{verseOfDay.random_verse.text.trim()}"
-              </p>
-              <p className="text-sm font-medium text-church-secondary">
-                {verseOfDay.random_verse.book} {verseOfDay.random_verse.chapter}:{verseOfDay.random_verse.verse} 
-                <span className="ml-2">({verseOfDay.translation.name})</span>
-              </p>
+            <>
+              <h3 className="text-2xl font-bold text-church-primary mb-2">Verse of the Day</h3>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+              >
+                {verseOfDay.images.length > 0 ? (
+                  <img 
+                    src={verseOfDay.images[0]} 
+                    alt="Verse of the Day" 
+                    className="w-full h-auto mb-4 rounded-lg" 
+                  />
+                ) : null}
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -50 }} // Start from the left
+                animate={{ opacity: 1, x: 0 }} // Fade in and slide to the center
+                transition={{ duration: 0.6 }}
+                className="space-y-4"
+              >
+                <p className="text-lg italic text-church-text leading-relaxed">
+                  "{verseOfDay.passage}"
+                </p>
+                <p className="text-sm font-medium text-church-secondary">
+                  {verseOfDay.citation} <span className="ml-2">({verseOfDay.version})</span>
+                </p>
+              </motion.div>
               <div className="mt-4">
                 <Button
                   onClick={handleShare}
@@ -92,7 +101,7 @@ export const FeaturesSection = () => {
                   Share Verse
                 </Button>
               </div>
-            </div>
+            </>
           )}
         </motion.div>
 
