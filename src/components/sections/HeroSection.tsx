@@ -68,7 +68,7 @@ export const HeroSection = () => {
           </Link>
           
 
-        {/* <Link to="/live">
+         <Link to="/live">
             <Button 
               variant="ghost" 
               className="text-white hover:bg-transparent hover:text-church-secondary text-3xl flex items-center"
@@ -77,7 +77,7 @@ export const HeroSection = () => {
               <span className="animate-pulse">Live Service</span>
               <ArrowRight className="w-6 h-6 text-church-secondary mr-2 animate-pulse" />
             </Button>
-          </Link> */}
+          </Link>
 
 
 
