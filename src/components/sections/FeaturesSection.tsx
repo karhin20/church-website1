@@ -66,32 +66,33 @@ export const FeaturesSection = () => {
           {verseOfDay && (
             <>
               <h3 className="text-2xl font-bold text-church-primary mb-2">Verse of the Day</h3>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-              >
-                {verseOfDay.images.length > 0 ? (
+              {verseOfDay.images.length > 0 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6 }}
+                >
                   <img 
                     src={verseOfDay.images[0]} 
                     alt="Verse of the Day" 
                     className="w-full h-auto mb-4 rounded-lg" 
                   />
-                ) : null}
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: -50 }} // Start from the left
-                animate={{ opacity: 1, x: 0 }} // Fade in and slide to the center
-                transition={{ duration: 0.6 }}
-                className="space-y-4"
-              >
-                <p className="text-lg italic text-church-text leading-relaxed">
-                  "{verseOfDay.passage}"
-                </p>
-                <p className="text-sm font-medium text-church-secondary">
-                  {verseOfDay.citation} <span className="ml-2">({verseOfDay.version})</span>
-                </p>
-              </motion.div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }} // Start from the left
+                  animate={{ opacity: 1, x: 0 }} // Fade in and slide to the center
+                  transition={{ duration: 0.6 }}
+                  className="space-y-4"
+                >
+                  <p className="text-lg italic text-church-text leading-relaxed">
+                    "{verseOfDay.passage}"
+                  </p>
+                  <p className="text-sm font-medium text-church-secondary">
+                    {verseOfDay.citation} <span className="ml-2">({verseOfDay.version})</span>
+                  </p>
+                </motion.div>
+              )}
               <div className="mt-4">
                 <Button
                   onClick={handleShare}
