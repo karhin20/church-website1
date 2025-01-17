@@ -68,7 +68,7 @@ export const HeroSection = () => {
           </Link>
           
 
-         <Link to="/offline">
+         <Link to="/live">
             <Button 
               variant="ghost" 
               className="text-white hover:bg-transparent hover:text-church-secondary text-3xl flex items-center"
