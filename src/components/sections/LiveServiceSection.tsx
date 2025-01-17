@@ -1,11 +1,16 @@
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Music4, BookPlus, MicVocal, MessageCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { Music4, BookPlus, MicVocal, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "./Navigation";
 import { ChatButton } from "../ChatButton";
+import { VerseReader } from '@/pages/VerseReader';
+import { FooterSection } from './FooterSection';
 
 export const LiveServiceSection = () => {
+  const [isVerseReaderOpen, setIsVerseReaderOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-church-background pt-20">
       <Navigation />
@@ -24,21 +29,8 @@ export const LiveServiceSection = () => {
           </div>
         </motion.div>
 
-
-          {/* Video 
-         <div className="aspect-video w-full max-w-4xl mx-auto mb-16">
-          <iframe
-            className="w-full h-full rounded-lg shadow-lg"
-            src="https://www.youtube.com/embed/live_stream?channel=YOUR_CHANNEL_ID"
-            title="Church Live Stream"
-            allowFullScreen
-          ></iframe>
-        </div>
-
-        Embed Container */}
-
         {/* Grid container with Podbean and Support */}
-        <div className="grid md:grid-cols-5 gap-6 max-w-6xl mx-auto mb-16">
+        <div className="grid md:grid-cols-5 gap-6 max-w-6xl mx-auto mb-8">
           {/* Podbean player taking 3/5 of the space */}
           <div className="md:col-span-3 bg-white rounded-lg shadow-md p-4">
             <iframe
@@ -68,79 +60,44 @@ export const LiveServiceSection = () => {
             </p>
           </div>
         </div>
-      </div>
 
-      {/* Hymn and Bible Section */}
-      <div className="bg-church-primary py-16 px-4">
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-          {/* Hymn Card */}
-          <motion.div 
-            className="p-6 pb-8 bg-white rounded-lg shadow-lg text-center"
-            whileHover={{ scale: 1.05 }}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 100,
-              damping: 15
-            }}
+        {/* Verse Reader Toggle Button and Content */}
+        <div className="max-w-6xl mx-auto">
+          <button
+            onClick={() => setIsVerseReaderOpen(!isVerseReaderOpen)}
+            className="w-full flex items-center justify-between p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
           >
-            <Music4 className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-church-primary mb-2">TAC Hymns</h3>
-            <p className="text-lg text-church-text mb-4">Explore our rich collection of spiritual hymns.</p> 
-            <Link to="/hymns">
-              <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-xl py-3 px-6 rounded-lg">
-                View Hymns
-              </Button>
-            </Link>
-          </motion.div>
+            <span className="text-lg font-semibold text-church-primary">
+              Bible Verse Reader
+            </span>
+            {isVerseReaderOpen ? (
+              <ChevronUp className="w-6 h-6 text-church-primary" />
+            ) : (
+              <ChevronDown className="w-6 h-6 text-church-primary" />
+            )}
+          </button>
 
-          {/* Bible Card */}
-          <motion.div 
-            className="p-6 pb-8 bg-white rounded-lg shadow-lg text-center"
-            whileHover={{ scale: 1.05 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            initial={{ opacity: 0, y: 50 }}
-            viewport={{ once: false }}
-            transition={{
-              type: "spring",
-              stiffness: 100,
-              damping: 15,
-              duration: 0.6
-            }}
-          >
-            <motion.div
-              animate={{
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <BookPlus className="w-14 h-14 text-yellow-500 mx-auto mb-4" />
-            </motion.div>
-            <h3 className="text-2xl font-bold text-church-primary mb-2">THE BIBLE</h3>
-            <p className="text-lg text-church-text mb-4">Read and study the Word of God in multiple languages.</p> 
-            <div className="flex gap-2 justify-center">
-              <Link to="/bible">
-                <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-2 px-4 rounded-lg">
-                  Read Bible
-                </Button>
-              </Link>
-              <Link to="/verse-reader">
-                <Button className="bg-church-primary text-white hover:bg-church-secondary transition-colors text-sm py-2 px-4 rounded-lg">
-                  Read a Verse
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
+          <AnimatePresence>
+            {isVerseReaderOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="overflow-hidden"
+              >
+                <div className="mt-4">
+                  <VerseReader />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+      </div>
         <div>
             <ChatButton />
         </div>
-      </div>
+        <FooterSection />
     </div>
   );
 };
