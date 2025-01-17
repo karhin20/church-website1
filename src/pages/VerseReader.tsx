@@ -83,10 +83,7 @@ const translations: TranslationsMap = {
     { value: "WE", label: "Worldwide English (New Testament)" },
     { value: "WYC", label: "Wycliffe Bible" },
     { value: "YLT", label: "Young's Literal Translation" }
-],
-  twi: [
-    { value: "NA-TWI", label: "Nkwa Asem" }
-  ]
+]
 };
 
 const bibleBooks = [
@@ -207,7 +204,6 @@ export const VerseReader = () => {
                 onChange={(e) => handleLanguageChange(e.target.value)}
               >
                 <option value="en">English</option>
-                <option value="twi">Twi</option>
               </select>
             </div>
             <div className="flex-1">
