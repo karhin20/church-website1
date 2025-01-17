@@ -70,7 +70,7 @@ export const Navigation = () => {
               Contact
             </button>
             <Link 
-              to="/offline" 
+              to="/live" 
               className="flex items-center px-4 py-2 text-sm hover:bg-accent rounded-md text-church-secondary"
             >
               <Radio className="w-4 h-4 mr-2" />
