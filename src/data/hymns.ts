@@ -672,7 +672,37 @@ export const hymns: Hymn[] = [
     "N’a nwonwa nnwuma bi ne sε\nWama po de ne huuyε no\nYi no ayε a ɔmmerε da\nW’ahyε sε ɔntena sε n’ahyεde\nN’a nwonwa nnwuma te dɔɔso dεn ara\nEnti na mεto ho dwom daa",
     "N’a nwonwa nnwuma a wayε\nNe sε ɔde Kristo mogya\nAma nnebɔneyεfo ahu\nYesu Kristo mu nkwagye no\nN’a nwonwa nnwuma te dɔɔso dεn ara\nEnti na mεto ho dwom daa"
   ]
-},    
+}, 
+{
+  "number": 56,
+  "title": "Tweadeampɔn Nyame, yεsɔre wo",
+  "stanzas": [
+    "Tweadeampɔn Nyame, yεsɔre wo\nYεde ayεyi afɔre brε wo\nWɔ w’asɔrefi kronkron mu\nNa wo nkoa hyira wo din\nW’adom wɔ hɔ ma yεn da anti\nOnyankopɔn,yεsɔre wo",
+    
+    "Sε yεhwε wo Nyame su a\nAnɔpa yi yεsɔre wo\nNhyira ne nidi ne tumi\nYε Onyankopɔn dea daa\nWo nsam nhyira ’yenya da anti\nOnyankopɔn,yεsɔre wo",
+    
+    "Yentumi nka ayamye a\nWoyε ma nipa nyinaa\nWobue wo nsam ma nnipa nyinaa\nNya nea wohia di mee daa\nNnepa a εmmɔ yen nti\nOnyankopɔn,yεsɔre wo",
+    
+    "Nhyira nka Agya Nyankopɔn\nɔde ne homhom kronkron\nMogya adansefo sɔre\nNea ɔwɔ hɔ nnε ne daa\nWo tumi a εkora yεn nti\nOnyankopɔn,yεsɔre wo",
+    
+    "Sε atεmmu da no du a\nWo nkoa nyinaa bεsɔre wo\nEfisε wo de yεn bεtena\nWo nsa nifa afebɔɔ\nTenabea a woasiesie ama yεn nti\nOnyankopɔn,yεsɔre wo"
+  ]
+},
+{
+  "number": 57,
+  "title": "Awurade Nyankopɔn Tumfo",
+  "stanzas": [
+    "Awurade Nyankopɔn Tumfo\nWo na yεyi wo ayε daa\nWo din kronkron no ama so\nWo na yεyi wo ayε daa\nAnuonyam,anuonyam nka wo\nɔdomankoma Nyankopɔn\nWo a te sorosoro\nWo na yεyi wo ayε daa",
+    
+    "Awurade Nyankopɔn Tumfo\nWo na yεyi wo ayε daa\nWo nkutoo na tumi wɔ wo\nWo na yεyi wo ayε daa\nAnuonyam,anuonyam nka wo\nWo a w’ahenni wɔ hɔ daa\nWo tumi boro tumi nyinaa so\nWo na yεyi wo ayε daa",
+    
+    "Awurade Nyankopɔn Tumfo\nWo na yεyi wo ayε daa\nɔsoro Nyankopɔn ’gyefo\nWo na yεyi wo ayε daa\nAnuonyam,anuonyam nka wo\nWo a wodi tumi daa\nOtweaduampɔn Nyamekopɔn koro\nWo na yεyi wo ayε daa",
+    
+    "Awurade Nyankopɔn Tumfo\nWo na yεyi wo ayε daa\nIsrael Nyankopɔn koro\nWo na yεyi wo ayε daa\nAnuonyam,anuonyam nka wo\nYεn nkwagye botan ne wo\nGyedifo Nyankopɔn Agya\nWo na yεyi wo ayε daa",
+    
+    "Awurade Nyankopɔn Tumfo\nWo na yεyi wo ayε daa\nDɔm Nyankopɔn koro\nWo na yεyi wo ayε daa\nWo nkutoo ne anidaso\nWo na yεyi wo ayε daa\nAwurade Nyankopɔn hwεfo\nWo na yεyi wo ayε daa"
+  ]
+},   
   {
     "number": 58,
     "title": "Yehowa nko na yεnim no",
@@ -1904,7 +1934,72 @@ export const hymns: Hymn[] = [
       "Me koma ahyε ma nnε,\nM’akɔtɔ ahosan sorɔkye no mu;\nBosu foforo bi atɔ\nAgu me kra mu nnε\nNokware Honhom na manya yi,\nHonhom boafo tena me mu daa."
     ]
   },
-
+  {
+    "number": 163,
+    "title": "Momma Kristo asεndua no so",
+    "stanzas": [
+      "Momma Kristo asεndua no so\nNkyerε nnebͻneyεfo nyinaa nnε\nMonka nkwangye nsεmpa no nkyerε wͻn\nNa nnebͻneyεfo gye da no adu",
+      
+      "(Chorus)\nDin bi nni soro ne asase so \nA wotumi gye nkwa wͻ mu\nEnti momma asεndua no so\nNa nneebͻneyεfo gye da no adu",
+      
+      "Kisto mogya mu tumi nnsa da\nEnti momma yεmfa gyidi nsͻre;\nMomma yεnkͻ nsraban no akyi\nNkͻfa wͻn a wͻapira no mmra fie",
+      
+      "Fa wo nkwa bͻ Kristo afͻre\nXrefrε wo yi tie na di n’akyi\nTeε wo nsa sͻ Kristo mu\nNa wo ne no mmom nkͻyε adwuma",
+      
+      "Pa wo ho akyi na di n’akyi\nNa wiase yi retwa mu akͻ\nOwia da so yi yε w’adwuma\nAde rebεsa enti yε no ntεm",
+      
+      "Me ne Yesu Kristo bεnantew\nAkͻfa nnomumfo no aba fie;\nKristo mogya no mu na menam\nEnti nkonimdi no bεye me de"
+    ]
+  },
+  {
+    "number": 172,
+    "title": "Yehowa ne me hwεfo",
+    "stanzas": [
+      "Yehowa ne me hwεfo\nEnti biribiara nhia me\nwura frͻmfrͻm adidibea\nHͻ na ƆMa me kra da",
+      
+      "(Chorus)\nƆdwodwo me kra daa\nmε fa n’akwan tenenee so\nenti me n’suro bͻne bi\nefiri sε ͻne me wͻ hͻ",
+      
+      "Ɔno ne hann ne nkwagye\nhena na me n’suro no?\nƆno ne me nkwa ahoͻden\nEnti me ho rempopo",
+      
+      "Sε dͻm bͻ me ho nsra a\nNe din nti me koma ren ntu\nSε wotu me so sa a\nNe din nti me ho tͻ me",
+      
+      "Ɔbε ma me ti so daa\nwͻ m’atamfo nyinaa anim\nmεto sanku ho nnwom daa\nabͻ n’ayεyi afͻre",
+      
+      "Me nkwagye me Nyankopͻn\nnyi w’ani nhintaw me \nme gyefo boafo nnyaw me \nw’anim na me re hwehwε"
+    ]
+  },
+  {
+    "number": 175,
+    "title": "Kristo asεndua ase na mεtena",
+    "stanzas": [
+      "Kristo asεndua ase na mεtena\nNa ne mogya no asosͻ me so\nEnti sε ͻhaw hyε me so mpo a\nMεma m’ani so ahwε Kalvary",
+      
+      "Kristo m’agyenkwa mεbata wo ho\nMe ne wo bεtena na ahyira me\nEnti sε nnipa tu me bo mpo a\nMεma m’ani so ahwε Kalvary",
+      
+      "Kristo asεndua soa no hyε me den\nNe mu tumi no kora gyedifo\nEnti sε me kra tͻ piti mpoa\nMεma m’ani so ahwε Kalvary",
+      
+      "Yesu Kristo dͻ no yε me frankaa\nƆde adi me bͻne so nkonim\nEnti sε bͻne mframa bͻ mpo a\nMεma m’ani so ahwε Kalvary",
+      
+      "Getsemane hɔ na Kristo kae me\nMe bɔne no nti, ɔnom kuruwa no;\nEnti sε wiase gyigye me mpo a\nMεma m’ani so ahwε Kalvary",
+      
+      "Kristo asεndua ase na mεtra\nEfisε ɔno ne me kra gyefo;\nSε bɔne yε me adesoa mpo a\nMεma m’ani so ahwε Kalvary",
+      
+      "Minim m’agyenkwa dɔ sεnea εte,\nOnim sε mepε sε me dɔ no bi;\nEnti sε me dɔ ano dwodwo mpo a\nMεma m’ani so ahwε Kalvary",
+      
+      "Kristo dɔ me, na me yε wo de,\nKyerεw wo dɔ no wɔ me koma mu;\nSε me hyia ɔtaa wɔ me som mu mpo a\nMεma m’ani so ahwε Kalvary."
+    ]
+  },
+  {
+    "number": 176,
+    "title": "Mεfrε Onyankopɔn",
+    "stanzas": [
+      "Mεfrε Onyankopɔn\nNa ͻbεgye me so\nMe ne no bεkasa\nNa ͻbεte ne nyinaa\nMe frε no gyedi mu\nNa wakyerε me nea me nyε\nObehwie ne Honhom\nAgu me so dasum’",
+      "Onyankopɔn bεma \nM’ate ne honhom nka\nEnti me nso mεyε\nN’adwuma no wɔ ha\nƆde ne nsa bεto\nMe so na w’ahyε me den\nMεte ne dasum\nNa m’asɔre ntɛm",
+      "Ɔbεfrε me afi\nM’abusua mu da bi\nNa m’apo yere ne mma\nNe m,adɔfo nyinaa\nMεsoa asɛndua\nNa m’akɔ ne soma no\nNe Honhom bɛboa me\nNa m’akɔ soma no",
+      "Onyankopɔn bɛma\nM’ahu ne bɔhyɛ no\nNea me ne no bɛkɔ\nAkɔyɛ n’adwuma no\nM’asɛm ara ne sɛ\nNea wopɛ no nyɛ hɔ\nEnti mede me ho \nBɔ afɔre ma wo",
+      "Dɛn na menyɛ mma wo?\nO,Awurade kasa\nKasa na meretie\nNea wobɛka nyinaa\nMa Honhom Kronkron no\nMmoa me wɔ me mmerewyɛ mu\nNa memfa me ho mmɔ\nAfɔre mma wo koraa"
+    ]
+  },
   {
     "number": 182,
     "title": "Din bi wͻ hͻ a εyε dε",
@@ -1919,6 +2014,22 @@ export const hymns: Hymn[] = [
     ],
     "chorus": [
       "Mεto n’ayεyi dwom no daa\nWͻ n’adom nkwagye no nti\nYesu Kristo ne me gyefo\nAyeyi nka ne din daa"
+    ]
+  },
+  {
+    "number": 185,
+    "title": "Yesu Kristo yɛ dɔfo",
+    "stanzas": [
+      "Yesu Kristo yɛ dɔfo\nNnebɔneyɛfo dɔfo pa\nW’agye yɛn afi owu mu\nMomma yɛnna no ase daa",
+      "Yesu Kristo yɛ dɔfo\nNnebɔneyɛfo gyefo pa\nƆdɔɔ yɛn kosi wumu mpo\nMomma yɛnna no ase daa",
+      "Yesu Kristo yɛ dɔfo\nObewui maa yɛn nyinaa\nDe gyee yɛn fi bɔne mu\nMomma yɛnna no ase daa",
+      "Yesu Kristo yɛ dɔfo\nKalvary dua no so Agyenkwa\nWopiraa no wɔ dua so\nMomma yɛnna no ase daa",
+      "Yesu Kristo yɛ dɔfo\nƆdɔfo bi nte sɛ ɔno\nNea ɔbɛsoaa yɛn bɔne\nMomma yɛnna no ase daa",
+      "Yesu Kristo yɛ dɔfo\nN’asɛndua duruduru soa mpo\nƆdɔ nnebɔneyɛfo nyinaa\nMomma yɛnna no ase daa",
+      "Yesu Kristo yɛ dɔfo\nNe dɔ n’asekyerɛ yɛ na\nNe nkutoo ne yɛn dɔfo\nMomma yɛnna no ase daa",
+      "Yesu baa wiase ha\nBehwehwɛɛ wɔn a wɔayera\nNam adom so gyee wɔn nkwa\nMomma yɛnna no ase daa",
+      "Onyankopɔn nam Kristo\nSo frɛ ne de nyinaa\nAba n’ahenni no mu\nMomma yɛnna no ase daa",
+      "Yesu din no yɛ me dɛ\nEmu tumi nsakra da\nW’abubu owu mpokyerɛ\nMomma yɛnna no ase daa"
     ]
   },
   {
@@ -1963,6 +2074,65 @@ export const hymns: Hymn[] = [
   },
   {
     "number": 189,
+    "title": "Mεsi me dan wɔ botan so",
+    "stanzas": [
+      "Mεsi me dan wɔ botan so \nMεto mebo mesi no yiye \nNa mene Yesu bεtena\nƆsoro ahenman no mu",
+      
+      "Mεsi me dan wɔ botan so\nƆbotan a ɔne Kristo,\nNea abantofo paa no\nNa w’abεyε kwatibo",
+      
+      "Mεsi me dan wɔ ɔbotan so\nBotan kronkron yi fi soro,\nKristo ne ɔbotan a \nWɔtwere no a wɔmpɔne da.",
+      
+      "Mεsi me dan wo ɔbotan so \nNa masipi wɔ ne so daa,\nMede me werε mεhyε ne mu\nNa m’abata ne ho daa",
+      
+      "Mεsi me dan wɔ ɔbotan so \nBotan Kristo so na megyina;\nWiase mu berε ne ’haw mpo\nMεsi me dan wɔ ɔbotan so.",
+      
+      "Mεsi me dan wɔ ɔbotan so \nMεhwε yiye na m’anwatiri,\nBotan yi so na mεto\nMεsi me dan wɔ ɔbotan so."
+    ],
+    "chorus": [
+      "Sε nsu retɔ a mennsuro\nSε ahumtu a me bo rentu,\nMesi medan wɔ botan so\nNa mene Yesu bεtena."
+    ]
+  },
+  {
+    "number": 190,
+    "title": "Mewɔ agyapade wɔ Kristo mu",
+    "stanzas": [
+      "Mewɔ agyapade wɔ Kristo mu,\nAdom mmroso a mentumi nka;\nNe mogya a tumi wɔ mu,\nNa ɔde atua me ti ka;\nDεn na mewɔ yε ma Kristo?\nMε bɔ ne din na ma dɔ no",
+      
+      "Mewɔ agyapade wɔ Kristo mu,\nƆno ne me kra gyefo pa;\nNnebɔneyεfo mmɔbrɔhunufo\nW’apopa me bɔne no nyinaa,\nNe nkwagye no ayε me nkwagye,\nMεbɔ ne din na m’adɔ no.",
+      
+      "Mewɔ agyapade wɔ Kristo mu,\nGetsemane kuruwa kae me;\nM’adesoa yεε no adesoa,\nƐnti ɔhunuu amane maa me,\nDεn na mewɔ ka wo Kristo ho?\nMεbɔ ne din na m’adɔ no",
+      
+      "Mewɔ agyapade wɔ Kristo mu,\nMogya bi a εhoro bɔne;\nƐyε adom nkwa nsu bi a\nƐpem fi Kristo apirakuru mu,\nAdom bi a ɔde agye me,\nMεbɔ ne din na m’ado no.",
+      
+      "Mewɔ agyapade wɔ Kristo mu,\nN’afɔbu no abu me bem;\nM’awerεhow adan me anigye,\nMe bɔne a Kristo soaa yε nti,\nAwurade Kristo kronkron gyefo,\nMεbɔ ne din na m’adɔ no",
+      
+      "Mewɔ agyapade wɔ Kristo mu,\nƆdɔɔ me kɔsii wu mu mpo;\nW’asie me nipa dedaw no,\nW’ama m’ahu ne dɔ mmroso,\nƆbεkae me wɔ N’ahenni mu,\nMεbɔ ne din na m’adɔ no."
+    ]
+  },
+  {
+    "number": 191,
+    "title": "Monto dwom dεdε nyi Awurade ayε",
+    "stanzas": [
+      "Monto dwom dεdε nyi Awurade ayε,\nMonto dwom dede mma no,\nMomfa osebɔ nyi Awurade ayε,\nMonto dwom dεdε mma no.",
+      
+      "Kristo yε nkonimdi hene ampa,\nNe mogya adi nkonim,\nW’agye debɔneyεni a ɔtesε me,\nMonto dwom dεdε mma no.",
+      
+      "Kristo yε nkonimdi hene ampa,\nNe mogya adi nkonim,\nW’agye debɔneyεni a ɔtesε me,\nMonto dwom dεdε mma no.",
+      
+      "Monto dwom dεdε nyi Awurade ayε,\nMonto dwom dεdε mma no,\nƆde me bɔne nyinaa akyε me,\nMonto dwom dεdε mma no.",
+      
+      "Monto dwom dεdε nyi Awurade ayε,\nMonto dwom dεdε mma no,\nNe mogya nti manya ahofadi,\nMonto dwom dεdε mma no.",
+      
+      "Monto dwom dεdε nyi Awurade ayε,\nMonto dwom dεdε mma no,\nƆsahene Kristo adi nkunim,\nMonto dwom dεdε mma no",
+      
+      "Monto dwom dεdε nyi Awurade ayε,\nMonto dwom dεdε mma no,\nSε mehu m’gyenkwa anim a,\nMεto dwom dεdε ama no."
+    ],
+    "chorus": [
+      "Kristo yε nkonimdi hene ampa,\nNe mogya adi nkonim,\nW’agye debɔneyεni a ɔtesε me,\nMonto dwom dεdε mma no."
+    ]
+  },
+  {
+    "number": 195,
     "title": "Oguamma sε ayeyi",
     "stanzas": [
       "Oguamma sε ayeyi\nOguamma sε nnase\nMomfa mo ho nyinaa mma no,\nƆno na ɔsε ayeyi",
@@ -3564,4 +3734,248 @@ export const hymns: Hymn[] = [
     "Nnipa ahyehyεde nyinaa bεprɔw,\nεrennkyε mfaso bio\nNnipa rennkyekye wɔn ho werε,\nEfisε ne mmoa rennhia;\nEnti onipa mmεnhaw w oho koraa,\nNa abɔde nyinaa renntena hɔ;\nFa wo werε hyε Onyankopɔn mu daa,\nNa wani bεgye ne trenneyε mu daa"
   ]
 },
+{
+  "number": 301,
+  "title": "Yε ma wo nantew yiye",
+  "stanzas": [
+    "Yε ma wo nantew yiye\nNyame mfa wo nkodu dwodwo\nYehowa nni wok an\nNa ɔmfa wo nkoku fie dwodwo",
+    
+    "Honhom kronkron no ara\nNyε wo nan ase kanea,\nYehowa nni wok an,\nNa ɔmfa wo nkodu dwodwo",
+    
+    "Nkonimdi bi wɔ hɔ,\nMa wo akoa pa nokwarefo\nAnigye nnwom wɔ hɔ\nWo ne nkonimdi bεto",
+    
+    "Nkonimdi anuonyam bi\nRetwεn wo wɔ Kristo nkyεn hɔ\nNkonimdi abɔtire bi\nRetwεn wo wɔ Kristo nkyεn hɔ",
+    
+    "Akoa pa nokwarefo\nSε yεne wo hyia wɔ soro\nNa yεn nyinaa bom tena a \nAnigye na da no bεyε"
+  ]
+},
+{
+  "number": 302,
+  "title": "Sε me ka m’ani gu so a",
+  "stanzas": [
+    "Sε me ka m’ani gu so a\nMa me nhu wo sε me wura,\nSε me ka m’ani gu so a\nMa me nhu wo sε m’agyenkwa,\nWo nkyεn ara me wura,\nWo nkyεn ara m’agyenkwa",
+    
+    "Sε me ka m’ani gu so a\nMa me nhu kurow kronkron no\nSε me ka m’ani gu so a\nMa me nhyεn kurow kronkron mu,\nWo nkyεn ara me wura,\nWo nkyεn ara m’agyenkwa",
+    
+    "Sε me ka m’ani gu so a\nMa mente nnwom kronkron no\nSε me ka m’ani gu so a\nMa me ne ɔsorodɔm nto nnwom\nWo nkyεn ara me wura,\nWo nkyεn ara m’agyenkwa",
+    
+    "Sε me ka m’ani gu so a\nMa abɔfo mmehyia me kwan\nSε me ka m’ani gu so a\nMa abɔfo nkyerε me kwan\nWo nkyεn ara me wura,\nWo nkyεn ara m’agyenkwa",
+    
+    "Sε me ka m’ani gu so a\nMa mw mmɔ wo din me wura,\nSε me ka m’ani gu so a\nMa me nte won ne m’agyenkwa,\nWo nkyεn ara me wura,\nWo nkyεn ara m’agyenkwa"
+  ]
+},
+{
+  "number": 303,
+  "title": "Ɔdasani awiei rebεn",
+  "stanzas": [
+    "Ɔdasani awiei rebεn\nN’ahoɔden bεbrε ’ase\nƆrennkɔ ne dwumadi so\nMfa nhoahoa no ho bio;\nWɔbεgye ne nkwa afi ne nsam\nNa ne nyansa wɔ he?",
+    
+    "Yare bεbɔ ɔhoɔdenfo\nNa w’abrε no ase\nNe werε befi ne nyansa\nNea εkyerε no waise kwan,\nNa ne nyansa wɔ he?",
+    
+    "Asaman rehwε onipaa kwan,\nNa w’ayε no atuu,\nNsamoa bεkasa akyerε no\nNa ɔremmue n’ano,\nƆbεdan dɔte ne mfutuma,\nNa ne nyansa wɔ he?",
+    
+    "Yε ahuhude nko,\nƐyε ɔbrε ne amane,\nNnipa brε ma nea εporɔw,\nSε ɔde nea εporɔw yi ti hɔ a\nNa ne nyansa wɔ he?",
+    
+    "Onipa rennhu owia hann\nƆrennte mframa nka,\nAni renngyina no bio\nEfisε wafi wiase;\nAsaman hɔ sum mpo bεpa no\nNa ne nyansa wɔ he?",
+    
+    "Awurade to me gyedi mu\nNa me kra dɔ wo,\nMa wanimtew no mmra me so\nNa fa w’asεm kyerε me kwan,\nSε me wiase asetena to twa a\nWo nkyεn ara Nyame"
+  ]
+},
+{
+  "number": 304,
+  "title": "Ade rekye ade resa",
+  "stanzas": [
+    "Ade rekye ade resa\nNa yεrebεn wiase awiei\nOnipa rebεn ne wu da\nNe atεmmu da",
+    
+    "Wͻre ware,wͻrewo mma\nWͻn a wͻrebu wͻretͻn\nNnipa rebrε ama owu\nNe atemmu da",
+    
+    "Akwantufo retu wͻn kwan\nAguadifo redi wͻn gua\nƐyε wͻn sε mmere te saa daa\nWͻn nkwa nna yε tia",
+    
+    "Onipa bεhwehwε nkwagye\nObebisa kwan trenee no\nNe nyansa de no bεyera\nNa w’ayera ne kra"
+  ]
+},
+{
+  "number": 305,
+  "title": "Sε da kεse no du a",
+  "stanzas": [
+    "Sε da kεse no du a\nYεn nnwuma bedi yεn akyi;\nSε da kεse no dua,\nYεbεhome afi yεn berεmu;\nYεbεte anigye nwom,\nWɔ Yerusalem kurow no mu,\nYεne wɔn a wadi kan kɔ no,\nBetena kurow Kronkron no mu",
+    
+    "Kurow kronkron no mu tena\nDe Akwatafo nni hɔ;\nKurow kronkron no mu tena de\nAnifirafo nni hɔ;\nWɔbεsakra yεn prεko,\nYεbεyε sε Yesu Kristo;\nN’asomdwoe ne yεn bεtena,\nKurow kronkron no mu daa",
+    
+    "Da no bεyε nkonimdi da,\nYεbεhyε ntade fitaa;\nKristo nsɔe hankare kyεn no\nBεdan yεn nkonim abɔtire;\nAwurade Yesu bεteεm,\nAfrε wɔn a wɔyε ne de,\nNa ɔde wεn atena ne nkyεn,\nNa w’ahome afebɔɔ",
+    
+    "Momma yεntwεn nkosi da no,\nDa no bεyε nkonimdi da;\nYεbεhyerεn sε nsoroma,\nYεn ahoɔfε bεtena hɔ daa;\nYεbεto santen akɔ\nKurow kronkron Yerusalεm mu\nTorobεnto nne bεgyigye\nAma yεn akwaaba"
+  ]
+},
+{
+  "number": 306,
+  "title": "Mede nipa dua yi to hɔ",
+  "stanzas": [
+    "Mede nipa dua yi to hɔ\nNa me dom fi honam mu\nKopue ahengua anim a\nMehu Kristo anuonyam",
+    
+    "Me honam yi yε dɔte\nMebu no nwura dodow\nSε me de to hɔ da bi a\nMehu Kristo anuonyam",
+    
+    "Me gye ma Agyenkwa Yesu di\nSε ne bɔhye no nyε kwa\nEnti sε me wu prɔw mpo a\nMehu Gyefo n’anuonyam",
+    
+    "Me nim sε medan dɔte\nNsamoa nso ne me bεtena\nNanso sε mete Ne nne a\nMεsɔre m’ahyε n’anuonyam",
+    
+    "Sε mete ne nne dasum a\nMεsɔre sε memmporɔw da\nMefi me brε nnwuma mu\nMehu Kristo anuonyam",
+    
+    "M’agyenkwa ne me bεtena\nNe bɔhyε kurow no mu\nMe nnwuma bedi m’akyi\nMehu Gyefo n’anuonyam"
+  ]
+},
+{
+  "number": 307,
+  "title": "Sε Yesu Kristo teεm dennen a",
+  "stanzas": [
+    "Sε Yesu Kristo teεm dennen a \nAsase bεwoso kεse\nNe nne no tumi no bεma\nSum kabii ahyε asase so;\nNnebɔneyεfo bεhwehwε nkwagye\nNanso wɔrenntumi nguan mfi mu;\nOnyankopɔn abufu no nti\nNnebɔneyεfo bεyera wɔn kra",
+    
+    "Totorobεnto nne bεgyigye,\nAbɔde nyinaa bεyε komm;\nWɔn a w’adeda nyinaa bεte\nAgyenkwa Yesu Kristo nne;\nƐpo bεyi n’awufu ama,\nMogya adansefo bεte\nKristo nne refrε sε, mommra;\nDamoa renntumi nkora wɔn so",
+    
+    "Wɔbεbobɔw soro yi sε mpa,\nWɔbεnane asase sε nku,\nSε nneεma nyina bεyε foforo;\nWɔn a wapo Yesu Kristo nyinaa\nBεyera afi asase so;\nYεde ahurisi bεto nnwom a\nAbɔfo renntumi nto bi da",
+    
+    "Monna yεnyɛ yε nkwagye ho adwuma\nNa akatua pa wɔ hε ma yεn;\nYεn berε nwuma yi rennyε kwa,\nYεbεhyε ne ho ahenkyεw\nƐrennkyε Yesu Kristo bεba,\nAbεhwε nnwuma a w’ayε;\nSε yedu ne nkyεn wɔ soro hɔ a\nƐbεbobɔ yεn din akyerε",
+    
+    "Gyedifo bεhyε ntade fitaa\nNe wɔn nkonimdi ho abɔtire;\nWɔn nyinaa bεhyerεn sε nsoroma;\nWɔn ahoɔfε no bεyε dεn?\nWɔn nyinaa behyia wε mpoano hɔ,\nNa wɔde nnwom ato santen\nAkohyia wɔn a w’adi kan hɔ\nYesu Kristo nkyεn rehome"
+  ]
+},
+{
+  "number": 308,
+  "title": "Yehowa da kεse reba",
+  "stanzas": [
+    "Yehowa da kεse reba\nGyedifo momma yεn nyε komm;\nSε torobεnto nne gyigye a\nWεn a w’adeda’bεsɔre,\nNa yε ne soro asafo’\nDe anigye ne aseda\nAma nea ɔtease daa no",
+    
+    "Yehowa da kεse reba\nTumi abran nyinaa bεyε komm,\nSε Awurade nne gyigye a \nSoro ne asase bεwoso,\nEnti momma yεnyε adwuma\nNtwεn yεn homeda kεse no,\nεrennkyε yεn ani begye",
+    
+    "Yehowa da kεse reba\nNkɔmɔdi ne anigye da;\nƆbεtena n’atεmmu agua sp \nAkasa tumi mu prεko;\nWɔn a w’ahoro wɔn ntade fitaa\nBεhyerεn da no sε nsoroma,\nNa w’atena anigye mu daa",
+    
+    "Yehowa da kεse reba\nWɔn a w’aberε rennte nka bio;\nEfisε ɔbrε nnwuma nyinaa \nBetwa’makɔ, wɔrennkae bio;\nƆteasefo no bεkasa\nNa agyedifo koma atɔ wɔn yam,\nNa w’ato nnwom ahyira no daa",
+    
+    "Yehowa da kεse reba\nYεbεhome afi yεn berε mu;\nƆtamfo rennyi yεn hu bio\nEfisε wɔbεsεe no koraa;\nAnigye ne aseda nnwom\nNa yεde bεtena ase daa;\nYεn awerhow to betwa",
+    
+    "Anigye da kεse reba\nYebehu yεn ho anim ne anim\nGyedifo nyinaa bεtom atena\nAnigye na da no bεyε\nKristo nkyεn hɔ bεyε yεn de;\nAlleluia, alleluia\nBεyε yεn nkonimdi nnwom daa"
+  ]
+},
+{
+  "number": 309,
+  "title": "Yεn Nyankopɔn no bεkasa",
+  "stanzas": [
+    "Yεn Nyankopɔn no bεkasa,\nWɔ nna a εyε hu no mu;\nOtumi ade nyinaa yε,\nƆgyefo biara ntesε ɔno,\nN’adwene mu dɔ, ne nyansa so,\nOye na n’adom wɔ hε daa",
+    
+    "Yεn Nyankopɔn no bεkasa,\nAkyerε wiase tumfo no;\nNe ho bεpopo wɔ n’anim\nWɔ n’abufu kεse no nti;\nAnigye dwom na yεbεto,na yεatena\nNe nkyεn hɔ daa",
+    
+    "Yεn Nyankopɔn no bεkasa,\nNa w’amene owu afebɔɔ;\nƆbεpopa nisu nyinaa,\nNa w’ayi ne man ahohora,\nOsukɔm renne yεn bio,\nYεbεto anigye dwom daa",
+    
+    "Yεn Nyankopɔn bεto yεn pon,\nNa ɔne yεn ato nsa adidi,\nYεbehu Nyankopɔn anim,\nNea yεn ani da so no,\nMomma yεnni ahurusi,\nEfisε yεbehu ne nkwagye"
+  ]
+},
+{
+  "number": 310,
+  "title": "M’ahu Yesu sε m’agyenkwa",
+  "stanzas": [
+    "M’ahu Yesu sε m’agyenkwa\nMe dimafo ne me hwεfo\nM’ahu Yesu sε m’agyenkwa\nMe kwankyerεfo ne me boafo\nM’ahu Yesu sε m’agyenkwa",
+    
+    "M’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε m’awurade\nM’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε me trenee\nM’ahu Yesu sε m’agyenkwa",
+    
+    "M’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε trenee’Hene\nM’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε botantim\nM’ahu Yesu sε m’agyenkwa",
+    
+    "M’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε Otumfo\nM’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε Oguanhwεfo\nM’ahu Yesu sε m’agyenkwa",
+    
+    "M’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε yaresafo\nM’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε dimafo\nM’ahu Yesu sε m’agyenkwa",
+    
+    "M’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε m’abankεse\nM’ahu Yesu sε m’agyenkwa\nM’ahu Yesu sε ɔteasefo\nM’ahu Yesu sε m’agyenkwa"
+  ]
+},
+{
+  "number": 311,
+  "title": "M’ate Yesu Kristo frε nti",
+  "stanzas": [
+    "M’ate Yesu Kristo frε nti\nWiase yi nyε me anigye\nM’ate Yesu Kristo frε nti\nM’abu nneεma nyinaa hwerede;\nM’anidaso ne ne nkutoo,\nƆfrε me, merensan m’akyi",
+    
+    "Ne frε kronkron no regyegye;\nMe kra di no mu ahurisi;\nMete soro anigye nnwom,\nSε egyigye me koma mu;\nMe nim nea m’agye no adi;\nƆfrε me, merensan m’akyi",
+    
+    "M’ate Yesu Kristo frε nti\nW’awo me foforo wɔ ne mu;\nƆno ne nokware, kwan ne nkwa;\nGyedifo nnepa wɔ ne mu;\nMe kwati no a mayera;\nMεnantew ne kwan tenenee mu",
+    
+    "M’ate Yesu Kristo frε nti\nN’asεm na me kra kɔn dɔ daa;\nƆno ne me kra nkwa nsu nti;\nEtumi dwudwo me koma;\nW’afrε me yi, medi n’akyi,\nNe nkyεn hɔ bεyε me tenabea"
+  ]
+},
+{
+  "number": 312,
+  "title": "Maa w’ani so hwε Kristo",
+  "stanzas": [
+    "Maa w’ani so hwε Kristo\nWɔ asεndua no so;\nBɔ ne din debɔneyεni\nNa wo benya nkwa’a enni awiei",
+    
+    "Kristo ne wiase Agyenkwa,\nBra na wobenya nkwa,\nBεka wo bɔne kyerε no\nNa wobenya nkwa’a enni awiei",
+    
+    "Gye agyenkwa Yesu di,\nNa wobenya nkwa,\nSεnea wo te biara bra,\nNa wobenya nkwa’a enni awiei",
+    
+    "Fa w’adesoa nyinaa bra,\nNa ɔbεgye wo nkwa,\nBɔ Yesu Kristo din nnε,\nNa wobenya nkwa’a enni awiei",
+    
+    "Kristo yε adamfo pa,\nƆremmpa wo da;\nƆrennkae wo bɔne bio,\nNa wobenya nkwa’a enni awiei",
+    
+    "Hwε Nyame eguammaa no,\nƆrebeyi bɔne akɔ,\nWo nso wo bɔne ka ho,\nEnti na ɔsεn dua no so no"
+  ],
+  "chorus": [
+    "Hwε no, hwε no, hwεno,\nHwε no, hwε no, hwε no\nNa wobenya nkwa’a enni awiei."
+  ]
+},
+{
+  "number": 313,
+  "title": "Onyankopɔn ahenni aba",
+  "stanzas": [
+    "Onyankopɔn ahenni aba\nYεn nkonimdi hene aba,\nOnyankopɔn ahenni mu\nNa’ahohiahia to bεtwa;\nOnyankopɔn ahenni yi mu\nNa asomdwoe bεtena daa",
+    
+    "Onyankopɔn ahenni aba,\nGyedifo gye da adu,\nOnyankopɔn ahenni aba\nKristo bɔgyε no adu\nOnyankopɔn ahenni yi mu\nNa treneeyε bεtena daa",
+    
+    "Onyankopɔn ahenni aba,\nNa bɔhyε bere no adu;\nOnyankopɔn ahenni aba\nGyedifo momma no so;\nOnyankopɔn ahenni yi mu\nNa awerεhow to betwa",
+    
+    "Onyankopɔn ahenni aba\nMomma yεntena mu nsom no\nOnyankopɔn ahenni aba\nMomma yεntena mu ntweri no\nOnyankopɔn ahenni yi mu\nNa anigye bεtena daa",
+    
+    "Onyankopɔn ahenni aba\nMomma yεnkamfo nkyerε\nOnyankopɔn ahenni aba\nMomma yεmma no so nkyerε\nOnyankopɔn ahenni yi mu\nNa n’anuonyam no bεhyerεn",
+    
+    "Onyankopɔn ahenni aba\nYεn berε nnwuma to atwa\nOnyankopɔn ahenni aba\nYεn gyedi no annyε kwa\nOnyankopɔn ahenni aba\nYεne no bedi Hene daa"
+  ]
+},
+{
+  "number": 314,
+  "title": "Hwε wo Nyame som so yiye",
+  "stanzas": [
+    "Hwε wo Nyame som so yiye\nBɔ mmɔden na wie w’adwuma\nNa wobenya nkonim abɔtiri\nDa a Yesu Kristo bεba",
+    
+    "Fa wo nkwa nyinaa bɔ afɔre\nNa bo Kristo nsempa no dawuru\nTeεm sε nkwagye bi wɔ Kristo mu\nEnti nnebɔneyεfo mommra",
+    
+    "Asase woso kεse reba \nSoro ne asase bεtwam akɔ\nNnipa de wɔn nne bεtom asu\nEfisε da no bεyε hu",
+    
+    "Yεretwεn Agyenkwa Kristo \nNea yεbεhome wɔ ne mu no\nYiw Awurade Yesu Kristo bra\nGyedifo nyinaa hwε wo kwan"
+  ],
+  "chorus": [
+    "Yesu reba, ɔreba ntεm\nAbεfa wɔn a w’adi nkonim\nEnti mo nni adanse nkyerε\nNa Yesu Kristo reba ntεm"
+  ]
+},
+{
+  "number": 315,
+  "title": "M’ahu sε wo ne Awurade",
+  "stanzas": [
+    "M’ahu sε wo ne Awurade\nWo kεse yε mu nni hwehwεbea;\nM’ahu sε wo ne Awurade\nW’nwonwa dwuma mu nni hwehwεbea;\nAde biako na me nim sε\nWo nkutoo ne Awurade\nW’asεm nti wo ne Awurade",
+    
+    "M’ahu sε wo ne Awurade\nWodi tumi wɔ wiase nyinaa;\nM’ahu sε wo ne Awurade\nMede me ho mεto wo so daa;\nAbɔde nyinaa hyε w’ase\nεnti tumi nyinaa yε wo de;\nM’ahu sε wo ne Awurade",
+    
+    "M’ahu sε wo ne Awurade\nEnti teneneefo bɔ wo din;\nM’ahu sε wo ne Awurade\nEnti na me twerε wo din\nAmpa wo nkutoo ne Awurade\nWɔ soro ne asase so;\nYiw wo nkutoo ne Awurade",
+    
+    "M’ahu sε wo ne Awurade\nEnti teneneefo twa ma wo daa;\nM’ahu sε wo ne Awurade\nSoro abɔfo twa ma wo daa;\nM’ahu sε wo ne Awurade\nOwia ne ɔsram di adanse; Yiw,\nWo nkutoo ne Awurade"
+  ]
+},
+{
+  "number": 316,
+  "title": "Onyankopɔn w’ahenni no mu tena",
+  "stanzas": [
+    "Onyankopɔn w’ahenni no mu tena\nNa gyedifo retwεn sε yεn nsa bεka;\nNti ma Honhom Kronkron mmoa yεn mmrewyε\nNa yεmfa gyedi ntwεn wo nkosi da no\nDa no na torobεnto nne bεgyigye\nNa gyedifo de anigye behyia wo;\nYεn werε befi dadwen ne ɔhaw nyinaa\nNa y’ato nwom Kronkron sε, \nAlleluia",
+    
+    "Yεde ntade fitaa behyia Kristo\nNa Kristo bεhu ne wu no so mfaso;\nWɔn a w’adeda nyinaa bεsɔre aba\nDe wɔn nkonimdi kronkron ama no;\nWiase mu atumfo ho bεpopo\nSε wɔte ahotewfo nnwom kronkon a\nWεn a w’adi owu so nkonimdi no bεsɔre\nNa y’ato nnwom kronkron sε,\nAlleluia",
+    
+    "Yebehyia ɔgyefo no wɔ mpoano\nNa y’ato mogya no ho nkonimdi nnwom\nKurow kronkron no ho nnwom na yεbεto\nAma ɔgyefo a w’adi nkonim no;\nAbɔde nyinaa bεte totorobεntoo nne;\nAhotewfo de anigye bεgye so;\nYesu Kristo bεto nsa afrε ne de,\nNa y’ato nnwom kronkron sε,\nAlleluia",
+    
+    "Yεbεto yεn nkonimdi ho nnwom kronkron\nYεbεbɔ ose wɔ kurow kronkron no mu;\nYεbεma yεn nsa kronkron so ato nnwom;\nYεbehuro ama nea ɔte ase daa no;\nYεbεhyerεn sε anɔpa nsoroma\nYεbεyε sε Yesu Kristo ankasa;\nYεbεhome afi yεn berε nnwuma mu\nNa y’ato nnwom kronkron sε,\nAlleluia"
+  ]
+}
 ];
