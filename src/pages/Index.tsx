@@ -14,7 +14,6 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChatButton } from "@/components/ChatButton";
 
-
 const Index = () => {
   const location = useLocation();
 
@@ -173,6 +172,7 @@ const Index = () => {
                   src={`/pictures/community${index}.jpg`}
                   alt="Church news"
                   className="w-full h-48 object-cover"
+                  loading="lazy"
                 />
                 <div className="p-6">
                   <div className="flex items-center text-church-secondary mb-2">
@@ -231,6 +231,7 @@ const Index = () => {
                   src={`/pictures/${image}`}
                   alt="Church gallery"
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-church-primary/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <Button variant="outline" className="text-white border-white hover:bg-white/20">
@@ -256,6 +257,7 @@ const Index = () => {
               <Button
                 className="absolute top-2 right-2 bg-black/50 hover:bg-black/75 text-white rounded-full p-2"
                 onClick={() => setSelectedImage(null)}
+                aria-label="Close image preview"
               >
                 <X className="w-4 h-4" />
               </Button>
