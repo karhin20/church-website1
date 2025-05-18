@@ -1,4 +1,4 @@
-const CACHE_NAME = 'church-app-v4';
+const CACHE_NAME = 'church-app-v5';
 const HYMN_CACHE_NAME = 'church-hymns-v1';
 const BIBLE_CACHE_NAME = 'church-bible-v1';
 const IMAGES_CACHE_NAME = 'church-images-v1';
