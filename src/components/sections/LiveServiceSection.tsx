@@ -7,6 +7,7 @@ import { Navigation } from "./Navigation";
 import { ChatButton } from "../ChatButton";
 import { VerseReader } from '@/pages/VerseReader';
 import { FooterSection } from './FooterSection';
+import { ShareButton } from "@/components/ShareButton";
 
 export const LiveServiceSection = () => {
   const [isVerseReaderOpen, setIsVerseReaderOpen] = useState(false);
@@ -20,13 +21,19 @@ export const LiveServiceSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-8 flex items-center justify-center gap-4"
+          className="text-center mb-8 flex items-center justify-between"
         >
-          <MicVocal className="w-14 h-14 text-church-primary" />
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-church-primary mb-1 text-left">Live Service</h2>
-            <p className="text-church-text text-left">Join us for our live service</p>
+          <div className="flex items-center gap-4">
+            <MicVocal className="w-14 h-14 text-church-primary" />
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-church-primary mb-1 text-left">Live Service</h2>
+              <p className="text-church-text text-left">Join us for our live service</p>
+            </div>
           </div>
+          <ShareButton 
+            title="TAC Live Service"
+            text="Join us for our live service at The Apostolic Church - Ghana"
+          />
         </motion.div>
 
         {/* Grid container with Podbean and Support */}

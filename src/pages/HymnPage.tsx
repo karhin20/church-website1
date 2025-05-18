@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Navigation } from "@/components/sections/Navigation";
 import StanzaCard from "@/components/StanzaCard";
 import { motion } from 'framer-motion';
+import { ShareButton } from "@/components/ShareButton";
 
 const HymnPage = () => {
   const { number } = useParams();
@@ -30,7 +31,13 @@ const HymnPage = () => {
         <div className="space-y-6">
           <div className="text-center">
             <div className="text-lg text-muted-foreground font-Microsoft Sans Serif">Hymn {hymn.number}</div>
-            <h1 className="text-3xl font-serif font-semibold">{hymn.title}</h1>
+            <div className="flex items-center justify-center gap-4">
+              <h1 className="text-3xl font-serif font-semibold">{hymn.title}</h1>
+              <ShareButton 
+                title={`TAC Hymn ${hymn.number}: ${hymn.title}`}
+                text={`Check out this beautiful hymn: ${hymn.title}`}
+              />
+            </div>
           </div>
           
           <div className="space-y-8">
