@@ -3824,6 +3824,9 @@ export const hymns: Hymn[] = [
     "M’agyenkwa ne me bεtena\nNe bɔhyε kurow no mu\nMe nnwuma bedi m’akyi\nMehu Gyefo n’anuonyam"
   ]
 },
+
+
+
 {
   "number": 307,
   "title": "Sε Yesu Kristo teεm dennen a",

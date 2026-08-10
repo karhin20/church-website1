@@ -9,7 +9,7 @@ import { PWAPrompt } from '@/components/PWAPrompt';
 import { LiveServiceSection } from "@/components/sections/LiveServiceSection";
 import { OfflineServiceSection } from "@/components/sections/OfflineServiceSection";
 
-// Lazy load components that need Firebase
+// Lazy load admin components
 const AuthProvider = lazy(() => import('@/admin/auth/useAuth').then(module => ({ default: module.AuthProvider })));
 const ChatProviderLazy = lazy(() => import('@/contexts/ChatContext').then(module => ({ default: module.ChatProvider })));
 const AdminLayout = lazy(() => import('@/components/layouts/AdminLayout'));
@@ -17,6 +17,7 @@ const DashboardOverview = lazy(() => import('@/pages/admin/DashboardOverview'));
 const SermonManager = lazy(() => import('@/components/admin/SermonManager'));
 const AnnouncementManager = lazy(() => import('@/components/admin/AnnouncementManager'));
 const GalleryManager = lazy(() => import('@/components/admin/GalleryManager'));
+const LiveEventManager = lazy(() => import('@/components/admin/LiveEventManager'));
 
 import HymnPage from "./pages/HymnPage";
 import Index from "./pages/Index";
@@ -25,7 +26,6 @@ import SignUp from './pages/SignUp';
 import Chat from './pages/Chat';
 import HymnHome from './pages/hymnHome';
 import BiblePage from './pages/Bible';
-import VerseReader from "@/pages/VerseReader";
 import VerseReaderPage from '@/pages/VerseReader';
 
 const queryClient = new QueryClient();
@@ -58,6 +58,7 @@ function App() {
               </Suspense>
             }>
               <Route index element={<DashboardOverview />} />
+              <Route path="live-events" element={<LiveEventManager />} />
               <Route path="sermons" element={<SermonManager />} />
               <Route path="announcements" element={<AnnouncementManager />} />
               <Route path="gallery" element={<GalleryManager />} />

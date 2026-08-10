@@ -1,16 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Music4, BookPlus, MicVocal, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { MicVocal, ChevronDown, ChevronUp, Radio, HeartHandshake } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "./Navigation";
 import { ChatButton } from "../ChatButton";
 import { VerseReader } from '@/pages/VerseReader';
 import { FooterSection } from './FooterSection';
 import { ShareButton } from "@/components/ShareButton";
+import { supabase, LiveEventItem } from '@/lib/supabase';
+import LiveAudioPlayer from '../live/LiveAudioPlayer';
 
 export const LiveServiceSection = () => {
   const [isVerseReaderOpen, setIsVerseReaderOpen] = useState(false);
+  const [activeLiveEvent, setActiveLiveEvent] = useState<LiveEventItem | null>(null);
+
+  useEffect(() => {
+    const fetchActiveEvent = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('live_events')
+          .select('*')
+          .eq('status', 'live')
+          .order('started_at', { ascending: false })
+          .limit(1);
+
+        if (!error && data && data.length > 0) {
+          setActiveLiveEvent(data[0]);
+        } else {
+          setActiveLiveEvent(null);
+        }
+      } catch (err) {
+        console.error('Error fetching live event in LiveServiceSection:', err);
+      }
+    };
+
+    fetchActiveEvent();
+    const interval = setInterval(fetchActiveEvent, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-church-background pt-20">
@@ -27,7 +55,7 @@ export const LiveServiceSection = () => {
             <MicVocal className="w-14 h-14 text-church-primary" />
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-church-primary mb-1 text-left">Live Service</h2>
-              <p className="text-church-text text-left">Join us for our live service</p>
+              <p className="text-church-text text-left">Join us for our live listening cloud & worship</p>
             </div>
           </div>
           <ShareButton 
@@ -36,35 +64,39 @@ export const LiveServiceSection = () => {
           />
         </motion.div>
 
-        {/* Grid container with Podbean and Support */}
-        <div className="grid md:grid-cols-5 gap-6 max-w-6xl mx-auto mb-8">
-          {/* Podbean player taking 3/5 of the space */}
-          <div className="md:col-span-3 bg-white rounded-lg shadow-md p-4">
-            <iframe
-              height="150" 
-              width="100%" 
-              style={{ border: 'none' }} 
-              scrolling="no" 
-              data-name="pb-iframe-player" 
-              src="https://www.podbean.com/live-player/?channel_id=WXPoH0puz9" 
-              referrerPolicy="no-referrer-when-downgrade" 
-              allow="autoplay" 
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-              allowFullScreen
-            />
+        {/* Agora Live Streaming Section */}
+        {activeLiveEvent ? (
+          <div className="mb-12">
+            <div className="flex items-center gap-2 mb-4 bg-red-600 text-white px-4 py-2 rounded-lg w-fit animate-pulse font-bold text-sm">
+              <Radio className="w-5 h-5" />
+              <span>LIVE AUDIO EVENT IN PROGRESS</span>
+            </div>
+            <LiveAudioPlayer event={activeLiveEvent} />
+          </div>
+        ) : (
+          <div className="mb-8 p-6 bg-white border rounded-xl shadow-sm text-center max-w-6xl mx-auto space-y-2">
+            <Radio className="w-10 h-10 text-gray-400 mx-auto" />
+            <h3 className="text-xl font-bold text-church-primary">No Live Service Currently Broadcasting</h3>
+            <p className="text-gray-600 text-sm max-w-md mx-auto">
+              Our live audio stream starts when an admin opens the live broadcast. Check back during service times (Sundays at 7:00 AM & 9:00 AM)!
+            </p>
+          </div>
+        )}
+
+        {/* Support & Giving Section */}
+        <div className="max-w-6xl mx-auto mb-8 bg-gradient-to-r from-church-secondary via-amber-400 to-church-secondary rounded-xl shadow-md p-6 text-church-primary flex flex-col md:flex-row items-center justify-between gap-4 border border-yellow-500/20">
+          <div className="flex items-center gap-4">
+            <HeartHandshake className="w-10 h-10 text-church-primary flex-shrink-0" />
+            <div>
+              <h4 className="text-lg font-bold font-serif">Contribute to God's Work</h4>
+              <p className="text-sm opacity-90">Support Nii Boiman Central Assembly through Mobile Money</p>
+            </div>
           </div>
 
-          {/* Support section taking 2/5 of the space */}
-          <div className="md:col-span-2 bg-church-secondary rounded-lg shadow-md p-6">
-            <h4 className="text-md font-semibold font-serif text-center mb-4">
-              Contribute to God's Work
-            </h4>
-            <p className="text-base font-medium mb-3">
-              MOMO NUMBER: <strong className="text-lg">0597672546</strong>
-            </p>
-            <p className="text-sm">
-              ACCOUNT NAME: <strong className="text-sm">THE TAC AHWC NII BOIMAN</strong>
-            </p>
+          <div className="bg-white/80 backdrop-blur-sm px-6 py-3 rounded-lg text-center md:text-right border">
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">MOMO NUMBER</p>
+            <p className="text-xl font-bold font-mono text-church-primary">0597672546</p>
+            <p className="text-xs text-gray-700 font-medium">ACCOUNT: THE TAC AHWC NII BOIMAN</p>
           </div>
         </div>
 
@@ -101,10 +133,10 @@ export const LiveServiceSection = () => {
           </AnimatePresence>
         </div>
       </div>
-        <div>
-            <ChatButton />
-        </div>
-        <FooterSection />
+      <div>
+        <ChatButton />
+      </div>
+      <FooterSection />
     </div>
   );
 };

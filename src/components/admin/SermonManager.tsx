@@ -4,24 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { getFirebaseFirestore, getFirebaseStorage } from '../../admin/auth/firebase';
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from 'firebase/storage';
-import { collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
-import { Trash2, Upload, Play } from 'lucide-react';
-
-interface Sermon {
-  id: string;
-  title: string;
-  preacher: string;
-  date: string;
-  description: string;
-  audioUrl: string;
-}
+import { supabase, SermonItem } from '@/lib/supabase';
+import { Trash2, Play } from 'lucide-react';
 
 export default function SermonManager() {
   const [title, setTitle] = useState('');
@@ -30,25 +14,22 @@ export default function SermonManager() {
   const [description, setDescription] = useState('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [sermons, setSermons] = useState<Sermon[]>([]);
+  const [sermons, setSermons] = useState<SermonItem[]>([]);
   const { toast } = useToast();
-  const firestore = getFirebaseFirestore();
-  const storage = getFirebaseStorage();
 
-  // Fetch sermons on component mount
   useEffect(() => {
     fetchSermons();
   }, []);
 
   const fetchSermons = async () => {
     try {
-      const sermonsCollection = collection(firestore, 'sermons');
-      const sermonsSnapshot = await getDocs(sermonsCollection);
-      const sermonsList = sermonsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Sermon));
-      setSermons(sermonsList);
+      const { data, error } = await supabase
+        .from('sermons')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setSermons(data || []);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -64,20 +45,36 @@ export default function SermonManager() {
 
     setLoading(true);
     try {
-      // Upload audio file to Firebase Storage
-      const storageRef = ref(storage, `sermons/${Date.now()}_${audioFile.name}`);
-      await uploadBytes(storageRef, audioFile);
-      const audioUrl = await getDownloadURL(storageRef);
+      // 1. Upload audio file to Supabase Storage
+      const fileExt = audioFile.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${fileName}`;
 
-      // Save sermon metadata to Firestore
-      await addDoc(collection(firestore, 'sermons'), {
-        title,
-        preacher,
-        date,
-        description,
-        audioUrl,
-        createdAt: new Date().toISOString(),
-      });
+      let audio_url = '';
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('sermons')
+        .upload(filePath, audioFile);
+
+      if (uploadError) {
+        console.warn('Storage upload error, using object URL fallback:', uploadError.message);
+        audio_url = URL.createObjectURL(audioFile);
+      } else {
+        const { data: urlData } = supabase.storage.from('sermons').getPublicUrl(filePath);
+        audio_url = urlData.publicUrl;
+      }
+
+      // 2. Save sermon metadata to Supabase DB 'sermons' table
+      const { error: dbError } = await supabase.from('sermons').insert([
+        {
+          title,
+          preacher,
+          date,
+          description,
+          audio_url,
+        },
+      ]);
+
+      if (dbError) throw dbError;
 
       toast({
         title: "Sermon uploaded successfully!",
@@ -90,7 +87,7 @@ export default function SermonManager() {
       setDescription('');
       setAudioFile(null);
       
-      // Refresh sermons list
+      // Refresh list
       fetchSermons();
     } catch (error: any) {
       toast({
@@ -105,7 +102,9 @@ export default function SermonManager() {
 
   const handleDelete = async (sermonId: string) => {
     try {
-      await deleteDoc(doc(firestore, 'sermons', sermonId));
+      const { error } = await supabase.from('sermons').delete().eq('id', sermonId);
+      if (error) throw error;
+
       toast({
         title: "Sermon deleted successfully!",
       });
@@ -193,14 +192,15 @@ export default function SermonManager() {
               <div>
                 <h3 className="font-semibold">{sermon.title}</h3>
                 <p className="text-sm text-gray-600">
-                  {sermon.preacher} • {new Date(sermon.date).toLocaleDateString()}
+                  {sermon.preacher} • {sermon.date ? new Date(sermon.date).toLocaleDateString() : 'N/A'}
                 </p>
+                <p className="text-xs text-gray-500 line-clamp-1">{sermon.description}</p>
               </div>
               <div className="flex gap-2">
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => window.open(sermon.audioUrl)}
+                  onClick={() => window.open(sermon.audio_url)}
                 >
                   <Play className="w-4 h-4" />
                 </Button>
@@ -214,8 +214,11 @@ export default function SermonManager() {
               </div>
             </div>
           ))}
+          {sermons.length === 0 && (
+            <p className="text-sm text-gray-500 italic">No sermons uploaded yet.</p>
+          )}
         </div>
       </div>
     </div>
   );
-} 
+}

@@ -1,0 +1,276 @@
+import { useState, useEffect, useRef } from 'react';
+import { LiveEventItem } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal } from 'lucide-react';
+import AgoraRTC, { IAgoraRTCClient, IRemoteAudioTrack } from 'agora-rtc-sdk-ng';
+import TemporalLiveChat from './TemporalLiveChat';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
+
+interface LiveAudioPlayerProps {
+  event: LiveEventItem;
+}
+
+export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
+  const [userName, setUserName] = useState(() => localStorage.getItem('tac_listener_name') || '');
+  const [inputName, setInputName] = useState('');
+  const [hasJoined, setHasJoined] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(80);
+  const [connecting, setConnecting] = useState(false);
+
+  const clientRef = useRef<IAgoraRTCClient | null>(null);
+  const remoteAudioTrackRef = useRef<IRemoteAudioTrack | null>(null);
+
+  useEffect(() => {
+    if (userName) {
+      joinStream();
+    }
+    return () => {
+      leaveStream();
+    };
+  }, [event.agora_channel, userName]);
+
+  const joinStream = async () => {
+    if (clientRef.current) return;
+    setConnecting(true);
+
+    try {
+      // 1. Obtain Agora Token from Express Backend API
+      const tokenRes = await fetch(`${API_BASE_URL}/api/agora/token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channelName: event.agora_channel, role: 'audience' }),
+      });
+
+      if (!tokenRes.ok) {
+        throw new Error('Failed to fetch Agora token from backend');
+      }
+
+      const { appId, token } = await tokenRes.json();
+
+      // 2. Initialize Client & Subscribe using Backend Token
+      const client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
+      clientRef.current = client;
+
+      await client.setClientRole('audience');
+
+      client.on('user-published', async (user, mediaType) => {
+        await client.subscribe(user, mediaType);
+        if (mediaType === 'audio' && user.audioTrack) {
+          remoteAudioTrackRef.current = user.audioTrack;
+          user.audioTrack.setVolume(volume);
+          user.audioTrack.play();
+          setIsPlaying(true);
+        }
+      });
+
+      client.on('user-unpublished', (user, mediaType) => {
+        if (mediaType === 'audio') {
+          setIsPlaying(false);
+        }
+      });
+
+      await client.join(appId, event.agora_channel, token || null, null);
+      setHasJoined(true);
+    } catch (err) {
+      console.error('Error joining live audio stream via backend token:', err);
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  const leaveStream = async () => {
+    if (remoteAudioTrackRef.current) {
+      remoteAudioTrackRef.current.stop();
+      remoteAudioTrackRef.current = null;
+    }
+    if (clientRef.current) {
+      try {
+        await clientRef.current.leave();
+      } catch (e) {
+        // ignore leave error
+      }
+      clientRef.current = null;
+    }
+    setHasJoined(false);
+    setIsPlaying(false);
+  };
+
+  const handleSaveName = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputName.trim()) return;
+    const name = inputName.trim();
+    localStorage.setItem('tac_listener_name', name);
+    setUserName(name);
+  };
+
+  const togglePlay = () => {
+    if (remoteAudioTrackRef.current) {
+      if (isPlaying) {
+        remoteAudioTrackRef.current.stop();
+        setIsPlaying(false);
+      } else {
+        remoteAudioTrackRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  const toggleMute = () => {
+    if (remoteAudioTrackRef.current) {
+      if (isMuted) {
+        remoteAudioTrackRef.current.setVolume(volume);
+        setIsMuted(false);
+      } else {
+        remoteAudioTrackRef.current.setVolume(0);
+        setIsMuted(true);
+      }
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    setVolume(val);
+    if (remoteAudioTrackRef.current && !isMuted) {
+      remoteAudioTrackRef.current.setVolume(val);
+    }
+  };
+
+  if (!userName) {
+    return (
+      <div className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg border border-church-primary/10">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center p-3 bg-red-100 rounded-full text-red-600 mb-3">
+            <Radio className="w-8 h-8 animate-pulse" />
+          </div>
+          <h3 className="text-2xl font-bold text-church-primary">Join Live Audio Stream</h3>
+          <p className="text-sm text-gray-600 mt-1">
+            Please enter your name to listen and participate in the live event chat. No sign-up required!
+          </p>
+        </div>
+
+        <form onSubmit={handleSaveName} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Your Name</Label>
+            <div className="relative mt-1">
+              <User className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input
+                id="name"
+                value={inputName}
+                onChange={(e) => setInputName(e.target.value)}
+                placeholder="e.g. Brother Samuel"
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full bg-church-secondary text-church-primary font-bold py-3 hover:bg-church-secondary/90 text-base">
+            Start Listening Now
+          </Button>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid md:grid-cols-5 gap-6 max-w-6xl mx-auto">
+      {/* Audio Player Card (3 cols) */}
+      <div className="md:col-span-3 bg-gradient-to-br from-church-primary via-slate-900 to-church-primary text-white rounded-xl shadow-xl p-6 flex flex-col justify-between border border-church-secondary/20">
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              </span>
+              <span className="text-xs font-bold uppercase tracking-wider text-red-400">Live Listening Cloud</span>
+            </div>
+
+            <div className="text-xs text-gray-300 flex items-center gap-1">
+              <User className="w-3.5 h-3.5 text-church-secondary" />
+              <span>{userName}</span>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('tac_listener_name');
+                  setUserName('');
+                }}
+                className="ml-2 text-[10px] text-church-secondary underline hover:text-white"
+              >
+                Change
+              </button>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold text-church-secondary mb-1">{event.title}</h3>
+            <p className="text-sm text-gray-300 flex items-center gap-2">
+              <MicVocal className="w-4 h-4 text-church-secondary" />
+              <span>Speaker: {event.speaker || 'Church Minister'}</span>
+            </p>
+            {event.description && (
+              <p className="text-xs text-gray-400 mt-2 italic">{event.description}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Player controls */}
+        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={togglePlay}
+                disabled={connecting}
+                className="w-12 h-12 rounded-full bg-church-secondary text-church-primary hover:bg-white transition-transform transform active:scale-95 flex items-center justify-center"
+              >
+                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
+              </Button>
+
+              <div>
+                <span className="text-sm font-semibold">
+                  {connecting ? 'Connecting via backend...' : isPlaying ? 'Broadcasting Audio Live' : 'Audio Paused'}
+                </span>
+                <p className="text-xs text-gray-300">Agora Listening Cloud</p>
+              </div>
+            </div>
+
+            {/* Visualizer animation */}
+            {isPlaying && (
+              <div className="flex items-end gap-1 h-6">
+                <span className="w-1 bg-church-secondary rounded-full animate-[bounce_1s_infinite_100ms] h-full"></span>
+                <span className="w-1 bg-church-secondary rounded-full animate-[bounce_1s_infinite_300ms] h-2/3"></span>
+                <span className="w-1 bg-church-secondary rounded-full animate-[bounce_1s_infinite_200ms] h-4/5"></span>
+                <span className="w-1 bg-church-secondary rounded-full animate-[bounce_1s_infinite_400ms] h-1/2"></span>
+              </div>
+            )}
+          </div>
+
+          {/* Volume control */}
+          <div className="flex items-center gap-3">
+            <button onClick={toggleMute} className="text-gray-300 hover:text-white">
+              {isMuted || volume === 0 ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-church-secondary" />}
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={isMuted ? 0 : volume}
+              onChange={handleVolumeChange}
+              className="w-full accent-church-secondary cursor-pointer h-1.5 bg-gray-600 rounded-lg"
+            />
+            <span className="text-xs font-mono text-gray-300 w-8">{isMuted ? '0%' : `${volume}%`}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Live Event Temporal Chat (2 cols) */}
+      <div className="md:col-span-2">
+        <TemporalLiveChat eventId={event.id} userName={userName} />
+      </div>
+    </div>
+  );
+}

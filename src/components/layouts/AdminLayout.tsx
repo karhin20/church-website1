@@ -19,12 +19,19 @@ export default function AdminLayout() {
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center gap-8">
             <h1 className="text-2xl font-bold text-church-primary">Admin Dashboard</h1>
-            <nav className="hidden md:flex space-x-4">
+            <nav className="hidden md:flex space-x-2">
               <Button 
                 variant="ghost" 
                 onClick={() => navigate('/admin')}
               >
                 Dashboard
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate('/admin/live-events')}
+                className="text-red-600 font-semibold"
+              >
+                🔴 Live Broadcast
               </Button>
               <Button 
                 variant="ghost" 
@@ -62,4 +69,4 @@ export default function AdminLayout() {
       </main>
     </div>
   );
-} 
+}

@@ -12,6 +12,9 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.js',
       injectRegister: 'auto',
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+      },
       manifest: {
         name: 'TAC-NBC',
         short_name: 'TAC-NBC',
@@ -30,6 +33,7 @@ export default defineConfig({
         ]
       },
       injectManifest: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         injectionPoint: 'self.__WB_MANIFEST'
       }
     })
@@ -56,9 +60,14 @@ export default defineConfig({
   },
   assetsInclude: ['**/*.mp3'],
   build: {
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        manualChunks: undefined
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          agora: ['agora-rtc-sdk-ng'],
+          supabase: ['@supabase/supabase-js'],
+        }
       }
     }
   }
