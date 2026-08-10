@@ -22,6 +22,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   const [volume, setVolume] = useState(80);
   const [connecting, setConnecting] = useState(false);
   const [streamEndedByAdmin, setStreamEndedByAdmin] = useState(false);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const remoteAudioTrackRef = useRef<IRemoteAudioTrack | null>(null);
@@ -53,6 +54,21 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
       supabase.removeChannel(channel);
     };
   }, [event.id]);
+
+  // ── Register global callback for when browser blocks autoplay ───────────
+  useEffect(() => {
+    const handleAutoplayFailed = () => {
+      console.warn("Autoplay blocked by browser policy");
+      setAutoplayBlocked(true);
+      setIsPlaying(false);
+    };
+
+    AgoraRTC.onAutoplayFailed = handleAutoplayFailed;
+
+    return () => {
+      AgoraRTC.onAutoplayFailed = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (userName) {
@@ -160,6 +176,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
       } else {
         remoteAudioTrackRef.current.play();
         setIsPlaying(true);
+        setAutoplayBlocked(false);
         setMediaSession(event.title, event.speaker || 'Church Minister', 'playing');
       }
     }
@@ -284,6 +301,27 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
             )}
           </div>
         </div>
+
+        {/* Browser Autoplay Block Warning */}
+        {autoplayBlocked && (
+          <div className="mb-3 p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-200 text-xs flex items-center justify-between gap-3 animate-pulse">
+            <span>Browser blocked automatic audio. Click "Play" or "Start Audio" to listen.</span>
+            <Button
+              size="sm"
+              onClick={() => {
+                if (remoteAudioTrackRef.current) {
+                  remoteAudioTrackRef.current.play();
+                  setIsPlaying(true);
+                  setAutoplayBlocked(false);
+                  setMediaSession(event.title, event.speaker || 'Church Minister', 'playing');
+                }
+              }}
+              className="bg-church-secondary text-church-primary font-bold hover:bg-white h-7 px-3 text-[11px] rounded flex-shrink-0"
+            >
+              Start Audio
+            </Button>
+          </div>
+        )}
 
         {/* Audio Waveform Visualizer */}
         <AudioWaveform isPlaying={isPlaying} isMuted={isMuted} connecting={connecting} />
