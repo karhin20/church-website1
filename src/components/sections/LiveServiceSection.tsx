@@ -14,8 +14,15 @@ import LiveAudioPlayer from '../live/LiveAudioPlayer';
 export const LiveServiceSection = () => {
   const [isVerseReaderOpen, setIsVerseReaderOpen] = useState(false);
   const [activeLiveEvent, setActiveLiveEvent] = useState<LiveEventItem | null>(null);
+  const [loadingEvent, setLoadingEvent] = useState(true);
+
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
 
   useEffect(() => {
+    // Fetch on mount
     const fetchActiveEvent = async () => {
       try {
         const { data, error } = await supabase
@@ -32,12 +39,29 @@ export const LiveServiceSection = () => {
         }
       } catch (err) {
         console.error('Error fetching live event in LiveServiceSection:', err);
+      } finally {
+        setLoadingEvent(false);
       }
     };
 
     fetchActiveEvent();
-    const interval = setInterval(fetchActiveEvent, 5000);
-    return () => clearInterval(interval);
+
+    // Subscribe to live_events changes via Realtime for instant updates
+    const channel = supabase
+      .channel('live_events_realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'live_events' },
+        () => {
+          // Re-fetch whenever any live_event row changes
+          fetchActiveEvent();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
@@ -65,7 +89,13 @@ export const LiveServiceSection = () => {
         </motion.div>
 
         {/* Agora Live Streaming Section */}
-        {activeLiveEvent ? (
+        {loadingEvent ? (
+          <div className="mb-8 p-6 bg-white border rounded-xl shadow-sm text-center max-w-6xl mx-auto flex flex-col items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
+            <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
+            <div className="h-3 w-64 bg-gray-100 rounded animate-pulse" />
+          </div>
+        ) : activeLiveEvent ? (
           <div className="mb-12">
             <div className="flex items-center gap-2 mb-4 bg-red-600 text-white px-4 py-2 rounded-lg w-fit animate-pulse font-bold text-sm">
               <Radio className="w-5 h-5" />

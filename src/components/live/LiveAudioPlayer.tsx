@@ -218,6 +218,9 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
           </div>
         </div>
 
+        {/* Audio Waveform Visualizer */}
+        <AudioWaveform isPlaying={isPlaying} isMuted={isMuted} connecting={connecting} />
+
         {/* Player controls */}
         <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 space-y-4">
           <div className="flex items-center justify-between">
@@ -232,21 +235,11 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
 
               <div>
                 <span className="text-sm font-semibold">
-                  {connecting ? 'Connecting via backend...' : isPlaying ? 'Broadcasting Audio Live' : 'Audio Paused'}
+                  {connecting ? 'Connecting...' : isPlaying ? 'Receiving Live Audio' : 'Audio Paused'}
                 </span>
                 <p className="text-xs text-gray-300">Agora Listening Cloud</p>
               </div>
             </div>
-
-            {/* Visualizer animation */}
-            {isPlaying && (
-              <div className="flex items-end gap-1 h-6">
-                <span className="w-1 bg-church-secondary rounded-full animate-[bounce_1s_infinite_100ms] h-full"></span>
-                <span className="w-1 bg-church-secondary rounded-full animate-[bounce_1s_infinite_300ms] h-2/3"></span>
-                <span className="w-1 bg-church-secondary rounded-full animate-[bounce_1s_infinite_200ms] h-4/5"></span>
-                <span className="w-1 bg-church-secondary rounded-full animate-[bounce_1s_infinite_400ms] h-1/2"></span>
-              </div>
-            )}
           </div>
 
           {/* Volume control */}
@@ -271,6 +264,81 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
       <div className="md:col-span-2">
         <TemporalLiveChat eventId={event.id} userName={userName} />
       </div>
+    </div>
+  );
+}
+
+// ─── Audio Waveform Visualizer ───────────────────────────────────────────────
+
+const BAR_COUNT = 28;
+
+// Each bar gets a random-looking but fixed height pattern and animation delay
+const BARS = Array.from({ length: BAR_COUNT }, (_, i) => ({
+  delay: `${(i * 0.07).toFixed(2)}s`,
+  height: [40, 70, 55, 90, 65, 80, 45, 95, 60, 75, 50, 85, 40, 70, 55, 90, 65, 80, 45, 95, 60, 75, 50, 85, 40, 70, 55, 90][i % 28],
+}));
+
+interface AudioWaveformProps {
+  isPlaying: boolean;
+  isMuted: boolean;
+  connecting: boolean;
+}
+
+function AudioWaveform({ isPlaying, isMuted, connecting }: AudioWaveformProps) {
+  const barColor = isMuted
+    ? 'bg-gray-500'
+    : isPlaying
+    ? 'bg-church-secondary'
+    : 'bg-white/30';
+
+  return (
+    <div className="my-4 px-1">
+      {/* Label */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
+          {connecting ? 'Connecting…' : isPlaying ? (isMuted ? 'Muted' : '🔴 Receiving Live Audio') : 'Stream Paused'}
+        </span>
+        {isPlaying && !isMuted && (
+          <span className="text-[10px] text-church-secondary animate-pulse font-semibold">● LIVE</span>
+        )}
+      </div>
+
+      {/* Waveform bars */}
+      <div
+        className="flex items-center justify-between gap-px w-full"
+        style={{ height: '52px' }}
+        aria-label="Audio waveform visualizer"
+      >
+        {BARS.map((bar, i) => (
+          <div
+            key={i}
+            className={`flex-1 rounded-full transition-colors duration-300 ${barColor}`}
+            style={{
+              height: isPlaying && !isMuted
+                ? `${bar.height}%`
+                : connecting
+                ? `${20 + Math.sin(i) * 10}%`
+                : '15%',
+              animationName: isPlaying && !isMuted ? 'waveform' : 'none',
+              animationDuration: isPlaying && !isMuted ? `${0.8 + (i % 5) * 0.15}s` : '0s',
+              animationDelay: bar.delay,
+              animationTimingFunction: 'ease-in-out',
+              animationIterationCount: 'infinite',
+              animationDirection: 'alternate',
+              transition: 'height 0.3s ease',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Inject waveform keyframes once */}
+      <style>{`
+        @keyframes waveform {
+          0%   { transform: scaleY(0.3); }
+          50%  { transform: scaleY(1);   }
+          100% { transform: scaleY(0.4); }
+        }
+      `}</style>
     </div>
   );
 }

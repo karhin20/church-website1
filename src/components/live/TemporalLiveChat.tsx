@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase, LiveChatMessageItem } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, MessageSquare } from 'lucide-react';
+import { Send, MessageSquare, Loader2 } from 'lucide-react';
 
 interface TemporalLiveChatProps {
   eventId: string;
@@ -13,8 +13,16 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
   const [messages, setMessages] = useState<LiveChatMessageItem[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior });
+    }, 80);
+  };
+
+  // Fetch existing messages
   const fetchMessages = async () => {
     try {
       const { data, error } = await supabase
@@ -25,19 +33,22 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
 
       if (!error && data) {
         setMessages(data);
-        scrollToBottom();
+        scrollToBottom('instant');
       }
     } catch (err) {
       console.error('Error fetching chat messages:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Always fetch immediately on mount
     fetchMessages();
 
-    // Subscribe to real-time additions for this event
+    // Subscribe to real-time new messages for this event
     const channel = supabase
-      .channel(`live_chat_${eventId}`)
+      .channel(`live_chat:${eventId}`)
       .on(
         'postgres_changes',
         {
@@ -48,22 +59,26 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
         },
         (payload) => {
           const newMsg = payload.new as LiveChatMessageItem;
-          setMessages((prev) => [...prev, newMsg]);
+          setMessages((prev) => {
+            // Deduplicate — avoid double-adding own messages
+            if (prev.find((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
           scrollToBottom();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        // If subscription failed, fall back to polling
+        if (status === 'CHANNEL_ERROR') {
+          const interval = setInterval(fetchMessages, 5000);
+          return () => clearInterval(interval);
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
   }, [eventId]);
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,21 +99,29 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
 
       if (error) {
         console.error('Error inserting message:', error);
+        // Restore message if failed
+        setNewMessage(content);
       }
     } catch (err) {
       console.error('Error sending message:', err);
+      setNewMessage(content);
     } finally {
       setSending(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-96 bg-gray-50 border rounded-lg overflow-hidden">
+    <div className="flex flex-col h-[420px] bg-gray-50 border rounded-lg overflow-hidden shadow-sm">
       {/* Header */}
-      <div className="bg-church-primary text-white p-3 flex items-center justify-between">
+      <div className="bg-church-primary text-white p-3 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-church-secondary" />
           <h4 className="font-semibold text-sm">Event Live Chat</h4>
+          {messages.length > 0 && (
+            <span className="bg-church-secondary text-church-primary text-[10px] font-bold rounded-full px-1.5 py-0.5">
+              {messages.length}
+            </span>
+          )}
         </div>
         <span className="text-xs text-gray-300">
           Chatting as <strong className="text-church-secondary">{userName}</strong>
@@ -106,10 +129,15 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
       </div>
 
       {/* Messages Scroll Container */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-3">
-        {messages.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-gray-400 text-xs italic">
-            Welcome to the live chat! Be the first to say amen or share a message.
+      <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-0">
+        {loading ? (
+          <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
+            <Loader2 className="w-5 h-5 animate-spin text-church-primary" />
+            <span className="text-xs">Loading chat...</span>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="h-full flex items-center justify-center text-gray-400 text-xs italic text-center px-4">
+            Welcome to the live chat! Be the first to say amen or share a message. 🙏
           </div>
         ) : (
           messages.map((msg) => {
@@ -119,7 +147,7 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
                 key={msg.id}
                 className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
               >
-                <span className="text-[10px] text-gray-500 font-medium px-1">
+                <span className="text-[10px] text-gray-500 font-medium px-1 mb-0.5">
                   {msg.user_name}
                 </span>
                 <div
@@ -139,15 +167,21 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
       </div>
 
       {/* Message Input Form */}
-      <form onSubmit={handleSendMessage} className="p-2 bg-white border-t flex gap-2">
+      <form onSubmit={handleSendMessage} className="p-2 bg-white border-t flex gap-2 flex-shrink-0">
         <Input
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message or amen..."
           className="flex-1 text-sm"
+          disabled={sending}
         />
-        <Button type="submit" size="sm" disabled={sending || !newMessage.trim()} className="bg-church-secondary text-church-primary hover:bg-church-secondary/90">
-          <Send className="w-4 h-4" />
+        <Button
+          type="submit"
+          size="sm"
+          disabled={sending || !newMessage.trim()}
+          className="bg-church-secondary text-church-primary hover:bg-church-secondary/90 flex-shrink-0"
+        >
+          {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
         </Button>
       </form>
     </div>
