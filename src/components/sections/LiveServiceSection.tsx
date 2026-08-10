@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { MicVocal, ChevronDown, ChevronUp, Radio, HeartHandshake } from "lucide-react";
+import { MicVocal, ChevronDown, ChevronUp, Radio } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "./Navigation";
 import { ChatButton } from "../ChatButton";
@@ -162,23 +162,6 @@ export const LiveServiceSection = () => {
             </p>
           </div>
         )}
-
-        {/* Support & Giving Section */}
-        <div className="max-w-6xl mx-auto mb-8 bg-gradient-to-r from-church-secondary via-amber-400 to-church-secondary rounded-xl shadow-md p-6 text-church-primary flex flex-col md:flex-row items-center justify-between gap-4 border border-yellow-500/20">
-          <div className="flex items-center gap-4">
-            <HeartHandshake className="w-10 h-10 text-church-primary flex-shrink-0" />
-            <div>
-              <h4 className="text-lg font-bold font-serif">Contribute to God's Work</h4>
-              <p className="text-sm opacity-90">Support Nii Boiman Central Assembly through Mobile Money</p>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm px-6 py-3 rounded-lg text-center md:text-right border">
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">MOMO NUMBER</p>
-            <p className="text-xl font-bold font-mono text-church-primary">0597672546</p>
-            <p className="text-xs text-gray-700 font-medium">ACCOUNT: THE TAC AHWC NII BOIMAN</p>
-          </div>
-        </div>
 
         {/* Verse Reader Toggle Button and Content */}
         <div className="max-w-6xl mx-auto">
