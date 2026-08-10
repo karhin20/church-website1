@@ -1,25 +1,31 @@
-import { Users, Heart, Share2, BookOpenText } from "lucide-react";
+import { Users, Heart, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 interface VerseOfDay {
-  citation: string;
-  passage: string;
-  images: string[];
-  version: string;
+  citation?: string;
+  passage?: string;
+  images?: string[];
+  version?: string;
 }
 
 export const FeaturesSection = () => {
   const [verseOfDay, setVerseOfDay] = useState<VerseOfDay | null>(null);
-  const [isImageOpen, setIsImageOpen] = useState(false); // State to manage image modal
+  const [isImageOpen, setIsImageOpen] = useState(false);
 
   useEffect(() => {
     const fetchVerseOfDay = async () => {
       try {
-        const response = await fetch('https://backend-church.vercel.app/api/verse-of-the-day'); // Your API endpoint
-        const data = await response.json();
-        setVerseOfDay(data);
+        const isDev = import.meta.env.DEV;
+        const url = isDev ? '/api/verse-of-the-day' : 'https://backend-church.vercel.app/api/verse-of-the-day';
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.passage) {
+            setVerseOfDay(data);
+          }
+        }
       } catch (error) {
         console.error('Error fetching verse of the day:', error);
       }
@@ -29,9 +35,9 @@ export const FeaturesSection = () => {
   }, []);
 
   const handleShare = async () => {
-    if (!verseOfDay) return;
+    if (!verseOfDay || !verseOfDay.passage) return;
 
-    const shareText = `${verseOfDay.citation}: "${verseOfDay.passage}"\n\n#NiiBoimanCentralApp`;
+    const shareText = `${verseOfDay.citation || 'Bible Verse'}: "${verseOfDay.passage}"\n\n#NiiBoimanCentralApp`;
 
     try {
       if (navigator.share) {
@@ -55,6 +61,8 @@ export const FeaturesSection = () => {
     setIsImageOpen(false);
   };
 
+  const hasImages = Array.isArray(verseOfDay?.images) && verseOfDay.images.length > 0;
+
   return (
     <section className="py-24 bg-church-background">
       <div className="container mx-auto grid md:grid-cols-3 gap-12 px-4">
@@ -72,12 +80,12 @@ export const FeaturesSection = () => {
             duration: 0.6
           }}
         >
-          {verseOfDay && (
+          <h3 className="text-2xl font-bold text-church-primary mb-2">Verse of the Day</h3>
+          {verseOfDay && verseOfDay.passage ? (
             <>
-              <h3 className="text-2xl font-bold text-church-primary mb-2">Verse of the Day</h3>
               <motion.div
-                initial={{ opacity: 0, x: -50 }} // Start from the left
-                animate={{ opacity: 1, x: 0 }} // Fade in and slide to the center
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6 }}
                 className="space-y-4"
               >
@@ -85,7 +93,7 @@ export const FeaturesSection = () => {
                   "{verseOfDay.passage}"
                 </p>
                 <p className="text-sm font-medium text-church-secondary">
-                  {verseOfDay.citation} <span className="ml-2">({verseOfDay.version})</span>
+                  {verseOfDay.citation} {verseOfDay.version && <span className="ml-2">({verseOfDay.version})</span>}
                 </p>
               </motion.div>
               <div className="mt-4 flex justify-center gap-2">
@@ -96,7 +104,7 @@ export const FeaturesSection = () => {
                   <Share2 className="w-4 h-4" />
                   Share Verse
                 </Button>
-                {verseOfDay.images.length > 0 && (
+                {hasImages && (
                   <Button
                     onClick={handleImageClick}
                     className="bg-church-secondary text-white hover:bg-church-primary transition-colors text-sm py-3 px-6 rounded-lg flex items-center gap-2"
@@ -106,6 +114,10 @@ export const FeaturesSection = () => {
                 )}
               </div>
             </>
+          ) : (
+            <p className="text-gray-500 italic text-sm mt-4">
+              "For God so loved the world that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life." — John 3:16
+            </p>
           )}
         </motion.div>
 
@@ -175,12 +187,12 @@ export const FeaturesSection = () => {
       </div>
 
       {/* Fullscreen Image Modal */}
-      {isImageOpen && verseOfDay?.images.length > 0 && (
+      {isImageOpen && hasImages && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
           <div className="relative">
             <button onClick={closeImageModal} className="absolute top-2 right-2 text-white text-2xl">✖</button>
             <img 
-              src={verseOfDay.images[0]} 
+              src={verseOfDay!.images![0]} 
               alt="Verse of the Day" 
               className="max-w-full max-h-full object-contain" 
             />
@@ -189,4 +201,4 @@ export const FeaturesSection = () => {
       )}
     </section>
   );
-}; 
+};

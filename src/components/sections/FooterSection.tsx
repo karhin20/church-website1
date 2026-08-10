@@ -11,15 +11,15 @@ export const FooterSection = () => {
             <h3 className="text-xl font-bold mb-6">Contact Us</h3>
             <div className="space-y-4">
               <div className="flex items-center">
-                <Map className="w-5 h-5 mr-3 text-church-secondary" />
+                <Map className="w-5 h-5 mr-3 text-church-secondary flex-shrink-0" />
                 <p>Nii Boiman West Road, Accra, Ghana</p>
               </div>
               <div className="flex items-center">
-                <Phone className="w-5 h-5 mr-3 text-church-secondary" />
+                <Phone className="w-5 h-5 mr-3 text-church-secondary flex-shrink-0" />
                 <p>+233 24 123 4567</p>
               </div>
               <div className="flex items-center">
-                <Mail className="w-5 h-5 mr-3 text-church-secondary" />
+                <Mail className="w-5 h-5 mr-3 text-church-secondary flex-shrink-0" />
                 <p>ahwcniiboiman@gmail.com</p>
               </div>
             </div>
@@ -45,28 +45,34 @@ export const FooterSection = () => {
             <h3 className="text-xl font-bold mb-6">Quick Links</h3>
             <div className="space-y-3">
               <Link
-                to="/about"
+                to="/"
                 className="block hover:text-church-secondary transition-colors"
               >
-                About Us
+                Home
               </Link>
               <Link
-                to="/sermons"
+                to="/live"
                 className="block hover:text-church-secondary transition-colors"
               >
-                Sermons
+                Live Service & Audio Stream
               </Link>
               <Link
-                to="/events"
+                to="/hymns"
                 className="block hover:text-church-secondary transition-colors"
               >
-                Events
+                Apostolic Hymns
               </Link>
               <Link
-                to="/contact"
+                to="/bible"
                 className="block hover:text-church-secondary transition-colors"
               >
-                Contact
+                Holy Bible
+              </Link>
+              <Link
+                to="/chat"
+                className="block hover:text-church-secondary transition-colors"
+              >
+                Chat with Aposor Kofi
               </Link>
             </div>
           </div>
@@ -76,7 +82,7 @@ export const FooterSection = () => {
             <h3 className="text-xl font-bold mb-6">
               Location & Social Media
             </h3>
-            <div className="mb-6 rounded-lg overflow-hidden">
+            <div className="mb-6 rounded-lg overflow-hidden border border-white/10">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.7358124867687!2d-0.2572909243561401!3d5.605986433143636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf9907a958ff31%3A0x6bf8d0c7685caae6!2sThe%20Apostolic%20Church%20Nii%20Boiman%20Assembly!5e0!3m2!1sen!2sgh!4v1733188166229!5m2!1sen!2sgh"
                 width="100%"
@@ -98,16 +104,15 @@ export const FooterSection = () => {
                         title:
                           "The Apostolic Church - Nii Boiman Central Assembly",
                         text: "Check out our location!",
-                        url: "https://www.google.com/maps/place/The+Apostolic+Church+Nii+Boiman+Assembly/@5.6059864,-0.2572909,17z/data=!3m1!4b1!4m6!3m5!1s0xfdf9907a958ff31:0x6bf8d0c7685caae6!8m2!3d5.6059864!4d-0.254706!16s%2Fg%2F11h1444_4f?entry=ttu", // Replace with your desired URL
+                        url: "https://www.google.com/maps/place/The+Apostolic+Church+Nii+Boiman+Assembly/@5.6059864,-0.2572909,17z/data=!3m1!4b1!4m6!3m5!1s0xfdf9907a958ff31:0x6bf8d0c7685caae6!8m2!3d5.6059864!4d-0.254706!16s%2Fg%2F11h1444_4f?entry=ttu",
                       })
                       .then(() => console.log("Successful share"))
                       .catch((error) => console.log("Error sharing:", error));
                   } else {
-                    // Fallback for browsers that do not support the Web Share API
                     alert("Web Share API is not supported in your browser.");
                   }
                 }}
-                className="bg-church-secondary text-church-primary px-4 py-2 rounded-md hover:bg-church-secondary/90 transition-colors"
+                className="bg-church-secondary text-church-primary px-4 py-2 rounded-md font-semibold hover:bg-church-secondary/90 transition-colors text-sm"
               >
                 Share Location
               </button>
@@ -117,12 +122,12 @@ export const FooterSection = () => {
 
         {/* Copyright */}
         <div className="border-t border-white/10 mt-12 pt-8 text-center">
-          <p>
+          <p className="text-sm">
             &copy; {new Date().getFullYear()} The Apostolic Church - Ghana, Nii
             Boiman Central Assembly. All rights reserved.
-            <span className="block mt-2 font-bold text-yellow-500">
+            <span className="block mt-2 font-bold text-yellow-500 text-sm">
               Contact the Developers:{" "}
-              <a href="tel:+233543119117">0543 119 117</a>
+              <a href="tel:+233543119117" className="underline hover:text-white">0543 119 117</a>
             </span>
           </p>
         </div>
