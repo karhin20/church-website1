@@ -46,7 +46,10 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
     // Always fetch immediately on mount
     fetchMessages();
 
-    // Subscribe to real-time new messages for this event
+    // ── Supabase Realtime subscription ──────────────────────────────────────
+    // NOTE: We intentionally do NOT pass a server-side `filter` here.
+    // Filtered postgres_changes requires REPLICA IDENTITY FULL on the table,
+    // which is not guaranteed. Instead we filter client-side by event_id.
     const channel = supabase
       .channel(`live_chat:${eventId}`)
       .on(
@@ -55,10 +58,11 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
           event: 'INSERT',
           schema: 'public',
           table: 'live_chat_messages',
-          filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
           const newMsg = payload.new as LiveChatMessageItem;
+          // Client-side filter — only accept messages for this event
+          if (newMsg.event_id !== eventId) return;
           setMessages((prev) => {
             // Deduplicate — avoid double-adding own messages
             if (prev.find((m) => m.id === newMsg.id)) return prev;
@@ -67,16 +71,16 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
           scrollToBottom();
         }
       )
-      .subscribe((status) => {
-        // If subscription failed, fall back to polling
-        if (status === 'CHANNEL_ERROR') {
-          const interval = setInterval(fetchMessages, 5000);
-          return () => clearInterval(interval);
-        }
-      });
+      .subscribe();
+
+    // ── Guaranteed polling fallback (4 s) ───────────────────────────────────
+    // Ensures messages always appear even if the Realtime socket drops or
+    // the postgres_changes event is missed.
+    const pollInterval = setInterval(fetchMessages, 4000);
 
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(pollInterval);
     };
   }, [eventId]);
 
@@ -85,25 +89,44 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
     if (!newMessage.trim() || sending) return;
 
     const content = newMessage.trim();
+    const optimisticId = `optimistic-${Date.now()}`;
+    const optimisticMsg: LiveChatMessageItem = {
+      id: optimisticId,
+      event_id: eventId,
+      user_name: userName || 'Guest Listener',
+      message: content,
+      created_at: new Date().toISOString(),
+    };
+
+    // Show message instantly in the sender's UI
+    setMessages((prev) => [...prev, optimisticMsg]);
+    scrollToBottom();
     setNewMessage('');
     setSending(true);
 
     try {
-      const { error } = await supabase.from('live_chat_messages').insert([
+      const { data, error } = await supabase.from('live_chat_messages').insert([
         {
           event_id: eventId,
           user_name: userName || 'Guest Listener',
           message: content,
         },
-      ]);
+      ]).select().single();
 
       if (error) {
         console.error('Error inserting message:', error);
-        // Restore message if failed
+        // Remove the optimistic message and restore input on failure
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
         setNewMessage(content);
+      } else if (data) {
+        // Replace the optimistic placeholder with the real row from the DB
+        setMessages((prev) =>
+          prev.map((m) => (m.id === optimisticId ? (data as LiveChatMessageItem) : m))
+        );
       }
     } catch (err) {
       console.error('Error sending message:', err);
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
       setNewMessage(content);
     } finally {
       setSending(false);

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { LiveEventItem } from '@/lib/supabase';
+import { LiveEventItem, supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal, LogOut } from 'lucide-react';
+import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal, LogOut, WifiOff } from 'lucide-react';
 import AgoraRTC, { IAgoraRTCClient, IRemoteAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from './TemporalLiveChat';
 
@@ -21,9 +21,38 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(80);
   const [connecting, setConnecting] = useState(false);
+  const [streamEndedByAdmin, setStreamEndedByAdmin] = useState(false);
 
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const remoteAudioTrackRef = useRef<IRemoteAudioTrack | null>(null);
+
+  // ── Watch for admin ending the stream via Supabase Realtime ──────────────
+  useEffect(() => {
+    const channel = supabase
+      .channel(`live_event_status:${event.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'live_events',
+          filter: `id=eq.${event.id}`,
+        },
+        (payload) => {
+          const updated = payload.new as LiveEventItem;
+          if (updated.status === 'ended') {
+            // Admin ended the stream — force everyone out immediately
+            leaveStream();
+            setStreamEndedByAdmin(true);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [event.id]);
 
   useEffect(() => {
     if (userName) {
@@ -155,6 +184,28 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
       remoteAudioTrackRef.current.setVolume(val);
     }
   };
+
+  // ── Stream ended by admin — show override screen to all listeners ──────────
+  if (streamEndedByAdmin) {
+    return (
+      <div className="max-w-md mx-auto bg-gradient-to-br from-gray-900 to-church-primary text-white p-8 rounded-xl shadow-xl border border-white/10 text-center">
+        <div className="inline-flex items-center justify-center p-4 bg-white/10 rounded-full mb-5">
+          <WifiOff className="w-10 h-10 text-red-400" />
+        </div>
+        <h3 className="text-2xl font-bold mb-2">Stream Has Ended</h3>
+        <p className="text-gray-300 text-sm mb-1">
+          The admin has ended this live broadcast.
+        </p>
+        <p className="text-gray-400 text-xs mb-6">
+          Thank you for joining us today. God bless you! 🙏
+        </p>
+        <div className="w-full h-px bg-white/10 mb-6" />
+        <p className="text-xs text-gray-500">
+          Check back during our next service for another live session.
+        </p>
+      </div>
+    );
+  }
 
   if (!userName) {
     return (
