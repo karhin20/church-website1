@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { MicVocal, ChevronDown, ChevronUp, Radio, HeartHandshake } from "lucide-react";
@@ -16,14 +16,58 @@ export const LiveServiceSection = () => {
   const [activeLiveEvent, setActiveLiveEvent] = useState<LiveEventItem | null>(null);
   const [loadingEvent, setLoadingEvent] = useState(true);
 
+  // Keep a ref to the current active event ID to prevent stale closures in callbacks
+  const activeEventIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    activeEventIdRef.current = activeLiveEvent ? activeLiveEvent.id : null;
+  }, [activeLiveEvent]);
+
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
   useEffect(() => {
-    // Fetch on mount
     const fetchActiveEvent = async () => {
+      const currentId = activeEventIdRef.current;
+
+      // 1. If we are currently watching an active event, check if its status changed
+      if (currentId) {
+        try {
+          const { data, error } = await supabase
+            .from('live_events')
+            .select('*')
+            .eq('id', currentId)
+            .single();
+
+          if (!error && data) {
+            if (data.status === 'live') {
+              setActiveLiveEvent(data);
+              return;
+            } else {
+              // The current event ended. Check if a new live event was started.
+              const { data: newLive, error: newLiveErr } = await supabase
+                .from('live_events')
+                .select('*')
+                .eq('status', 'live')
+                .order('started_at', { ascending: false })
+                .limit(1);
+
+              if (!newLiveErr && newLive && newLive.length > 0) {
+                setActiveLiveEvent(newLive[0]);
+              } else {
+                setActiveLiveEvent(data); // Keep the ended event in state so the player displays the Ended banner
+              }
+              return;
+            }
+          }
+        } catch (err) {
+          console.error('Error checking active live event status:', err);
+        }
+      }
+
+      // 2. Otherwise (or if status check failed), look for the latest live event
       try {
         const { data, error } = await supabase
           .from('live_events')
@@ -46,21 +90,25 @@ export const LiveServiceSection = () => {
 
     fetchActiveEvent();
 
-    // Subscribe to live_events changes via Realtime for instant updates
+    // ── Supabase Realtime subscription ──────────────────────────────────────
     const channel = supabase
       .channel('live_events_realtime')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'live_events' },
         () => {
-          // Re-fetch whenever any live_event row changes
           fetchActiveEvent();
         }
       )
       .subscribe();
 
+    // ── Polling Fallback (4 s) ──────────────────────────────────────────────
+    // Guarantees status updates even if Realtime events are delayed or dropped.
+    const interval = setInterval(fetchActiveEvent, 4000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, []);
 
@@ -97,10 +145,12 @@ export const LiveServiceSection = () => {
           </div>
         ) : activeLiveEvent ? (
           <div className="mb-12">
-            <div className="flex items-center gap-2 mb-4 bg-red-600 text-white px-4 py-2 rounded-lg w-fit animate-pulse font-bold text-sm">
-              <Radio className="w-5 h-5" />
-              <span>LIVE AUDIO EVENT IN PROGRESS</span>
-            </div>
+            {activeLiveEvent.status === 'live' && (
+              <div className="flex items-center gap-2 mb-4 bg-red-600 text-white px-4 py-2 rounded-lg w-fit animate-pulse font-bold text-sm">
+                <Radio className="w-5 h-5" />
+                <span>LIVE AUDIO EVENT IN PROGRESS</span>
+              </div>
+            )}
             <LiveAudioPlayer event={activeLiveEvent} />
           </div>
         ) : (
