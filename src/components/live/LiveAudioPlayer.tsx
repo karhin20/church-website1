@@ -3,7 +3,7 @@ import { LiveEventItem } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal } from 'lucide-react';
+import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal, LogOut } from 'lucide-react';
 import AgoraRTC, { IAgoraRTCClient, IRemoteAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from './TemporalLiveChat';
 
@@ -65,12 +65,15 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
           user.audioTrack.setVolume(volume);
           user.audioTrack.play();
           setIsPlaying(true);
+          // Register with OS Media Session so audio continues on screen lock
+          setMediaSession(event.title, event.speaker || 'Church Minister', 'playing');
         }
       });
 
       client.on('user-unpublished', (user, mediaType) => {
         if (mediaType === 'audio') {
           setIsPlaying(false);
+          setMediaSession(event.title, event.speaker || 'Church Minister', 'paused');
         }
       });
 
@@ -98,6 +101,17 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     }
     setHasJoined(false);
     setIsPlaying(false);
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'none';
+    }
+  };
+
+  // Full leave — disconnect and return to name screen
+  const handleLeaveStream = async () => {
+    await leaveStream();
+    localStorage.removeItem('tac_listener_name');
+    setUserName('');
+    setInputName('');
   };
 
   const handleSaveName = (e: React.FormEvent) => {
@@ -113,9 +127,11 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
       if (isPlaying) {
         remoteAudioTrackRef.current.stop();
         setIsPlaying(false);
+        setMediaSession(event.title, event.speaker || 'Church Minister', 'paused');
       } else {
         remoteAudioTrackRef.current.play();
         setIsPlaying(true);
+        setMediaSession(event.title, event.speaker || 'Church Minister', 'playing');
       }
     }
   };
@@ -257,6 +273,15 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
             />
             <span className="text-xs font-mono text-gray-300 w-8">{isMuted ? '0%' : `${volume}%`}</span>
           </div>
+
+          {/* Leave Stream */}
+          <button
+            onClick={handleLeaveStream}
+            className="w-full flex items-center justify-center gap-2 text-xs text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-400/60 rounded-md py-1.5 transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Leave Stream
+          </button>
         </div>
       </div>
 
@@ -266,6 +291,26 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
       </div>
     </div>
   );
+}
+
+// ─── Media Session API helper (background / lock-screen audio) ────────────────
+
+function setMediaSession(
+  title: string,
+  artist: string,
+  state: 'playing' | 'paused' | 'none'
+) {
+  if (!('mediaSession' in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title,
+    artist,
+    album: 'TAC Nii Boiman Central — Live Stream',
+    artwork: [
+      { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+  });
+  navigator.mediaSession.playbackState = state;
 }
 
 // ─── Audio Waveform Visualizer ───────────────────────────────────────────────
