@@ -21,29 +21,47 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(80);
   const [connecting, setConnecting] = useState(false);
-  const [streamEndedByAdmin, setStreamEndedByAdmin] = useState(event.status === 'ended');
+  const [streamEndedByAdmin, setStreamEndedByAdmin] = useState(false);
 
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const remoteAudioTrackRef = useRef<IRemoteAudioTrack | null>(null);
 
-  // ── Watch for event status prop changes ──────────────────────────────────
+  // ── Watch for admin ending the stream via Supabase Realtime ──────────────
   useEffect(() => {
-    if (event.status === 'ended') {
-      leaveStream();
-      setStreamEndedByAdmin(true);
-    } else {
-      setStreamEndedByAdmin(false);
-    }
-  }, [event.status]);
+    const channel = supabase
+      .channel(`live_event_status:${event.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'live_events',
+          filter: `id=eq.${event.id}`,
+        },
+        (payload) => {
+          const updated = payload.new as LiveEventItem;
+          if (updated.status === 'ended') {
+            // Admin ended the stream — force everyone out immediately
+            leaveStream();
+            setStreamEndedByAdmin(true);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [event.id]);
 
   useEffect(() => {
-    if (userName && event.status === 'live') {
+    if (userName) {
       joinStream();
     }
     return () => {
       leaveStream();
     };
-  }, [event.agora_channel, userName, event.status]);
+  }, [event.agora_channel, userName]);
 
   const joinStream = async () => {
     if (clientRef.current) return;

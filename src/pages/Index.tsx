@@ -9,39 +9,25 @@ import { FooterSection } from "@/components/sections/FooterSection";
 import { Calendar, MessageCircle, Music4, X, BookPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Link, useLocation, useNavigate, Routes, Route } from "react-router-dom";
+import { Link, useLocation, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChatButton } from "@/components/ChatButton";
 
 const Index = () => {
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if we have a section to scroll to
-    if (location.state && typeof location.state === 'object' && 'scrollTo' in location.state) {
-      const stateObj = location.state as { scrollTo: string };
-      const sectionId = stateObj.scrollTo;
-
-      // Clear the state to prevent scrolling again on subsequent renders/reloads
-      navigate(location.pathname, { replace: true, state: {} });
-
-      // Retry scroll to handle dynamic / lazy-loaded sections
-      let attempts = 0;
-      const tryScroll = () => {
-        const element = document.getElementById(sectionId);
-        if (element) {
+    if (location.state?.scrollTo) {
+      const element = document.getElementById(location.state.scrollTo);
+      if (element) {
+        setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth' });
-        } else if (attempts < 10) {
-          attempts++;
-          setTimeout(tryScroll, 100);
-        }
-      };
-
-      setTimeout(tryScroll, 150);
+        }, 100); // Small delay to ensure the page is loaded
+      }
     }
-  }, [location, navigate]);
+  }, [location]);
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   return (
