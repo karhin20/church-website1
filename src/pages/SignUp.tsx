@@ -4,9 +4,6 @@ import { doCreateUserWithEmailAndPassword, doSignInWithGoogle, ROLES } from '@/a
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { auth, firestore } from '@/admin/auth/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { setDoc, doc } from 'firebase/firestore';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -117,4 +114,4 @@ export default function SignUp() {
       </div>
     </div>
   );
-} 
+}

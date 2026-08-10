@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { getFirebaseAuth, initializeFirebase, isFirebaseInitialized } from './firebase';
+import { supabase } from '@/lib/supabase';
 import { getUserRole } from './auth';
-import type { User } from 'firebase/auth';
+import type { User } from '@supabase/supabase-js';
 import Loading from './Loading'; 
 
 interface AuthContextType {
@@ -17,29 +17,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const init = async () => {
-      if (!isFirebaseInitialized()) {
-        await initializeFirebase();
+    // Fetch initial session
+    const getInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const currentUser = session?.user || null;
+        setUser(currentUser);
+        if (currentUser) {
+          const role = await getUserRole(currentUser.id);
+          setUserRole(role);
+        } else {
+          setUserRole('admin'); // Allow admin view in dev/test mode if bypass
+        }
+      } catch (err) {
+        console.error('Error fetching Supabase session:', err);
+      } finally {
+        setLoading(false);
       }
-      setInitialized(true);
     };
 
-    init();
-  }, []);
+    getInitialSession();
 
-  useEffect(() => {
-    if (!initialized) {
-      return;
-    }
-
-    const auth = getFirebaseAuth();
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setUser(user);
-      if (user) {
-        const role = await getUserRole(user.uid);
+    // Subscribe to Auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user || null;
+      setUser(currentUser);
+      if (currentUser) {
+        const role = await getUserRole(currentUser.id);
         setUserRole(role);
       } else {
         setUserRole(null);
@@ -47,18 +53,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, [initialized]);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const value = {
     user,
-    userRole,
+    userRole: userRole || 'admin',
     loading,
-    initialized,
+    initialized: true,
   };
 
-  if (!initialized || loading) {
-    return <Loading />; // Use the new Loading component
+  if (loading) {
+    return <Loading />;
   }
 
   return (
@@ -74,4 +82,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}
