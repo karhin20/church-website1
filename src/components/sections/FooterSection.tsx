@@ -74,6 +74,12 @@ export const FooterSection = () => {
               >
                 Chat with Aposor Kofi
               </Link>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-2 mt-2 bg-church-secondary text-church-primary px-4 py-2 rounded-md font-semibold text-sm hover:bg-church-secondary/90 transition-colors"
+              >
+                🔐 Admin Sign In
+              </Link>
             </div>
           </div>
 
