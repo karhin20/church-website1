@@ -333,7 +333,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
         {/* Browser Autoplay Block Warning */}
         {autoplayBlocked && (
           <div className="mb-3 p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-200 text-xs flex items-center justify-between gap-3 animate-pulse">
-            <span>Browser blocked automatic audio. Click "Play" or "Start Audio" to listen.</span>
+            <span> Click "Play" or "Start Audio" to listen.</span>
             <Button
               size="sm"
               onClick={() => {

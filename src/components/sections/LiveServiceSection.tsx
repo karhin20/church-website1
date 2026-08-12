@@ -84,12 +84,11 @@ export const LiveServiceSection = () => {
             <MicVocal className="w-14 h-14 text-church-primary" />
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-church-primary mb-1 text-left">Live Service</h2>
-              <p className="text-church-text text-left">Join us for our live audio service & worship</p>
             </div>
           </div>
           <ShareButton 
             title="TAC Live Service"
-            text="Join us for our live service at The Apostolic Church - Ghana"
+            text="Join us for our live service at The Apostolic Church-Ghana, Nii Boiman Central"
           />
         </motion.div>
 
