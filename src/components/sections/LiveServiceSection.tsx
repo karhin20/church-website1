@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { MicVocal, ChevronDown, ChevronUp, Radio, HeartHandshake } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { MicVocal, Radio, HeartHandshake } from "lucide-react";
+import { motion } from "framer-motion";
 import { Navigation } from "./Navigation";
 import { ChatButton } from "../ChatButton";
-import { VerseReader } from '@/pages/VerseReader';
 import { FooterSection } from './FooterSection';
 import { ShareButton } from "@/components/ShareButton";
 import { supabase, LiveEventItem } from '@/lib/supabase';
 import LiveAudioPlayer from '../live/LiveAudioPlayer';
 
 export const LiveServiceSection = () => {
-  const [isVerseReaderOpen, setIsVerseReaderOpen] = useState(false);
   const [activeLiveEvent, setActiveLiveEvent] = useState<LiveEventItem | null>(null);
   const [loadingEvent, setLoadingEvent] = useState(true);
 
@@ -22,8 +19,10 @@ export const LiveServiceSection = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch on mount
-    const fetchActiveEvent = async () => {
+    // Fetch on mount (and on realtime re-fetches). Only the initial call
+    // should toggle the loading skeleton — subsequent re-fetches update
+    // state quietly so the layout doesn't shift/jump on every row change.
+    const fetchActiveEvent = async (isInitial = false) => {
       try {
         const { data, error } = await supabase
           .from('live_events')
@@ -40,13 +39,19 @@ export const LiveServiceSection = () => {
       } catch (err) {
         console.error('Error fetching live event in LiveServiceSection:', err);
       } finally {
-        setLoadingEvent(false);
+        if (isInitial) {
+          setLoadingEvent(false);
+        }
       }
     };
 
-    fetchActiveEvent();
+    fetchActiveEvent(true);
 
-    // Subscribe to live_events changes via Realtime for instant updates
+    // Subscribe to live_events changes via Realtime for instant updates.
+    // Deliberately unfiltered: a status filter would only match on the new
+    // row for UPDATEs, so it would miss the live→ended transition (the row
+    // stops matching the moment it ends) and the player could get stuck
+    // showing "LIVE" after a broadcast actually stops.
     const channel = supabase
       .channel('live_events_realtime')
       .on(
@@ -54,7 +59,7 @@ export const LiveServiceSection = () => {
         { event: '*', schema: 'public', table: 'live_events' },
         () => {
           // Re-fetch whenever any live_event row changes
-          fetchActiveEvent();
+          fetchActiveEvent(false);
         }
       )
       .subscribe();
@@ -79,7 +84,7 @@ export const LiveServiceSection = () => {
             <MicVocal className="w-14 h-14 text-church-primary" />
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-church-primary mb-1 text-left">Live Service</h2>
-              <p className="text-church-text text-left">Join us for our live listening cloud & worship</p>
+              <p className="text-church-text text-left">Join us for our live audio service & worship</p>
             </div>
           </div>
           <ShareButton 
@@ -128,39 +133,6 @@ export const LiveServiceSection = () => {
             <p className="text-xl font-bold font-mono text-church-primary">0597672546</p>
             <p className="text-xs text-gray-700 font-medium">ACCOUNT: THE TAC AHWC NII BOIMAN</p>
           </div>
-        </div>
-
-        {/* Verse Reader Toggle Button and Content */}
-        <div className="max-w-6xl mx-auto">
-          <button
-            onClick={() => setIsVerseReaderOpen(!isVerseReaderOpen)}
-            className="w-full flex items-center justify-between p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
-          >
-            <span className="text-lg font-semibold text-church-primary">
-              Bible Verse Reader
-            </span>
-            {isVerseReaderOpen ? (
-              <ChevronUp className="w-6 h-6 text-church-primary" />
-            ) : (
-              <ChevronDown className="w-6 h-6 text-church-primary" />
-            )}
-          </button>
-
-          <AnimatePresence>
-            {isVerseReaderOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="overflow-hidden"
-              >
-                <div className="mt-4">
-                  <VerseReader />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
       <div>

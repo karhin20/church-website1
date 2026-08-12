@@ -68,8 +68,11 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
         }
       )
       .subscribe((status) => {
+        // Temporary debug logging — remove once realtime is confirmed working
+        console.log('[TemporalLiveChat] channel status:', status, 'eventId:', eventId);
+
         // If subscription failed, fall back to polling
-        if (status === 'CHANNEL_ERROR') {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
           const interval = setInterval(fetchMessages, 5000);
           return () => clearInterval(interval);
         }
@@ -88,23 +91,47 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
     setNewMessage('');
     setSending(true);
 
+    // Optimistic add — show the message immediately instead of waiting on
+    // the realtime echo (which may be delayed, or never arrive if Realtime
+    // isn't enabled for this table).
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMsg: LiveChatMessageItem = {
+      id: tempId,
+      event_id: eventId,
+      user_name: userName || 'Guest Listener',
+      message: content,
+      created_at: new Date().toISOString(),
+    } as LiveChatMessageItem;
+
+    setMessages((prev) => [...prev, optimisticMsg]);
+    scrollToBottom();
+
     try {
-      const { error } = await supabase.from('live_chat_messages').insert([
-        {
-          event_id: eventId,
-          user_name: userName || 'Guest Listener',
-          message: content,
-        },
-      ]);
+      const { data, error } = await supabase
+        .from('live_chat_messages')
+        .insert([
+          {
+            event_id: eventId,
+            user_name: userName || 'Guest Listener',
+            message: content,
+          },
+        ])
+        .select();
 
       if (error) {
         console.error('Error inserting message:', error);
-        // Restore message if failed
         setNewMessage(content);
+        // Roll back the optimistic message on failure
+        setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      } else if (data && data[0]) {
+        // Swap the temp message for the real row (real id) so the later
+        // realtime INSERT event for this row gets deduped correctly.
+        setMessages((prev) => prev.map((m) => (m.id === tempId ? data[0] : m)));
       }
     } catch (err) {
       console.error('Error sending message:', err);
       setNewMessage(content);
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
     } finally {
       setSending(false);
     }

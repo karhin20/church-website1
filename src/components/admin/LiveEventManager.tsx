@@ -178,7 +178,7 @@ export default function LiveEventManager() {
   const toggleMute = () => {
     if (localAudioTrackRef.current) {
       const nextMuteState = !isMuted;
-      localAudioTrackRef.current.setMute(nextMuteState);
+      localAudioTrackRef.current.setMuted(nextMuteState);
       setIsMuted(nextMuteState);
       toast({
         title: nextMuteState ? "Microphone Muted" : "Microphone Active",

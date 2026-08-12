@@ -272,7 +272,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
               </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-red-400">Live Listening Cloud</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-red-400">Live Broadcast</span>
             </div>
 
             <div className="text-xs text-gray-300 flex items-center gap-1">
@@ -342,7 +342,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
                 <span className="text-sm font-semibold">
                   {connecting ? 'Connecting...' : isPlaying ? 'Receiving Live Audio' : 'Audio Paused'}
                 </span>
-                <p className="text-xs text-gray-300">Agora Listening Cloud</p>
+                <p className="text-xs text-gray-300">Agora Audio Player</p>
               </div>
             </div>
           </div>
