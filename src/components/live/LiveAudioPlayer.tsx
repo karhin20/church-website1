@@ -26,6 +26,11 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
 
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const remoteAudioTrackRef = useRef<IRemoteAudioTrack | null>(null);
+  // Stable per-tab id used as the presence key — lets the same person open
+  // multiple tabs/devices without their listener count colliding/merging.
+  const listenerIdRef = useRef<string>(
+    (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `listener-${Date.now()}-${Math.random()}`
+  );
 
   // ── Watch for admin ending the stream via Supabase Realtime ──────────────
   useEffect(() => {
@@ -54,6 +59,29 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
       supabase.removeChannel(channel);
     };
   }, [event.id]);
+
+  // ── Track presence so the admin panel can show a live listener count ────
+  useEffect(() => {
+    if (!userName) return; // only start counting once someone has joined
+
+    const presenceChannel = supabase.channel(`live_listeners:${event.id}`, {
+      config: { presence: { key: listenerIdRef.current } },
+    });
+
+    presenceChannel.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') {
+        await presenceChannel.track({
+          userName,
+          joined_at: new Date().toISOString(),
+        });
+      }
+    });
+
+    return () => {
+      presenceChannel.untrack();
+      supabase.removeChannel(presenceChannel);
+    };
+  }, [event.id, userName]);
 
   // ── Register global callback for when browser blocks autoplay ───────────
   useEffect(() => {

@@ -18,7 +18,13 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
 
   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
     setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior });
+      // block/inline: 'nearest' keeps this scroll confined to the chat's own
+      // overflow-y-auto container. Without it, scrollIntoView's default
+      // (block: 'start') walks up every scrollable ancestor — including the
+      // page itself — trying to align the element with the top of the
+      // viewport, which is what was yanking the whole page toward this
+      // section every time a message arrived or was sent.
+      messagesEndRef.current?.scrollIntoView({ behavior, block: 'nearest', inline: 'nearest' });
     }, 80);
   };
 
@@ -46,6 +52,12 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
     // Always fetch immediately on mount
     fetchMessages();
 
+    // Fallback poller — only used if the realtime subscription can't
+    // connect. Tracked in a ref so the effect's cleanup can always clear
+    // it, and guarded so repeated error statuses don't stack up multiple
+    // intervals.
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
+
     // Subscribe to real-time new messages for this event
     const channel = supabase
       .channel(`live_chat:${eventId}`)
@@ -68,17 +80,19 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
         }
       )
       .subscribe((status) => {
-        // Temporary debug logging — remove once realtime is confirmed working
-        console.log('[TemporalLiveChat] channel status:', status, 'eventId:', eventId);
-
-        // If subscription failed, fall back to polling
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          const interval = setInterval(fetchMessages, 5000);
-          return () => clearInterval(interval);
+          if (!pollInterval) {
+            pollInterval = setInterval(fetchMessages, 5000);
+          }
+        } else if (status === 'SUBSCRIBED' && pollInterval) {
+          // Connection recovered — stop polling, realtime has it again
+          clearInterval(pollInterval);
+          pollInterval = null;
         }
       });
 
     return () => {
+      if (pollInterval) clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, [eventId]);

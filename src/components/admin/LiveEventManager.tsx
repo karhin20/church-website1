@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { Radio, Mic, MicOff, Square, MessageSquare } from 'lucide-react';
+import { Radio, Mic, MicOff, Square, MessageSquare, Headphones } from 'lucide-react';
 import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from '../live/TemporalLiveChat';
 
@@ -16,6 +16,7 @@ export default function LiveEventManager() {
   const [speaker, setSpeaker] = useState('');
   const [description, setDescription] = useState('');
   const [activeEvent, setActiveEvent] = useState<LiveEventItem | null>(null);
+  const [listenerCount, setListenerCount] = useState(0);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,27 @@ export default function LiveEventManager() {
       cleanupAgora();
     };
   }, []);
+
+  // ── Live listener count via Supabase Presence ────────────────────────────
+  useEffect(() => {
+    if (!activeEvent) {
+      setListenerCount(0);
+      return;
+    }
+
+    const presenceChannel = supabase.channel(`live_listeners:${activeEvent.id}`);
+
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState();
+        setListenerCount(Object.keys(state).length);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(presenceChannel);
+    };
+  }, [activeEvent?.id]);
 
   const cleanupAgora = async () => {
     if (localAudioTrackRef.current) {
@@ -199,9 +221,15 @@ export default function LiveEventManager() {
               </span>
               <h2 className="text-2xl font-bold tracking-wide uppercase">Broadcast In Progress</h2>
             </div>
-            <span className="text-xs bg-black/40 px-3 py-1 rounded-full font-mono">
-              Channel: {activeEvent.agora_channel}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs bg-black/40 px-3 py-1 rounded-full font-mono flex items-center gap-1.5">
+                <Headphones className="w-3.5 h-3.5 text-church-secondary" />
+                {listenerCount} listening
+              </span>
+              <span className="text-xs bg-black/40 px-3 py-1 rounded-full font-mono">
+                Channel: {activeEvent.agora_channel}
+              </span>
+            </div>
           </div>
 
           <div className="bg-black/30 p-4 rounded-md mb-6 space-y-1">
