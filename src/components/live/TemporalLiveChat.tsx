@@ -2,14 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase, LiveChatMessageItem } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, MessageSquare, Loader2 } from 'lucide-react';
+import { Send, MessageSquare, Loader2, BookOpen } from 'lucide-react';
 
 interface TemporalLiveChatProps {
   eventId: string;
   userName: string;
+  /** When true, the message input is hidden (read-only view for listeners who post via the standard flow) */
+  readOnly?: boolean;
 }
 
-export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChatProps) {
+export default function TemporalLiveChat({ eventId, userName, readOnly }: TemporalLiveChatProps) {
   const [messages, setMessages] = useState<LiveChatMessageItem[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -114,6 +116,7 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
       event_id: eventId,
       user_name: userName || 'Guest Listener',
       message: content,
+      message_type: 'chat',
       created_at: new Date().toISOString(),
     } as LiveChatMessageItem;
 
@@ -128,6 +131,7 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
             event_id: eventId,
             user_name: userName || 'Guest Listener',
             message: content,
+            message_type: 'chat',
           },
         ])
         .select();
@@ -182,7 +186,36 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
           </div>
         ) : (
           messages.map((msg) => {
+            const isVerse = msg.message_type === 'verse';
             const isMe = msg.user_name === userName;
+
+            // ── Scripture card — admin-posted verse ──────────────────────
+            if (isVerse) {
+              return (
+                <div key={msg.id} className="w-full px-1">
+                  <div className="relative rounded-xl border border-amber-400/60 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-md p-4 text-center">
+                    {/* Decorative top bar */}
+                    <div className="absolute top-0 left-0 right-0 h-1 rounded-t-xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400" />
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <BookOpen className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700">
+                        Scripture
+                      </span>
+                    </div>
+                    <p className="text-sm italic text-gray-800 leading-relaxed font-serif">
+                      &ldquo;{msg.message}&rdquo;
+                    </p>
+                    {msg.verse_ref && (
+                      <p className="mt-2 text-xs font-semibold text-amber-700">
+                        — {msg.verse_ref}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            }
+
+            // ── Regular chat bubble ──────────────────────────────────────
             return (
               <div
                 key={msg.id}
@@ -207,24 +240,26 @@ export default function TemporalLiveChat({ eventId, userName }: TemporalLiveChat
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input Form */}
-      <form onSubmit={handleSendMessage} className="p-2 bg-white border-t flex gap-2 flex-shrink-0">
-        <Input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message or amen..."
-          className="flex-1 text-sm"
-          disabled={sending}
-        />
-        <Button
-          type="submit"
-          size="sm"
-          disabled={sending || !newMessage.trim()}
-          className="bg-church-secondary text-church-primary hover:bg-church-secondary/90 flex-shrink-0"
-        >
-          {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-        </Button>
-      </form>
+      {/* Message Input Form — hidden in readOnly mode */}
+      {!readOnly && (
+        <form onSubmit={handleSendMessage} className="p-2 bg-white border-t flex gap-2 flex-shrink-0">
+          <Input
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message or amen..."
+            className="flex-1 text-sm"
+            disabled={sending}
+          />
+          <Button
+            type="submit"
+            size="sm"
+            disabled={sending || !newMessage.trim()}
+            className="bg-church-secondary text-church-primary hover:bg-church-secondary/90 flex-shrink-0"
+          >
+            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          </Button>
+        </form>
+      )}
     </div>
   );
 }

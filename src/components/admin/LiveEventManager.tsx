@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { Radio, Mic, MicOff, Square, MessageSquare, Headphones } from 'lucide-react';
+import { Radio, Mic, MicOff, Square, MessageSquare, Headphones, BookOpen } from 'lucide-react';
 import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from '../live/TemporalLiveChat';
+import AdminBiblePanel from './AdminBiblePanel';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
 
@@ -20,6 +21,7 @@ export default function LiveEventManager() {
   const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'chat' | 'bible'>('chat');
   const { toast } = useToast();
 
   const clientRef = useRef<IAgoraRTCClient | null>(null);
@@ -264,15 +266,48 @@ export default function LiveEventManager() {
             </Button>
           </div>
 
-          {/* Admin view of live event chat */}
+          {/* Admin panel tabs: Live Chat | Bible */}
           <div className="mt-8 pt-6 border-t border-white/20">
-            <h4 className="text-lg font-bold mb-3 flex items-center gap-2 text-white">
-              <MessageSquare className="w-5 h-5 text-yellow-300" />
-              Live Event Temporal Chat
-            </h4>
-            <div className="bg-white text-gray-900 rounded-lg p-3">
-              <TemporalLiveChat eventId={activeEvent.id} userName="Admin (Host)" />
+            {/* Tab header */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setActiveTab('chat')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  activeTab === 'chat'
+                    ? 'bg-white text-church-primary shadow'
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Live Chat
+              </button>
+              <button
+                onClick={() => setActiveTab('bible')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  activeTab === 'bible'
+                    ? 'bg-amber-400 text-amber-900 shadow'
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                <BookOpen className="w-4 h-4" />
+                Bible
+              </button>
             </div>
+
+            {/* Tab content */}
+            {activeTab === 'chat' ? (
+              <div className="bg-white text-gray-900 rounded-lg p-3">
+                <TemporalLiveChat eventId={activeEvent.id} userName="Admin (Host)" />
+              </div>
+            ) : (
+              <div className="bg-white text-gray-900 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <BookOpen className="w-5 h-5 text-amber-600" />
+                  <h4 className="font-bold text-amber-800">Post a Scripture to Live Chat</h4>
+                </div>
+                <AdminBiblePanel eventId={activeEvent.id} userName="Admin (Host)" />
+              </div>
+            )}
           </div>
         </div>
       ) : (

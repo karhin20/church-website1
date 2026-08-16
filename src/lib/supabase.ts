@@ -45,5 +45,7 @@ export interface LiveChatMessageItem {
   event_id: string;
   user_name: string;
   message: string;
+  message_type?: 'chat' | 'verse';
+  verse_ref?: string;
   created_at?: string;
 }
