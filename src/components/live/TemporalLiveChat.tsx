@@ -186,9 +186,33 @@ export default function TemporalLiveChat({ eventId, userName, readOnly }: Tempor
 
   return (
     <div className={containerClasses}>
+      {/* Floating Reduce Chat button when enlarged */}
+      {isExpanded && (
+        <button
+          onClick={() => setIsExpanded(false)}
+          className="fixed top-4 right-4 z-[60] bg-purple-600 text-white rounded-full px-4 py-2 font-bold text-xs shadow-2xl hover:bg-purple-700 flex items-center gap-2 transition-all active:scale-95 border-2 border-white"
+          title="Reduce Chat Area"
+        >
+          <Minimize2 className="w-4 h-4" />
+          <span>Reduce Chat</span>
+        </button>
+      )}
+
       {/* Drag Handle Pill & Title Header with Full-Surface Toggle */}
       <div className="pt-2 pb-2 px-4 flex items-center justify-between flex-shrink-0 border-b border-gray-100 bg-white relative">
-        <div className="w-8" />
+        {isExpanded ? (
+          <button
+            onClick={() => setIsExpanded(false)}
+            className="flex items-center gap-1.5 px-3 py-1 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-full font-bold text-xs shadow-sm transition-colors"
+            title="Reduce Chat"
+          >
+            <Minimize2 className="w-3.5 h-3.5" />
+            <span>Reduce</span>
+          </button>
+        ) : (
+          <div className="w-16" />
+        )}
+
         <div className="text-center">
           <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-1" />
           <h3 className="text-xs font-black uppercase tracking-widest text-gray-800">
@@ -199,10 +223,20 @@ export default function TemporalLiveChat({ eventId, userName, readOnly }: Tempor
         {/* Full Surface Maximize / Minimize Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-          title={isExpanded ? "Collapse view" : "Open full surface chat"}
+          className="p-1.5 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors flex items-center gap-1 text-xs font-bold"
+          title={isExpanded ? "Reduce view" : "Open full surface chat"}
         >
-          {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          {isExpanded ? (
+            <>
+              <Minimize2 className="w-4 h-4 text-purple-600" />
+              <span className="text-purple-600 hidden sm:inline">Reduce</span>
+            </>
+          ) : (
+            <>
+              <Maximize2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Expand</span>
+            </>
+          )}
         </button>
       </div>
 

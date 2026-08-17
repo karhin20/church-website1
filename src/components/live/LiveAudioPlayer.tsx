@@ -7,8 +7,6 @@ import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal, LogOut, WifiOff }
 import AgoraRTC, { IAgoraRTCClient, IRemoteAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from './TemporalLiveChat';
 
-import { ShareButton } from '@/components/ShareButton';
-
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
 
 interface LiveAudioPlayerProps {
@@ -26,6 +24,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   const [streamEndedByAdmin, setStreamEndedByAdmin] = useState(false);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
   const [listenerCount, setListenerCount] = useState<number>(1);
+  const [activeListeners, setActiveListeners] = useState<string[]>([]);
 
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const remoteAudioTrackRef = useRef<IRemoteAudioTrack | null>(null);
@@ -33,10 +32,13 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `listener-${Date.now()}-${Math.random()}`
   );
 
-  // Parse dynamic speakers list from event.speaker string
+  // Dynamic speaker names parsed from event speaker field
   const speakerNames = event.speaker 
     ? event.speaker.split(/[,&]/).map((s) => s.trim()).filter(Boolean)
-    : ['Host Minister'];
+    : [];
+
+  // Host name as requested: TAC-GH, NBC
+  const hostName = 'TAC-GH, NBC';
 
   // ── Watch for admin ending stream ───────────────────────────────────────
   useEffect(() => {
@@ -65,7 +67,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     };
   }, [event.id]);
 
-  // ── Track listener presence ──────────────────────────────────────────────
+  // ── Track listener presence & active listener names ──────────────────────
   useEffect(() => {
     if (!userName) return;
 
@@ -76,8 +78,16 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     presenceChannel
       .on('presence', { event: 'sync' }, () => {
         const state = presenceChannel.presenceState();
-        const count = Object.keys(state).length;
-        setListenerCount(Math.max(count, 1));
+        const namesList: string[] = [];
+        Object.values(state).forEach((presences: any) => {
+          presences.forEach((p: any) => {
+            if (p.userName && !namesList.includes(p.userName)) {
+              namesList.push(p.userName);
+            }
+          });
+        });
+        setActiveListeners(namesList);
+        setListenerCount(Math.max(namesList.length, 1));
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
@@ -229,7 +239,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     ? `${(listenerCount / 1000).toFixed(1)}K` 
     : listenerCount.toString();
 
-  // ── Stream ended by admin ────────────────────────────────────────────────
+  // ── Stream ended view ──────────────────────────────────────────────────
   if (streamEndedByAdmin) {
     return (
       <div className="max-w-md mx-auto bg-gradient-to-br from-gray-900 to-church-primary text-white p-8 rounded-3xl shadow-2xl border border-white/10 text-center">
@@ -289,30 +299,28 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     );
   }
 
+  // Combine host, speaker names, and joined listeners
+  const allPeopleOnStream = [
+    { name: hostName, role: 'HOST', isHost: true },
+    ...speakerNames.map((s) => ({ name: s, role: 'SPEAKER', isHost: false })),
+    ...activeListeners.map((l) => ({ name: l, role: 'LISTENER', isHost: false })),
+  ];
+
   return (
     <div className="max-w-md mx-auto bg-white rounded-[36px] shadow-2xl overflow-hidden border border-gray-200 relative font-sans text-gray-900">
       
       {/* ── STAGE / PLAYER HEADER ────────────────────────────────────────── */}
       <div className="p-6 pt-5 pb-4 bg-gradient-to-b from-slate-50 via-white to-gray-50/50">
-        {/* Header Title & Status */}
-        <div className="mb-4 text-center">
-          <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-tight mb-2">
-            {event.title}
-          </h1>
-          
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-red-100 text-red-600 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-red-600 animate-ping" />
-              LIVE
-            </span>
-            <span className="bg-gray-200/80 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full">
-              {formattedCount} Listening
-            </span>
-            <ShareButton
-              title={`Live: ${event.title}`}
-              text={`Join us live for "${event.title}"${event.speaker ? ` with ${event.speaker}` : ''} at The Apostolic Church-Ghana, Nii Boiman Central!`}
-            />
-          </div>
+        
+        {/* Status Badges */}
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <span className="inline-flex items-center gap-1.5 bg-red-100 text-red-600 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-red-600 animate-ping" />
+            LIVE
+          </span>
+          <span className="bg-gray-200/80 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full">
+            {formattedCount} Listening
+          </span>
         </div>
 
         {/* Autoplay Warning */}
@@ -334,51 +342,51 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
           <GradientAudioWaveform isPlaying={isPlaying} isMuted={isMuted} connecting={connecting} />
         </div>
 
-        {/* Episode Box showing Service & Speaker Name */}
+        {/* Lower Card showing Event/Sermon Title & Speaker */}
         <div className="my-5 flex items-center justify-center">
           <div className="w-full max-w-xs rounded-2xl bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 p-4 text-white text-center shadow-xl border border-white/10">
-            <div className="flex items-center justify-center gap-1.5 text-pink-400 mb-1">
-              <Radio className="w-4 h-4 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-pink-300">LIVE SERVICE</span>
-            </div>
-            <h2 className="text-base font-bold leading-snug text-white line-clamp-1 mb-1">
+            <h2 className="text-base font-bold leading-snug text-white line-clamp-2 mb-1">
               {event.title}
             </h2>
-            <p className="text-xs text-purple-200 flex items-center justify-center gap-1">
-              <MicVocal className="w-3.5 h-3.5 text-pink-400" />
-              <span>{event.speaker || 'Church Minister'}</span>
-            </p>
+            {event.speaker && (
+              <p className="text-xs text-purple-200 flex items-center justify-center gap-1">
+                <MicVocal className="w-3.5 h-3.5 text-pink-400" />
+                <span>{event.speaker}</span>
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Dynamic & Scrollable Silhouette Avatars matching Speaker Names */}
+        {/* Dynamic & Scrollable Silhouette Avatars for Host, Speakers & Joined Listeners */}
         <div className="my-4">
           <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400 text-center mb-2">
             ON THE STREAM
           </p>
           
-          <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2 px-3 max-w-full justify-start sm:justify-center">
-            {speakerNames.map((name, index) => {
-              const colors = [
+          <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2 px-3 max-w-full justify-start">
+            {allPeopleOnStream.map((person, index) => {
+              const borderGradients = [
                 'from-emerald-400 to-teal-500',
                 'from-yellow-400 to-amber-500',
                 'from-cyan-400 to-blue-500',
                 'from-purple-400 to-pink-500',
               ];
-              const gradientClass = colors[index % colors.length];
+              const gradientClass = person.isHost 
+                ? 'from-emerald-400 to-teal-500' 
+                : borderGradients[index % borderGradients.length];
 
               return (
-                <div key={index} className="flex flex-col items-center flex-shrink-0">
-                  <div className={`w-14 h-14 rounded-full p-1 bg-gradient-to-r ${gradientClass} shadow-md relative flex items-center justify-center ${isPlaying ? 'ring-2 ring-emerald-400/50' : ''}`}>
+                <div key={`${person.name}-${index}`} className="flex flex-col items-center flex-shrink-0">
+                  <div className={`w-14 h-14 rounded-full p-1 bg-gradient-to-r ${gradientClass} shadow-md relative flex items-center justify-center ${isPlaying && person.isHost ? 'ring-2 ring-emerald-400/50' : ''}`}>
                     <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center border-2 border-white overflow-hidden text-gray-600">
                       <User className="w-7 h-7 text-gray-500 stroke-[1.75]" />
                     </div>
-                    <span className="absolute -bottom-1.5 bg-gray-900 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow whitespace-nowrap">
-                      {index === 0 ? 'HOST' : `SPEAKER ${index}`}
+                    <span className="absolute -bottom-1.5 bg-gray-900 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow whitespace-nowrap">
+                      {person.role}
                     </span>
                   </div>
-                  <span className="text-xs font-bold text-gray-800 mt-2 text-center max-w-[80px] truncate">
-                    {name}
+                  <span className="text-[11px] font-bold text-gray-800 mt-2 text-center max-w-[84px] truncate">
+                    {person.name}
                   </span>
                 </div>
               );
