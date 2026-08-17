@@ -542,11 +542,11 @@ export default function LiveEventManager() {
             </div>
 
             {activeTab === 'chat' ? (
-              <div className="bg-white text-gray-900 rounded-lg p-3">
+              <div className="bg-white text-gray-900 rounded-2xl p-2 h-[600px] md:h-[650px] shadow-lg overflow-hidden flex flex-col">
                 <TemporalLiveChat eventId={activeEvent.id} userName="Admin (Host)" />
               </div>
             ) : (
-              <div className="bg-white text-gray-900 rounded-lg p-4">
+              <div className="bg-white text-gray-900 rounded-2xl p-4 min-h-[550px] shadow-lg">
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen className="w-5 h-5 text-amber-600" />
                   <h4 className="font-bold text-amber-800">Post a Scripture to Live Chat</h4>
