@@ -358,16 +358,37 @@ export default function SermonManager() {
     }
   };
 
-  // ─── Delete Handler ───────────────────────────────────────────────────────────
+  // ─── Delete Handler (Permanently deletes from database) ────────────────────────
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this sermon from the archive?')) return;
+    if (!confirm('Are you sure you want to permanently delete this sermon from the database?')) return;
     try {
-      const { error } = await supabase.from('sermons').delete().eq('id', id);
-      if (error) throw error;
-      toast({ title: 'Sermon deleted successfully' });
+      const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
+      let success = false;
+
+      // 1. Attempt permanent delete via backend API
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/db/sermons/${id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (res.ok) {
+          success = true;
+        }
+      } catch (backendErr) {
+        console.warn('Backend delete endpoint warning, attempting direct Supabase deletion:', backendErr);
+      }
+
+      // 2. Fallback / Direct Supabase delete
+      if (!success) {
+        const { error } = await supabase.from('sermons').delete().eq('id', id);
+        if (error) throw error;
+      }
+
+      toast({ title: 'Sermon permanently deleted from database' });
       fetchSermons();
     } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Error deleting sermon', description: error.message });
+      console.error('Error deleting sermon:', error);
+      toast({ variant: 'destructive', title: 'Error deleting sermon from database', description: error.message });
     }
   };
 
