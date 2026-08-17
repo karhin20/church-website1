@@ -61,8 +61,16 @@ export default function TemporalLiveChat({ eventId, userName, readOnly }: Tempor
 
     let pollInterval: ReturnType<typeof setInterval> | null = null;
 
+    const chatChannelName = `live_chat:${eventId}`;
+
+    // Remove any existing channel first (strict-mode safety)
+    const existingCh = supabase.getChannels().find(ch => ch.topic === `realtime:${chatChannelName}`);
+    if (existingCh) {
+      supabase.removeChannel(existingCh);
+    }
+
     const channel = supabase
-      .channel(`live_chat:${eventId}`)
+      .channel(chatChannelName)
       .on(
         'postgres_changes',
         {

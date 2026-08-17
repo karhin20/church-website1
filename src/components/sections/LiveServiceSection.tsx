@@ -52,6 +52,12 @@ export const LiveServiceSection = () => {
     // row for UPDATEs, so it would miss the live→ended transition (the row
     // stops matching the moment it ends) and the player could get stuck
     // showing "LIVE" after a broadcast actually stops.
+    // Remove any existing channel first (strict-mode safety)
+    const existingCh = supabase.getChannels().find(ch => ch.topic === 'realtime:live_events_realtime');
+    if (existingCh) {
+      supabase.removeChannel(existingCh);
+    }
+
     const channel = supabase
       .channel('live_events_realtime')
       .on(

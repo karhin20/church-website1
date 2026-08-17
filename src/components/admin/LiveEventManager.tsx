@@ -85,7 +85,16 @@ export default function LiveEventManager() {
       return;
     }
 
-    const presenceChannel = supabase.channel(`live_listeners:${activeEvent.id}`);
+    const channelName = `live_listeners:${activeEvent.id}`;
+
+    // Remove any existing channel with the same name first (prevents
+    // "cannot add callbacks after subscribe" on React strict-mode remounts)
+    const existing = supabase.getChannels().find(ch => ch.topic === `realtime:${channelName}`);
+    if (existing) {
+      supabase.removeChannel(existing);
+    }
+
+    const presenceChannel = supabase.channel(channelName);
 
     presenceChannel
       .on('presence', { event: 'sync' }, () => {
@@ -553,11 +562,6 @@ export default function LiveEventManager() {
           <div className="flex items-center gap-3 mb-4">
             <Radio className="w-7 h-7 text-church-primary animate-pulse" />
             <h2 className="text-2xl font-bold text-church-primary">Start Live Audio Stream</h2>
-          </div>
-
-          <div className="mb-5 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs leading-relaxed">
-            <strong>🎙️ Manual Recording:</strong> When you start a broadcast, recording is <strong>inactive</strong> by default.
-            You can manually start and stop recording segments at any point during your live stream. Stopped segments are uploaded to <strong>Cloudinary</strong> and archived.
           </div>
 
           <form onSubmit={handleStartBroadcast} className="space-y-4">

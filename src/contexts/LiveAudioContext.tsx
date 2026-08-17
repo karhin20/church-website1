@@ -70,6 +70,12 @@ export const LiveAudioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     fetchEvent();
 
+    // Remove any existing channel first (strict-mode safety)
+    const existingCh = supabase.getChannels().find(ch => ch.topic === 'realtime:global_live_events_realtime');
+    if (existingCh) {
+      supabase.removeChannel(existingCh);
+    }
+
     const channel = supabase
       .channel('global_live_events_realtime')
       .on(
@@ -90,7 +96,16 @@ export const LiveAudioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     if (!activeLiveEvent || !userName) return;
 
-    const presenceChannel = supabase.channel(`live_listeners:${activeLiveEvent.id}`, {
+    const channelName = `live_listeners:${activeLiveEvent.id}`;
+
+    // Remove any existing channel with the same name first (prevents
+    // "cannot add callbacks after subscribe" on React strict-mode remounts)
+    const existing = supabase.getChannels().find(ch => ch.topic === `realtime:${channelName}`);
+    if (existing) {
+      supabase.removeChannel(existing);
+    }
+
+    const presenceChannel = supabase.channel(channelName, {
       config: { presence: { key: listenerIdRef.current } },
     });
 

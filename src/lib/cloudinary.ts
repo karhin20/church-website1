@@ -1,5 +1,5 @@
 /**
- * Backend Cloudinary Storage & Media Utility
+ * Backend-authenticated Cloudinary Storage & Media Utility
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
@@ -20,89 +20,96 @@ export function getCloudinaryUrl(url: string, options: { resourceType?: 'audio' 
 }
 
 /**
- * Converts a File object to a Base64 string for transmission to Express backend
+ * Uploads a file (audio / video / thumbnail) securely using Backend signature + direct Cloudinary stream
+ * (Bypasses serverless payload size limits while using backend credentials & signatures)
  */
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
-}
+export async function uploadToCloudinary(
+  file: File,
+  resourceType: 'video' | 'image' | 'auto' = 'video'
+): Promise<string> {
+  // 1. Request backend signature & credentials from Express API
+  let cloudName = 'demo';
+  let apiKey = '';
+  let signature = '';
+  let timestamp = Math.floor(Date.now() / 1000);
+  let uploadPreset = 'unsigned_sermons';
 
-/**
- * Uploads a file (audio / video / thumbnail) STRICTLY via the Express Backend API
- */
-export async function uploadToCloudinary(file: File, resourceType: 'video' | 'image' | 'auto' = 'video'): Promise<string> {
   try {
-    // 1. First attempt: Direct backend upload endpoint
-    const base64Data = await fileToBase64(file);
-
-    const response = await fetch(`${API_BASE_URL}/api/cloudinary/upload`, {
+    const sigRes = await fetch(`${API_BASE_URL}/api/cloudinary/signature`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        file: base64Data,
-        resourceType,
-        folder: 'sermons',
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ upload_preset: 'unsigned_sermons' }),
     });
 
-    if (!response.ok) {
-      throw new Error(`Backend Cloudinary endpoint returned HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data && data.url) {
-      return data.url;
-    }
-
-    throw new Error('Backend Cloudinary response missing URL field');
-  } catch (error) {
-    console.warn('Backend upload proxy error, attempting backend signed direct upload fallback:', error);
-
-    // 2. Fallback attempt: Fetch backend SHA-1 upload signature
-    try {
-      const sigRes = await fetch(`${API_BASE_URL}/api/cloudinary/signature`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ upload_preset: 'unsigned_sermons' }),
-      });
-
-      if (!sigRes.ok) {
-        throw new Error('Failed to fetch signature from backend');
+    if (sigRes.ok) {
+      const sigData = await sigRes.json();
+      if (sigData.cloudName) cloudName = sigData.cloudName;
+      if (sigData.apiKey) apiKey = sigData.apiKey;
+      if (sigData.signature) signature = sigData.signature;
+      if (sigData.timestamp) timestamp = sigData.timestamp;
+      if (sigData.uploadPreset) uploadPreset = sigData.uploadPreset;
+    } else {
+      // Try GET as fallback
+      const getSigRes = await fetch(`${API_BASE_URL}/api/cloudinary/signature`);
+      if (getSigRes.ok) {
+        const sigData = await getSigRes.json();
+        if (sigData.cloudName) cloudName = sigData.cloudName;
+        if (sigData.apiKey) apiKey = sigData.apiKey;
+        if (sigData.signature) signature = sigData.signature;
+        if (sigData.timestamp) timestamp = sigData.timestamp;
+        if (sigData.uploadPreset) uploadPreset = sigData.uploadPreset;
       }
+    }
+  } catch (err) {
+    console.warn('Could not fetch Cloudinary signature from backend, attempting default upload:', err);
+  }
 
-      const { signature, timestamp, apiKey, cloudName, uploadPreset } = await sigRes.json();
+  // 2. Build FormData with the binary file (no base64 overhead, no size limit!)
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('timestamp', timestamp.toString());
+  if (uploadPreset) formData.append('upload_preset', uploadPreset);
+  if (apiKey) formData.append('api_key', apiKey);
+  if (signature) formData.append('signature', signature);
 
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('timestamp', timestamp.toString());
-      if (uploadPreset) formData.append('upload_preset', uploadPreset);
-      if (apiKey) formData.append('api_key', apiKey);
-      if (signature) formData.append('signature', signature);
+  // 3. Upload directly from browser to Cloudinary CDN endpoint
+  const targetCloud = cloudName && cloudName !== 'demo' ? cloudName : 'demo';
+  const uploadRes = await fetch(
+    `https://api.cloudinary.com/v1_1/${targetCloud}/${resourceType}/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
 
-      const targetCloud = cloudName || 'demo';
-      const uploadRes = await fetch(
+  if (!uploadRes.ok) {
+    const errorText = await uploadRes.text();
+    console.error('Cloudinary upload error response:', errorText);
+
+    // Fallback: If signed upload fails, attempt unsigned fallback if preset provided
+    if (signature) {
+      console.warn('Signed upload failed, retrying unsigned...');
+      const fallbackFormData = new FormData();
+      fallbackFormData.append('file', file);
+      fallbackFormData.append('upload_preset', uploadPreset || 'unsigned_sermons');
+
+      const retryRes = await fetch(
         `https://api.cloudinary.com/v1_1/${targetCloud}/${resourceType}/upload`,
         {
           method: 'POST',
-          body: formData,
+          body: fallbackFormData,
         }
       );
 
-      if (!uploadRes.ok) {
-        throw new Error(`Direct Cloudinary signed upload failed: ${uploadRes.statusText}`);
+      if (retryRes.ok) {
+        const retryData = await retryRes.json();
+        return retryData.secure_url || retryData.url;
       }
-
-      const data = await uploadRes.json();
-      return data.secure_url || data.url;
-    } catch (fallbackErr) {
-      console.error('All backend Cloudinary upload paths failed:', fallbackErr);
-      throw fallbackErr;
     }
+
+    throw new Error(`Cloudinary upload failed (HTTP ${uploadRes.status}): ${errorText}`);
   }
+
+  const data = await uploadRes.json();
+  return data.secure_url || data.url;
 }
