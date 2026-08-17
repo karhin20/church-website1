@@ -110,7 +110,7 @@ export default function SermonsPage() {
             Sermon Archive
           </h1>
           <p className="text-church-accent max-w-xl mx-auto text-base md:text-lg">
-            Search and listen to recorded sermons sorted by month and year.
+            Search and listen to sermons.
           </p>
 
           {/* Search & Filter Bar */}
@@ -177,7 +177,7 @@ export default function SermonsPage() {
           <div className="text-center py-20 bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
             <h3 className="text-xl font-bold text-gray-800 mb-2">No Sermons Found</h3>
             <p className="text-gray-500 text-sm max-w-md mx-auto">
-              No recorded sermons matched your search filters. Try clearing the search or selecting a different month/year.
+              No sermons matched your search filters. Try clearing the search or selecting a different month/year.
             </p>
           </div>
         ) : (

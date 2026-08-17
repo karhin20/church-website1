@@ -8,7 +8,7 @@ import { supabase, SermonItem } from '@/lib/supabase';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import {
   Trash2, Play, UploadCloud, Loader2, Pencil, X,
-  Mic, MicOff, StopCircle, Eye, EyeOff, Clock, CheckCircle2, Radio
+  Mic, StopCircle, Eye, EyeOff, Clock, CheckCircle2, PlusCircle
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -22,17 +22,30 @@ function formatDuration(seconds: number): string {
 }
 
 export default function SermonManager() {
-  // Form state
+  // New Sermon Form state
+  const [newTitle, setNewTitle] = useState('');
+  const [newPreacher, setNewPreacher] = useState('');
+  const [newDate, setNewDate] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newAudioFile, setNewAudioFile] = useState<File | null>(null);
+  const [newCloudinaryUrlInput, setNewCloudinaryUrlInput] = useState('');
+  const [newPreacherImageUrl, setNewPreacherImageUrl] = useState('');
+  const [newPreacherImageFile, setNewPreacherImageFile] = useState<File | null>(null);
+  const [creating, setCreating] = useState(false);
+
+  // Edit Overlay Modal state
   const [editingSermon, setEditingSermon] = useState<SermonItem | null>(null);
-  const [title, setTitle] = useState('');
-  const [preacher, setPreacher] = useState('');
-  const [date, setDate] = useState('');
-  const [description, setDescription] = useState('');
-  const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [cloudinaryUrlInput, setCloudinaryUrlInput] = useState('');
-  const [preacherImageUrl, setPreacherImageUrl] = useState('');
-  const [preacherImageFile, setPreacherImageFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editPreacher, setEditPreacher] = useState('');
+  const [editDate, setEditDate] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editAudioFile, setEditAudioFile] = useState<File | null>(null);
+  const [editCloudinaryUrlInput, setEditCloudinaryUrlInput] = useState('');
+  const [editPreacherImageUrl, setEditPreacherImageUrl] = useState('');
+  const [editPreacherImageFile, setEditPreacherImageFile] = useState<File | null>(null);
+  const [updating, setUpdating] = useState(false);
+
+  // General State
   const [sermons, setSermons] = useState<SermonItem[]>([]);
   const { toast } = useToast();
 
@@ -66,24 +79,27 @@ export default function SermonManager() {
 
       if (error) throw error;
       setSermons(data || []);
-    } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Error fetching sermons', description: error.message });
+    } catch (err: any) {
+      toast({ variant: 'destructive', title: 'Failed to fetch sermons', description: err.message });
     }
   };
 
-  // ─── Recording Controls ───────────────────────────────────────────────────────
+  // ─── Recording Logic ────────────────────────────────────────────────────────
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-      chunksRef.current = [];
 
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-        ? 'audio/webm;codecs=opus'
-        : 'audio/mp4';
+      let mimeType = 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mimeType = 'audio/webm;codecs=opus';
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4';
+      }
 
       const recorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = recorder;
+      chunksRef.current = [];
 
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
@@ -93,7 +109,11 @@ export default function SermonManager() {
         const blob = new Blob(chunksRef.current, { type: mimeType });
         setRecordedBlob(blob);
         setRecordedPreviewUrl(URL.createObjectURL(blob));
-        stream.getTracks().forEach(t => t.stop());
+        setRecordingState('stopped');
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(t => t.stop());
+          streamRef.current = null;
+        }
       };
 
       recorder.start(250);
@@ -101,61 +121,73 @@ export default function SermonManager() {
       setRecordingSeconds(0);
 
       timerRef.current = setInterval(() => {
-        setRecordingSeconds(s => s + 1);
+        setRecordingSeconds(prev => prev + 1);
       }, 1000);
+
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Microphone access denied', description: err.message });
+      toast({
+        variant: 'destructive',
+        title: 'Microphone Access Error',
+        description: 'Unable to access microphone. Please check permissions.',
+      });
     }
   };
 
   const stopRecording = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop();
     }
-    if (timerRef.current) clearInterval(timerRef.current);
-    setRecordingState('stopped');
   };
 
   const discardRecording = () => {
+    if (recordedPreviewUrl) URL.revokeObjectURL(recordedPreviewUrl);
     setRecordedBlob(null);
     setRecordedPreviewUrl(null);
     setRecordingSeconds(0);
     setRecordingState('idle');
+    chunksRef.current = [];
   };
 
   const saveRecording = async () => {
-    if (!recordedBlob || !title || !preacher || !date) {
-      toast({
-        variant: 'destructive',
-        title: 'Fill in sermon details first',
-        description: 'Title, Preacher, and Date are required before saving the recording.',
-      });
+    if (!recordedBlob) return;
+    if (!newTitle.trim() || !newPreacher.trim()) {
+      toast({ variant: 'destructive', title: 'Fields Required', description: 'Enter Sermon Title and Preacher before saving.' });
       return;
     }
 
     setSavingRecording(true);
     try {
-      // Convert Blob to File for upload
       const ext = recordedBlob.type.includes('mp4') ? 'mp4' : 'webm';
-      const file = new File([recordedBlob], `sermon_recording_${Date.now()}.${ext}`, { type: recordedBlob.type });
+      const file = new File([recordedBlob], `recorded_sermon_${Date.now()}.${ext}`, { type: recordedBlob.type });
 
-      const audio_url = await uploadToCloudinary(file, 'video');
+      const audioUrl = await uploadToCloudinary(file, 'video');
+
+      let final_preacher_image_url = newPreacherImageUrl.trim();
+      if (newPreacherImageFile) {
+        try {
+          final_preacher_image_url = await uploadToCloudinary(newPreacherImageFile, 'image');
+        } catch (imgErr) {
+          console.warn('Preacher image upload error:', imgErr);
+        }
+      }
 
       const { error } = await supabase.from('sermons').insert([{
-        title,
-        preacher,
-        date,
-        description,
-        audio_url,
+        title: newTitle.trim(),
+        preacher: newPreacher.trim(),
+        date: newDate || new Date().toISOString().split('T')[0],
+        description: newDescription.trim(),
+        audio_url: audioUrl,
+        preacher_image_url: final_preacher_image_url,
         recording_duration: recordingSeconds,
         is_hidden: false,
       }]);
 
       if (error) throw error;
 
-      toast({ title: '🎙️ Recording saved to Cloudinary!', description: `"${title}" is now in your sermon archive.` });
+      toast({ title: '🎙️ Recording saved to Cloudinary!', description: `"${newTitle}" is now in your sermon archive.` });
       discardRecording();
-      handleCancelEdit();
+      resetNewForm();
       fetchSermons();
     } catch (err: any) {
       toast({ variant: 'destructive', title: 'Failed to save recording', description: err.message });
@@ -164,92 +196,144 @@ export default function SermonManager() {
     }
   };
 
-  // ─── Form actions ─────────────────────────────────────────────────────────────
-  const handleStartEdit = (sermon: SermonItem) => {
-    setEditingSermon(sermon);
-    setTitle(sermon.title);
-    setPreacher(sermon.preacher);
-    setDate(sermon.date || '');
-    setDescription(sermon.description || '');
-    setCloudinaryUrlInput(sermon.audio_url || '');
-    setPreacherImageUrl(sermon.preacher_image_url || '');
-    setAudioFile(null);
-    setPreacherImageFile(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // ─── Reset New Sermon Form ───────────────────────────────────────────────────
+  const resetNewForm = () => {
+    setNewTitle('');
+    setNewPreacher('');
+    setNewDate('');
+    setNewDescription('');
+    setNewAudioFile(null);
+    setNewCloudinaryUrlInput('');
+    setNewPreacherImageUrl('');
+    setNewPreacherImageFile(null);
   };
 
-  const handleCancelEdit = () => {
-    setEditingSermon(null);
-    setTitle('');
-    setPreacher('');
-    setDate('');
-    setDescription('');
-    setAudioFile(null);
-    setCloudinaryUrlInput('');
-    setPreacherImageUrl('');
-    setPreacherImageFile(null);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  // ─── Create New Sermon Handler ───────────────────────────────────────────────
+  const handleCreateSermon = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!editingSermon && !audioFile && !cloudinaryUrlInput.trim()) {
+    if (!newAudioFile && !newCloudinaryUrlInput.trim()) {
       toast({ variant: 'destructive', title: 'Media required', description: 'Select an audio file or enter a Cloudinary URL.' });
       return;
     }
 
-    setLoading(true);
+    setCreating(true);
     try {
-      let audio_url = cloudinaryUrlInput.trim();
-      let final_preacher_image_url = preacherImageUrl.trim();
+      let audio_url = newCloudinaryUrlInput.trim();
+      let final_preacher_image_url = newPreacherImageUrl.trim();
 
-      if (audioFile) {
+      if (newAudioFile) {
         try {
-          audio_url = await uploadToCloudinary(audioFile, 'video');
+          audio_url = await uploadToCloudinary(newAudioFile, 'video');
         } catch {
-          const ext = audioFile.name.split('.').pop();
+          const ext = newAudioFile.name.split('.').pop();
           const fileName = `${Date.now()}.${ext}`;
           const { data: urlData } = supabase.storage.from('sermons').getPublicUrl(fileName);
           audio_url = urlData.publicUrl;
         }
       }
 
-      if (preacherImageFile) {
+      if (newPreacherImageFile) {
         try {
-          final_preacher_image_url = await uploadToCloudinary(preacherImageFile, 'image');
+          final_preacher_image_url = await uploadToCloudinary(newPreacherImageFile, 'image');
         } catch (imgErr: any) {
           console.warn('Preacher avatar upload warning:', imgErr);
         }
       }
 
-      if (editingSermon) {
-        const { error } = await supabase.from('sermons').update({
-          title, preacher,
-          date: date || new Date().toISOString().split('T')[0],
-          description,
-          audio_url: audio_url || editingSermon.audio_url,
-          preacher_image_url: final_preacher_image_url,
-        }).eq('id', editingSermon.id);
-        if (error) throw error;
-        toast({ title: 'Sermon updated successfully!' });
-      } else {
-        const { error } = await supabase.from('sermons').insert([{
-          title, preacher,
-          date: date || new Date().toISOString().split('T')[0],
-          description, audio_url,
-          preacher_image_url: final_preacher_image_url,
-          is_hidden: false,
-        }]);
-        if (error) throw error;
-        toast({ title: 'Sermon saved to Cloudinary!' });
-      }
+      const { error } = await supabase.from('sermons').insert([{
+        title: newTitle.trim(),
+        preacher: newPreacher.trim(),
+        date: newDate || new Date().toISOString().split('T')[0],
+        description: newDescription.trim(),
+        audio_url,
+        preacher_image_url: final_preacher_image_url,
+        is_hidden: false,
+      }]);
 
-      handleCancelEdit();
+      if (error) throw error;
+      toast({ title: 'Sermon created & saved successfully!' });
+
+      resetNewForm();
       fetchSermons();
     } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Error saving sermon', description: error.message });
+      toast({ variant: 'destructive', title: 'Error creating sermon', description: error.message });
     } finally {
-      setLoading(false);
+      setCreating(false);
+    }
+  };
+
+  // ─── Edit Overlay Handlers ────────────────────────────────────────────────────
+  const handleOpenEditOverlay = (sermon: SermonItem) => {
+    setEditingSermon(sermon);
+    setEditTitle(sermon.title);
+    setEditPreacher(sermon.preacher);
+    setEditDate(sermon.date || '');
+    setEditDescription(sermon.description || '');
+    setEditCloudinaryUrlInput(sermon.audio_url || '');
+    setEditPreacherImageUrl(sermon.preacher_image_url || '');
+    setEditAudioFile(null);
+    setEditPreacherImageFile(null);
+  };
+
+  const handleCloseEditOverlay = () => {
+    setEditingSermon(null);
+    setEditTitle('');
+    setEditPreacher('');
+    setEditDate('');
+    setEditDescription('');
+    setEditAudioFile(null);
+    setEditCloudinaryUrlInput('');
+    setEditPreacherImageUrl('');
+    setEditPreacherImageFile(null);
+  };
+
+  const handleUpdateSermon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSermon) return;
+
+    setUpdating(true);
+    try {
+      let audio_url = editCloudinaryUrlInput.trim();
+      let final_preacher_image_url = editPreacherImageUrl.trim();
+
+      if (editAudioFile) {
+        try {
+          audio_url = await uploadToCloudinary(editAudioFile, 'video');
+        } catch {
+          const ext = editAudioFile.name.split('.').pop();
+          const fileName = `${Date.now()}.${ext}`;
+          const { data: urlData } = supabase.storage.from('sermons').getPublicUrl(fileName);
+          audio_url = urlData.publicUrl;
+        }
+      }
+
+      if (editPreacherImageFile) {
+        try {
+          final_preacher_image_url = await uploadToCloudinary(editPreacherImageFile, 'image');
+        } catch (imgErr: any) {
+          console.warn('Preacher avatar upload warning:', imgErr);
+        }
+      }
+
+      const { error } = await supabase.from('sermons').update({
+        title: editTitle.trim(),
+        preacher: editPreacher.trim(),
+        date: editDate || new Date().toISOString().split('T')[0],
+        description: editDescription.trim(),
+        audio_url: audio_url || editingSermon.audio_url,
+        preacher_image_url: final_preacher_image_url,
+      }).eq('id', editingSermon.id);
+
+      if (error) throw error;
+      toast({ title: 'Sermon updated successfully!' });
+
+      handleCloseEditOverlay();
+      fetchSermons();
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Error updating sermon', description: error.message });
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -261,78 +345,59 @@ export default function SermonManager() {
         .from('sermons')
         .update({ is_hidden: newHidden })
         .eq('id', sermon.id);
+
       if (error) throw error;
 
       toast({
-        title: newHidden ? '👁️ Sermon hidden from public' : '✅ Sermon now visible to all',
+        title: newHidden ? 'Sermon hidden' : 'Sermon visible',
+        description: `"${sermon.title}" is now ${newHidden ? 'hidden from public view' : 'visible on public page'}.`,
       });
       fetchSermons();
-    } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Error updating visibility', description: error.message });
+    } catch (err: any) {
+      toast({ variant: 'destructive', title: 'Failed to update visibility', description: err.message });
     }
   };
 
-  // ─── Delete ───────────────────────────────────────────────────────────────────
-  const handleDelete = async (sermonId: string) => {
-    if (!window.confirm('Permanently delete this sermon? This cannot be undone.')) return;
-
+  // ─── Delete Handler ───────────────────────────────────────────────────────────
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this sermon from the archive?')) return;
     try {
-      const { error } = await supabase.from('sermons').delete().eq('id', sermonId);
+      const { error } = await supabase.from('sermons').delete().eq('id', id);
       if (error) throw error;
-      toast({ title: 'Sermon deleted.' });
-      if (editingSermon?.id === sermonId) handleCancelEdit();
+      toast({ title: 'Sermon deleted successfully' });
       fetchSermons();
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Error deleting sermon', description: error.message });
     }
   };
 
-  // ─── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-8 font-sans">
 
-      {/* ── IN-BROWSER RECORDING PANEL ── */}
-      <div className="bg-gradient-to-br from-red-50 to-pink-50 p-6 rounded-2xl shadow-sm border border-red-200">
-        <div className="flex items-center gap-2 mb-4 border-b border-red-100 pb-3">
-          <Radio className="w-5 h-5 text-red-600" />
-          <h2 className="text-xl font-black text-red-800">Record Sermon Directly</h2>
-          <span className="text-xs text-red-500 font-semibold ml-auto">Uses your microphone → saves to Cloudinary</span>
-        </div>
-
-        {/* Recording Form Fields */}
-        <div className="grid md:grid-cols-3 gap-4 mb-5">
+      {/* ── SECTION 1: ADD NEW SERMON & RECORDING ── */}
+      <div className="bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-2xl border border-red-100 shadow-sm space-y-6">
+        <div className="flex items-center gap-2 border-b border-red-100 pb-3">
+          <PlusCircle className="w-6 h-6 text-church-primary" />
           <div>
-            <Label className="text-red-700 font-bold">Sermon Title *</Label>
-            <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. The Power of Prayer" className="border-red-200 focus:ring-red-300" />
+            <h2 className="text-xl font-black text-church-primary">Add New Sermon</h2>
+            <p className="text-xs text-gray-500">Record live audio or upload new sermon recordings to your archive.</p>
           </div>
-          <div>
-            <Label className="text-red-700 font-bold">Preacher *</Label>
-            <Input value={preacher} onChange={e => setPreacher(e.target.value)} placeholder="e.g. Apostle J. K. Atinyo" className="border-red-200 focus:ring-red-300" />
-          </div>
-          <div>
-            <Label className="text-red-700 font-bold">Date *</Label>
-            <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="border-red-200 focus:ring-red-300" />
-          </div>
-        </div>
-
-        <div className="mb-5">
-          <Label className="text-red-700 font-bold">Topic / Description</Label>
-          <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Brief topic or message summary..." className="border-red-200" />
         </div>
 
         {/* Recording Controls */}
-        <div className="bg-white/70 rounded-2xl p-5 border border-red-100">
+        <div className="bg-white/80 rounded-2xl p-5 border border-red-100">
+          <h3 className="text-xs font-bold text-church-primary uppercase tracking-wider mb-3">Option A: Record Live Audio via Microphone</h3>
           {recordingState === 'idle' && (
             <div className="flex items-center gap-4">
               <Button
                 type="button"
                 onClick={startRecording}
-                className="bg-red-600 hover:bg-red-700 text-white font-black px-6 h-12 rounded-xl flex items-center gap-2 shadow-lg"
+                className="bg-red-600 hover:bg-red-700 text-white font-black px-6 h-11 rounded-xl flex items-center gap-2 shadow-lg"
               >
                 <Mic className="w-5 h-5" />
                 Start Recording
               </Button>
-              <p className="text-xs text-gray-500">Click to begin recording using your microphone. Make sure to allow microphone access.</p>
+              <p className="text-xs text-gray-500">Click to begin recording. Ensure Title & Preacher fields below are filled.</p>
             </div>
           )}
 
@@ -341,7 +406,7 @@ export default function SermonManager() {
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
                 <span className="font-black text-red-700 text-lg tracking-widest">{formatDuration(recordingSeconds)}</span>
-                <span className="text-xs text-red-500 font-semibold">RECORDING</span>
+                <span className="text-xs text-red-500 font-semibold">RECORDING ACTIVE</span>
               </div>
               <Button
                 type="button"
@@ -374,7 +439,7 @@ export default function SermonManager() {
                   {savingRecording ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Uploading to Cloudinary...</>
                   ) : (
-                    <><UploadCloud className="w-4 h-4" /> Save to Cloudinary</>
+                    <><UploadCloud className="w-4 h-4" /> Save Recorded Sermon</>
                   )}
                 </Button>
                 <Button
@@ -387,85 +452,66 @@ export default function SermonManager() {
                   <X className="w-4 h-4 mr-1" /> Discard
                 </Button>
               </div>
-              <p className="text-xs text-gray-500">Preview the recording before saving. Title, Preacher, and Date fields above are required to save.</p>
             </div>
           )}
         </div>
-      </div>
 
-      {/* ── UPLOAD / EDIT FORM ── */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between mb-4 border-b pb-3">
-          <div className="flex items-center gap-2">
-            {editingSermon ? <Pencil className="w-5 h-5 text-amber-600" /> : <UploadCloud className="w-5 h-5 text-church-primary" />}
-            <h2 className="text-xl font-black">{editingSermon ? 'Edit Sermon Details' : 'Upload Recorded File'}</h2>
-          </div>
-          {editingSermon && (
-            <Button type="button" variant="outline" size="sm" onClick={handleCancelEdit} className="text-xs gap-1">
-              <X className="w-4 h-4" /> Cancel
-            </Button>
-          )}
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* New Sermon Form */}
+        <form onSubmit={handleCreateSermon} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+          <h3 className="text-xs font-bold text-church-primary uppercase tracking-wider border-b pb-2">Option B: Upload Audio File / Cloudinary Link</h3>
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <Label>Sermon Title</Label>
-              <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. The Power of Faith" required />
+              <Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. The Power of Faith" required />
             </div>
             <div>
               <Label>Preacher</Label>
-              <Input value={preacher} onChange={e => setPreacher(e.target.value)} placeholder="e.g. Pastor Richard Mensah" required />
+              <Input value={newPreacher} onChange={e => setNewPreacher(e.target.value)} placeholder="e.g. Pastor Richard Mensah" required />
             </div>
             <div>
               <Label>Date</Label>
-              <Input type="date" value={date} onChange={e => setDate(e.target.value)} required />
+              <Input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} required />
             </div>
           </div>
 
           <div>
             <Label>Description / Topic</Label>
-            <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Brief summary of the message..." />
+            <Textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="Brief summary of the message..." />
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <Label>{editingSermon ? 'Replace Audio File' : 'Audio File (Cloudinary Upload)'}</Label>
-              <Input type="file" accept="audio/*,video/*" onChange={e => setAudioFile(e.target.files?.[0] || null)} />
+              <Label>Audio File (Cloudinary Upload)</Label>
+              <Input type="file" accept="audio/*,video/*" onChange={e => setNewAudioFile(e.target.files?.[0] || null)} />
             </div>
             <div>
               <Label>Or Cloudinary Audio URL</Label>
-              <Input value={cloudinaryUrlInput} onChange={e => setCloudinaryUrlInput(e.target.value)} placeholder="https://res.cloudinary.com/.../sermon.mp3" />
+              <Input value={newCloudinaryUrlInput} onChange={e => setNewCloudinaryUrlInput(e.target.value)} placeholder="https://res.cloudinary.com/.../sermon.mp3" />
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
             <div>
               <Label>Preacher Image (Tiny Avatar Beside Player)</Label>
-              <Input type="file" accept="image/*" onChange={e => setPreacherImageFile(e.target.files?.[0] || null)} />
+              <Input type="file" accept="image/*" onChange={e => setNewPreacherImageFile(e.target.files?.[0] || null)} />
             </div>
             <div>
               <Label>Or Preacher Image URL</Label>
-              <Input value={preacherImageUrl} onChange={e => setPreacherImageUrl(e.target.value)} placeholder="https://res.cloudinary.com/.../preacher.jpg" />
+              <Input value={newPreacherImageUrl} onChange={e => setNewPreacherImageUrl(e.target.value)} placeholder="https://res.cloudinary.com/.../preacher.jpg" />
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button type="submit" disabled={loading} className="flex-1 h-11 bg-church-primary font-bold">
-              {loading ? (
-                <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />{editingSermon ? 'Saving...' : 'Uploading...'}</span>
-              ) : editingSermon ? 'Update Sermon' : 'Save & Upload Sermon'}
-            </Button>
-            {editingSermon && (
-              <Button type="button" variant="outline" onClick={handleCancelEdit} className="h-11 px-6">Cancel</Button>
-            )}
-          </div>
+          <Button type="submit" disabled={creating} className="w-full h-11 bg-church-primary font-bold shadow-md">
+            {creating ? (
+              <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Uploading Sermon...</span>
+            ) : 'Save & Add Sermon to Archive'}
+          </Button>
         </form>
       </div>
 
-      {/* ── SERMONS ARCHIVE LIST ── */}
+      {/* ── SECTION 2: SERMONS ARCHIVE LIST ── */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 border-b pb-3">
           <h2 className="text-xl font-black">Sermon Archive ({sermons.length})</h2>
           <span className="text-xs text-gray-500 font-semibold">
             {sermons.filter(s => s.is_hidden).length} hidden from public
@@ -477,9 +523,7 @@ export default function SermonManager() {
             <div
               key={sermon.id}
               className={`flex items-center justify-between p-4 border rounded-xl transition-all ${
-                editingSermon?.id === sermon.id
-                  ? 'border-amber-400 bg-amber-50/40 shadow-sm'
-                  : sermon.is_hidden
+                sermon.is_hidden
                   ? 'border-gray-200 bg-gray-50/60 opacity-75'
                   : 'border-gray-200 hover:border-church-primary/30'
               }`}
@@ -519,35 +563,107 @@ export default function SermonManager() {
                   variant="outline"
                   onClick={() => toggleVisibility(sermon)}
                   title={sermon.is_hidden ? 'Make visible to public' : 'Hide from public'}
-                  className={sermon.is_hidden ? 'border-gray-300 text-gray-400' : 'border-blue-200 text-blue-600'}
+                  className={sermon.is_hidden ? 'text-gray-400' : 'text-church-primary'}
                 >
                   {sermon.is_hidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </Button>
 
-                {/* Edit */}
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => handleStartEdit(sermon)}
-                  className="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold gap-1 text-xs"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                  Edit
+                {/* Edit (Opens Overlay Modal) */}
+                <Button size="sm" variant="outline" onClick={() => handleOpenEditOverlay(sermon)} title="Edit Sermon">
+                  <Pencil className="w-3.5 h-3.5 text-amber-600" />
                 </Button>
 
                 {/* Delete */}
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(sermon.id)} title="Delete permanently">
+                <Button size="sm" variant="outline" onClick={() => handleDelete(sermon.id)} title="Delete Sermon" className="text-red-500 hover:text-red-700">
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
           ))}
-
-          {sermons.length === 0 && (
-            <p className="text-sm text-gray-400 italic text-center py-8">No recorded sermons yet. Use the panels above to record or upload.</p>
-          )}
         </div>
       </div>
+
+      {/* ── OVERLAY MODAL: EDIT SERMON ── */}
+      {editingSermon && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-gray-100 relative my-8">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b pb-4 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-amber-50 rounded-2xl text-amber-600 border border-amber-200">
+                  <Pencil className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-gray-900">Edit Sermon</h2>
+                  <p className="text-xs text-gray-500">Updating "{editingSermon.title}"</p>
+                </div>
+              </div>
+              <Button type="button" variant="ghost" size="icon" onClick={handleCloseEditOverlay} className="rounded-full">
+                <X className="w-5 h-5 text-gray-500" />
+              </Button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleUpdateSermon} className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label>Sermon Title</Label>
+                  <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} required />
+                </div>
+                <div>
+                  <Label>Preacher</Label>
+                  <Input value={editPreacher} onChange={e => setEditPreacher(e.target.value)} required />
+                </div>
+                <div>
+                  <Label>Date</Label>
+                  <Input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} required />
+                </div>
+              </div>
+
+              <div>
+                <Label>Description / Topic</Label>
+                <Textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={3} />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label>Replace Audio File</Label>
+                  <Input type="file" accept="audio/*,video/*" onChange={e => setEditAudioFile(e.target.files?.[0] || null)} />
+                </div>
+                <div>
+                  <Label>Or Audio Cloudinary URL</Label>
+                  <Input value={editCloudinaryUrlInput} onChange={e => setEditCloudinaryUrlInput(e.target.value)} />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+                <div>
+                  <Label>Replace Preacher Image Avatar</Label>
+                  <Input type="file" accept="image/*" onChange={e => setEditPreacherImageFile(e.target.files?.[0] || null)} />
+                </div>
+                <div>
+                  <Label>Or Preacher Image URL</Label>
+                  <Input value={editPreacherImageUrl} onChange={e => setEditPreacherImageUrl(e.target.value)} />
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
+                <Button type="button" variant="outline" onClick={handleCloseEditOverlay} className="flex-1 h-11 font-bold">
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={updating} className="flex-1 h-11 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-md">
+                  {updating ? (
+                    <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Saving Changes...</span>
+                  ) : 'Update Sermon'}
+                </Button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
