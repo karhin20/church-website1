@@ -7,10 +7,13 @@ import { supabase, SermonItem } from "@/lib/supabase";
 import { getCloudinaryUrl } from "@/lib/cloudinary";
 import { Search, Calendar, MicVocal, Loader2, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { getCache, setCache, TTL } from "@/lib/queryCache";
 
 interface GroupedSermons {
   [yearMonthKey: string]: SermonItem[];
 }
+
+const ALL_SERMONS_KEY = 'sermons-all';
 
 export default function SermonsPage() {
   const [sermons, setSermons] = useState<SermonItem[]>([]);
@@ -21,6 +24,15 @@ export default function SermonsPage() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
+
+    // Serve from memory cache if still fresh
+    const cached = getCache<SermonItem[]>(ALL_SERMONS_KEY);
+    if (cached) {
+      setSermons(cached);
+      setLoading(false);
+      return;
+    }
+
     fetchSermons();
   }, []);
 
@@ -33,6 +45,7 @@ export default function SermonsPage() {
         .order("date", { ascending: false });
 
       if (!error && data) {
+        setCache(ALL_SERMONS_KEY, data, TTL.SERMONS);
         setSermons(data);
       }
     } catch (err) {

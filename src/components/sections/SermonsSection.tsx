@@ -6,11 +6,21 @@ import { motion } from "framer-motion";
 import { supabase, SermonItem } from "@/lib/supabase";
 import { Link } from "react-router-dom";
 import { getCloudinaryUrl } from "@/lib/cloudinary";
+import { getCache, setCache, TTL } from "@/lib/queryCache";
+
+const LATEST_SERMONS_KEY = 'sermons-latest-3';
 
 export const SermonsSection = () => {
   const [dbSermons, setDbSermons] = useState<SermonItem[]>([]);
 
   useEffect(() => {
+    // Serve from memory cache if still fresh
+    const cached = getCache<SermonItem[]>(LATEST_SERMONS_KEY);
+    if (cached) {
+      setDbSermons(cached);
+      return;
+    }
+
     const fetchLatestThreeSermons = async () => {
       try {
         const { data, error } = await supabase
@@ -21,6 +31,7 @@ export const SermonsSection = () => {
           .limit(3);
 
         if (!error && data && data.length > 0) {
+          setCache(LATEST_SERMONS_KEY, data, TTL.SERMONS);
           setDbSermons(data);
         }
       } catch (err) {

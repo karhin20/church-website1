@@ -2,9 +2,19 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MicVocal, MessageSquare, Image, Radio } from 'lucide-react';
+import { getCache, setCache, TTL } from '@/lib/queryCache';
+
+const STATS_KEY = 'dashboard-stats';
+
+interface Stats {
+  sermons: number;
+  announcements: number;
+  gallery: number;
+  activeLiveEvents: number;
+}
 
 export default function DashboardOverview() {
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<Stats>({
     sermons: 0,
     announcements: 0,
     gallery: 0,
@@ -12,31 +22,36 @@ export default function DashboardOverview() {
   });
 
   useEffect(() => {
+    // Serve from memory cache if still fresh (2-minute TTL)
+    const cached = getCache<Stats>(STATS_KEY);
+    if (cached) {
+      setStats(cached);
+      return;
+    }
+
     const fetchStats = async () => {
       try {
-        const { count: sermonsCount } = await supabase
-          .from('sermons')
-          .select('*', { count: 'exact', head: true });
+        // Run all 4 count queries concurrently instead of sequentially
+        const [
+          { count: sermonsCount },
+          { count: announcementsCount },
+          { count: galleryCount },
+          { count: liveCount },
+        ] = await Promise.all([
+          supabase.from('sermons').select('*', { count: 'exact', head: true }),
+          supabase.from('announcements').select('*', { count: 'exact', head: true }),
+          supabase.from('gallery').select('*', { count: 'exact', head: true }),
+          supabase.from('live_events').select('*', { count: 'exact', head: true }).eq('status', 'live'),
+        ]);
 
-        const { count: announcementsCount } = await supabase
-          .from('announcements')
-          .select('*', { count: 'exact', head: true });
-
-        const { count: galleryCount } = await supabase
-          .from('gallery')
-          .select('*', { count: 'exact', head: true });
-
-        const { count: liveCount } = await supabase
-          .from('live_events')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'live');
-
-        setStats({
+        const newStats: Stats = {
           sermons: sermonsCount || 0,
           announcements: announcementsCount || 0,
           gallery: galleryCount || 0,
           activeLiveEvents: liveCount || 0,
-        });
+        };
+        setCache(STATS_KEY, newStats, TTL.DASHBOARD_STATS);
+        setStats(newStats);
       } catch (err) {
         console.error('Error fetching dashboard stats from Supabase:', err);
       }

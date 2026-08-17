@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase, SermonItem } from '@/lib/supabase';
 import { uploadToCloudinary } from '@/lib/cloudinary';
+import { clearCache } from '@/lib/queryCache';
 import {
   Trash2, Play, UploadCloud, Loader2, Pencil, X,
   Mic, StopCircle, Eye, EyeOff, Clock, CheckCircle2, PlusCircle
@@ -252,6 +253,9 @@ export default function SermonManager() {
       }]);
 
       if (error) throw error;
+      // Bust public caches so homepage + SermonsPage show new sermon immediately
+      clearCache('sermons-latest-3');
+      clearCache('sermons-all');
       toast({ title: 'Sermon created & saved successfully!' });
 
       resetNewForm();
@@ -326,6 +330,9 @@ export default function SermonManager() {
       }).eq('id', editingSermon.id);
 
       if (error) throw error;
+      // Bust public caches
+      clearCache('sermons-latest-3');
+      clearCache('sermons-all');
       toast({ title: 'Sermon updated successfully!' });
 
       handleCloseEditOverlay();
@@ -348,6 +355,9 @@ export default function SermonManager() {
 
       if (error) throw error;
 
+      // Bust public caches (visibility change affects public pages)
+      clearCache('sermons-latest-3');
+      clearCache('sermons-all');
       toast({
         title: newHidden ? 'Sermon hidden' : 'Sermon visible',
         description: `"${sermon.title}" is now ${newHidden ? 'hidden from public view' : 'visible on public page'}.`,
@@ -384,6 +394,9 @@ export default function SermonManager() {
         if (error) throw error;
       }
 
+      // Bust public caches
+      clearCache('sermons-latest-3');
+      clearCache('sermons-all');
       toast({ title: 'Sermon permanently deleted from database' });
       fetchSermons();
     } catch (error: any) {

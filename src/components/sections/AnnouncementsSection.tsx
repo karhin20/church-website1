@@ -1,11 +1,21 @@
 import { useEffect, useState } from 'react';
 import { supabase, AnnouncementItem } from '@/lib/supabase';
 import { Bell } from 'lucide-react';
+import { getCache, setCache, TTL } from '@/lib/queryCache';
+
+const ANNOUNCEMENTS_KEY = 'announcements';
 
 export const AnnouncementsSection = () => {
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
 
   useEffect(() => {
+    // Serve from memory cache if still fresh
+    const cached = getCache<AnnouncementItem[]>(ANNOUNCEMENTS_KEY);
+    if (cached) {
+      setAnnouncements(cached);
+      return;
+    }
+
     const fetchAnnouncements = async () => {
       try {
         const { data, error } = await supabase
@@ -14,6 +24,7 @@ export const AnnouncementsSection = () => {
           .order('created_at', { ascending: false });
 
         if (!error && data) {
+          setCache(ANNOUNCEMENTS_KEY, data, TTL.ANNOUNCEMENTS);
           setAnnouncements(data);
         }
       } catch (err) {

@@ -2,6 +2,7 @@ import { Users, Heart, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { getCache, setCache, TTL } from "@/lib/queryCache";
 
 interface VerseOfDay {
   citation?: string;
@@ -10,11 +11,20 @@ interface VerseOfDay {
   version?: string;
 }
 
+const VOTD_KEY = 'verse-of-the-day';
+
 export const FeaturesSection = () => {
   const [verseOfDay, setVerseOfDay] = useState<VerseOfDay | null>(null);
   const [isImageOpen, setIsImageOpen] = useState(false);
 
   useEffect(() => {
+    // Serve from 24-hour sessionStorage cache if available
+    const cached = getCache<VerseOfDay>(VOTD_KEY);
+    if (cached) {
+      setVerseOfDay(cached);
+      return;
+    }
+
     const fetchVerseOfDay = async () => {
       try {
         const isDev = import.meta.env.DEV;
@@ -23,6 +33,7 @@ export const FeaturesSection = () => {
         if (response.ok) {
           const data = await response.json();
           if (data && data.passage) {
+            setCache(VOTD_KEY, data, TTL.VOTD, true /* persist to sessionStorage */);
             setVerseOfDay(data);
           }
         }
