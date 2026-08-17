@@ -7,6 +7,8 @@ import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal, LogOut, WifiOff }
 import AgoraRTC, { IAgoraRTCClient, IRemoteAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from './TemporalLiveChat';
 
+import { ShareButton } from '@/components/ShareButton';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
 
 interface LiveAudioPlayerProps {
@@ -298,7 +300,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
             {event.title}
           </h1>
           
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
             <span className="inline-flex items-center gap-1.5 bg-red-100 text-red-600 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
               <span className="w-2 h-2 rounded-full bg-red-600 animate-ping" />
               LIVE
@@ -306,6 +308,10 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
             <span className="bg-gray-200/80 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full">
               {formattedCount} Listening
             </span>
+            <ShareButton
+              title={`Live: ${event.title}`}
+              text={`Join us live for "${event.title}"${event.speaker ? ` with ${event.speaker}` : ''} at The Apostolic Church-Ghana, Nii Boiman Central!`}
+            />
           </div>
         </div>
 

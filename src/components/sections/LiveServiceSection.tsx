@@ -87,8 +87,11 @@ export const LiveServiceSection = () => {
             </div>
           </div>
           <ShareButton 
-            title="TAC Live Service"
-            text="Join us for our live service at The Apostolic Church-Ghana, Nii Boiman Central"
+            title={activeLiveEvent ? `Live: ${activeLiveEvent.title}` : "TAC Live Service"}
+            text={activeLiveEvent 
+              ? `Join us live for "${activeLiveEvent.title}"${activeLiveEvent.speaker ? ` with ${activeLiveEvent.speaker}` : ''} at The Apostolic Church-Ghana, Nii Boiman Central!` 
+              : "Join us for our live service at The Apostolic Church-Ghana, Nii Boiman Central"
+            }
           />
         </motion.div>
 
