@@ -101,31 +101,17 @@ export const LiveServiceSection = () => {
           </div>
         ) : activeLiveEvent ? (
           <div className="mb-12">
-            <div className="flex items-center gap-2 mb-4 bg-red-600 text-white px-4 py-2 rounded-lg w-fit animate-pulse font-bold text-sm">
-              <Radio className="w-5 h-5" />
-              <span>LIVE AUDIO EVENT IN PROGRESS</span>
-            </div>
             <LiveAudioPlayer event={activeLiveEvent} />
           </div>
         ) : (
-          <div className="mb-12">
-            <div className="flex items-center justify-between gap-2 mb-4 bg-red-600 text-white px-4 py-2 rounded-xl w-full max-w-md mx-auto font-bold text-sm shadow-md">
-              <div className="flex items-center gap-2">
-                <Radio className="w-5 h-5 animate-pulse" />
-                <span>LIVE AUDIO BROADCAST PREVIEW</span>
-              </div>
-              <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded font-mono">DEMO MODE</span>
+          <div className="mb-12 p-8 bg-white border border-gray-200 rounded-3xl shadow-sm text-center max-w-xl mx-auto space-y-3">
+            <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto text-gray-400">
+              <Radio className="w-7 h-7" />
             </div>
-            <LiveAudioPlayer event={activeLiveEvent || {
-              id: 'demo-live-1',
-              title: 'The Daily Creative: How to Scale Your Ideas',
-              speaker: 'Alex',
-              description: 'Live Audio Service & Discussion',
-              status: 'live',
-              agora_channel: 'tac_live_demo',
-              started_at: new Date().toISOString(),
-              created_at: new Date().toISOString(),
-            }} />
+            <h3 className="text-xl font-bold text-church-primary">No Live Event at the Moment</h3>
+            <p className="text-gray-600 text-sm max-w-md mx-auto leading-relaxed">
+              There is no live audio service currently broadcasting. Please check back later or join us during our service times (Sundays at 7:00 AM & 9:00 AM)!
+            </p>
           </div>
         )}
 

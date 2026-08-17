@@ -2,17 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase, LiveChatMessageItem } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Loader2, BookOpen, Smile } from 'lucide-react';
+import { Send, Loader2, BookOpen, Smile, Maximize2, Minimize2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface TemporalLiveChatProps {
   eventId: string;
   userName: string;
   readOnly?: boolean;
-  onSendReaction?: (emoji: string) => void;
 }
 
-// Preset user avatar colors for nice visual variety like in the mockup
 const AVATAR_COLORS = [
   'bg-teal-500',
   'bg-amber-500',
@@ -24,12 +22,13 @@ const AVATAR_COLORS = [
 
 const EMOJI_PRESETS = ['😊', '🙏', '❤️', '🔥', '🙌', '👏', '😮', '😂', '👍'];
 
-export default function TemporalLiveChat({ eventId, userName, readOnly, onSendReaction }: TemporalLiveChatProps) {
+export default function TemporalLiveChat({ eventId, userName, readOnly }: TemporalLiveChatProps) {
   const [messages, setMessages] = useState<LiveChatMessageItem[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
@@ -98,12 +97,10 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
     };
   }, [eventId]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || sending) return;
+  const sendMessageContent = async (content: string) => {
+    if (!content.trim() || sending) return;
 
-    const content = newMessage.trim();
-    setNewMessage('');
+    const trimmed = content.trim();
     setSending(true);
 
     const tempId = `temp-${Date.now()}`;
@@ -111,7 +108,7 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
       id: tempId,
       event_id: eventId,
       user_name: userName || 'Guest Listener',
-      message: content,
+      message: trimmed,
       message_type: 'chat',
       created_at: new Date().toISOString(),
     } as LiveChatMessageItem;
@@ -126,7 +123,7 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
           {
             event_id: eventId,
             user_name: userName || 'Guest Listener',
-            message: content,
+            message: trimmed,
             message_type: 'chat',
           },
         ])
@@ -134,28 +131,32 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
 
       if (error) {
         console.error('Error inserting message:', error);
-        setNewMessage(content);
         setMessages((prev) => prev.filter((m) => m.id !== tempId));
       } else if (data && data[0]) {
         setMessages((prev) => prev.map((m) => (m.id === tempId ? data[0] : m)));
       }
     } catch (err) {
       console.error('Error sending message:', err);
-      setNewMessage(content);
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
     } finally {
       setSending(false);
     }
   };
 
-  const insertEmoji = (emoji: string) => {
-    setNewMessage((prev) => prev + emoji);
-    if (onSendReaction) {
-      onSendReaction(emoji);
-    }
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+    const msg = newMessage;
+    setNewMessage('');
+    await sendMessageContent(msg);
   };
 
-  // Helper to format text with highlighted @mentions
+  // Clicking an emoji posts that emoji directly as a chat message under user's name
+  const handleSendEmojiMessage = async (emoji: string) => {
+    setShowEmojiPicker(false);
+    await sendMessageContent(emoji);
+  };
+
   const renderMessageContent = (text: string) => {
     const parts = text.split(/(@\w+)/g);
     return parts.map((part, i) => {
@@ -170,7 +171,6 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
     });
   };
 
-  // Helper to get consistent avatar color for a username
   const getAvatarColor = (name: string) => {
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -180,33 +180,33 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
     return AVATAR_COLORS[index];
   };
 
+  const containerClasses = isExpanded
+    ? "fixed inset-0 z-50 bg-white flex flex-col p-4 shadow-2xl animate-in fade-in zoom-in-95 font-sans"
+    : "flex flex-col h-[400px] bg-white rounded-t-[28px] relative overflow-hidden font-sans";
+
   return (
-    <div className="flex flex-col h-[380px] bg-white rounded-t-[28px] relative overflow-hidden font-sans">
-      {/* Curved Drag Handle Pill & Title */}
-      <div className="pt-3 pb-2 text-center flex-shrink-0 border-b border-gray-100 bg-white relative">
-        <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-2" />
-        <h3 className="text-xs font-black uppercase tracking-widest text-gray-800">
-          LIVE CHAT
-        </h3>
+    <div className={containerClasses}>
+      {/* Drag Handle Pill & Title Header with Full-Surface Toggle */}
+      <div className="pt-2 pb-2 px-4 flex items-center justify-between flex-shrink-0 border-b border-gray-100 bg-white relative">
+        <div className="w-8" />
+        <div className="text-center">
+          <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-1" />
+          <h3 className="text-xs font-black uppercase tracking-widest text-gray-800">
+            LIVE CHAT
+          </h3>
+        </div>
+
+        {/* Full Surface Maximize / Minimize Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+          title={isExpanded ? "Collapse view" : "Open full surface chat"}
+        >
+          {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+        </button>
       </div>
 
-      {/* Floating Reaction Bar overlay on right edge */}
-      {onSendReaction && (
-        <div className="absolute right-3 top-14 z-20 flex flex-col gap-2">
-          {['❤️', '👍', '😮', '👏'].map((emoji) => (
-            <button
-              key={emoji}
-              onClick={() => onSendReaction(emoji)}
-              className="w-8 h-8 rounded-full bg-white/90 shadow-md border border-gray-100 flex items-center justify-center text-sm hover:scale-110 active:scale-95 transition-transform"
-              title={`React with ${emoji}`}
-            >
-              {emoji}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Chat Messages Container */}
+      {/* Chat Messages Container (Scrollable) */}
       <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-0">
         {loading ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400 gap-2">
@@ -215,7 +215,7 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
           </div>
         ) : messages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-gray-400 text-xs italic text-center px-6">
-            Welcome to the live chat! Share a message or amen. 🙏
+            Welcome to the live chat! Tap an emoji or type a message. 🙏
           </div>
         ) : (
           messages.map((msg) => {
@@ -248,12 +248,10 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
 
             return (
               <div key={msg.id} className={`flex items-start gap-2.5 ${isMe ? 'flex-row-reverse' : ''}`}>
-                {/* User Avatar Circle */}
                 <div className={`w-8 h-8 rounded-full ${avatarBg} text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm uppercase`}>
                   {msg.user_name.charAt(0)}
                 </div>
 
-                {/* Bubble & Name */}
                 <div className={`flex flex-col max-w-[78%] ${isMe ? 'items-end' : 'items-start'}`}>
                   <span className="text-[10px] font-bold text-gray-500 mb-0.5 px-1">
                     @{msg.user_name.replace(/\s+/g, '')}
@@ -273,40 +271,31 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Footer Input Form (No Gift Box, No CALL IN button) */}
+      {/* Footer Input Form with Emojis on the Left */}
       {!readOnly && (
         <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-gray-100 flex items-center gap-2 flex-shrink-0">
-          <div className="relative flex-1 flex items-center bg-gray-100 rounded-full px-3 py-1.5 border border-gray-200 focus-within:border-purple-500">
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 text-xs border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1 h-7"
-              disabled={sending}
-            />
-
-            {/* Emoji Popover */}
+          
+          {/* Quick Emoji Reaction Buttons / Picker on the LEFT SIDE */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Popover Emoji Picker */}
             <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className="text-gray-400 hover:text-amber-500 transition-colors p-1"
+                  className="w-9 h-9 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-colors border border-amber-200"
                   title="Choose emoji"
                 >
                   <Smile className="w-5 h-5" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-64 p-2 bg-white rounded-2xl shadow-xl border border-gray-100" align="end">
+              <PopoverContent className="w-64 p-2 bg-white rounded-2xl shadow-xl border border-gray-100" align="start">
                 <div className="grid grid-cols-5 gap-1.5 text-center">
                   {EMOJI_PRESETS.map((emoji) => (
                     <button
                       key={emoji}
                       type="button"
-                      onClick={() => {
-                        insertEmoji(emoji);
-                        setShowEmojiPicker(false);
-                      }}
-                      className="text-lg p-1.5 hover:bg-gray-100 rounded-xl transition-colors"
+                      onClick={() => handleSendEmojiMessage(emoji)}
+                      className="text-xl p-2 hover:bg-gray-100 rounded-xl transition-transform active:scale-95"
                     >
                       {emoji}
                     </button>
@@ -314,6 +303,35 @@ export default function TemporalLiveChat({ eventId, userName, readOnly, onSendRe
                 </div>
               </PopoverContent>
             </Popover>
+
+            {/* Quick One-Tap Emojis on the Left */}
+            <button
+              type="button"
+              onClick={() => handleSendEmojiMessage('❤️')}
+              className="w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 flex items-center justify-center text-sm border border-red-100 transition-transform active:scale-95 hidden sm:flex"
+              title="Send ❤️"
+            >
+              ❤️
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSendEmojiMessage('👏')}
+              className="w-8 h-8 rounded-full bg-amber-50 hover:bg-amber-100 flex items-center justify-center text-sm border border-amber-100 transition-transform active:scale-95 hidden sm:flex"
+              title="Send 👏"
+            >
+              👏
+            </button>
+          </div>
+
+          {/* Text Input Pill */}
+          <div className="flex-1 flex items-center bg-gray-100 rounded-full px-3 py-1.5 border border-gray-200 focus-within:border-purple-500">
+            <Input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 text-xs border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1 h-7"
+              disabled={sending}
+            />
           </div>
 
           {/* Send Button */}
