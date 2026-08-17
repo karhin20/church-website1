@@ -405,76 +405,113 @@ export default function SermonManager() {
           </div>
         </div>
 
-        {/* Recording Controls */}
-        <div className="bg-white/80 rounded-2xl p-5 border border-red-100">
-          <h3 className="text-xs font-bold text-church-primary uppercase tracking-wider mb-3">Option A: Record Live Audio via Microphone</h3>
-          {recordingState === 'idle' && (
-            <div className="flex items-center gap-4">
-              <Button
-                type="button"
-                onClick={startRecording}
-                className="bg-red-600 hover:bg-red-700 text-white font-black px-6 h-11 rounded-xl flex items-center gap-2 shadow-lg"
-              >
-                <Mic className="w-5 h-5" />
-                Start Recording
-              </Button>
-              <p className="text-xs text-gray-500">Click to begin recording. Ensure Title & Preacher fields below are filled.</p>
-            </div>
-          )}
+        {/* Option A: Record Live Audio via Microphone */}
+        <div className="bg-white/90 rounded-2xl p-5 border border-red-100 shadow-sm space-y-4">
+          <div className="border-b border-red-100 pb-2">
+            <h3 className="text-xs font-bold text-church-primary uppercase tracking-wider">Option A: Record Live Audio via Microphone</h3>
+            <p className="text-xs text-gray-500">Record sermon audio directly from your device microphone with full metadata options.</p>
+          </div>
 
-          {recordingState === 'recording' && (
-            <div className="flex items-center gap-5 flex-wrap">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-                <span className="font-black text-red-700 text-lg tracking-widest">{formatDuration(recordingSeconds)}</span>
-                <span className="text-xs text-red-500 font-semibold">RECORDING ACTIVE</span>
+          {/* Recording Metadata Inputs */}
+          <div className="space-y-3 bg-red-50/40 p-4 rounded-xl border border-red-100">
+            <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">Sermon Metadata Options</h4>
+            <div className="grid md:grid-cols-3 gap-3">
+              <div>
+                <Label className="text-xs">Sermon Title</Label>
+                <Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Walking in Grace" className="h-9 text-xs" />
               </div>
-              <Button
-                type="button"
-                onClick={stopRecording}
-                className="bg-gray-900 hover:bg-gray-800 text-white font-black px-6 h-11 rounded-xl flex items-center gap-2"
-              >
-                <StopCircle className="w-5 h-5 text-red-400" />
-                Stop Recording
-              </Button>
-            </div>
-          )}
-
-          {recordingState === 'stopped' && recordedPreviewUrl && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
-                <CheckCircle2 className="w-5 h-5" />
-                Recording complete — {formatDuration(recordingSeconds)}
+              <div>
+                <Label className="text-xs">Preacher</Label>
+                <Input value={newPreacher} onChange={e => setNewPreacher(e.target.value)} placeholder="e.g. Pastor Richard Mensah" className="h-9 text-xs" />
               </div>
+              <div>
+                <Label className="text-xs">Date</Label>
+                <Input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="h-9 text-xs" />
+              </div>
+            </div>
 
-              {/* Preview Player */}
-              <audio controls src={recordedPreviewUrl} className="w-full rounded-xl" />
+            <div className="grid md:grid-cols-3 gap-3 pt-1">
+              <div className="md:col-span-2">
+                <Label className="text-xs">Description / Topic</Label>
+                <Input value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="Brief message summary..." className="h-9 text-xs" />
+              </div>
+              <div>
+                <Label className="text-xs">Preacher Image Avatar (Optional)</Label>
+                <Input type="file" accept="image/*" onChange={e => setNewPreacherImageFile(e.target.files?.[0] || null)} className="h-9 text-xs" />
+              </div>
+            </div>
+          </div>
 
-              <div className="flex gap-3 flex-wrap">
+          {/* Live Recording Controls */}
+          <div className="pt-2">
+            {recordingState === 'idle' && (
+              <div className="flex items-center gap-4">
                 <Button
                   type="button"
-                  onClick={saveRecording}
-                  disabled={savingRecording}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 h-11 rounded-xl flex items-center gap-2 shadow-md"
+                  onClick={startRecording}
+                  className="bg-red-600 hover:bg-red-700 text-white font-black px-6 h-11 rounded-xl flex items-center gap-2 shadow-lg"
                 >
-                  {savingRecording ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Uploading to Cloudinary...</>
-                  ) : (
-                    <><UploadCloud className="w-4 h-4" /> Save Recorded Sermon</>
-                  )}
+                  <Mic className="w-5 h-5" />
+                  Start Live Recording
                 </Button>
+                <p className="text-xs text-gray-500">Click to start recording your microphone live audio.</p>
+              </div>
+            )}
+
+            {recordingState === 'recording' && (
+              <div className="flex items-center gap-5 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                  <span className="font-black text-red-700 text-lg tracking-widest">{formatDuration(recordingSeconds)}</span>
+                  <span className="text-xs text-red-500 font-semibold">RECORDING LIVE AUDIO</span>
+                </div>
                 <Button
                   type="button"
-                  variant="outline"
-                  onClick={discardRecording}
-                  disabled={savingRecording}
-                  className="h-11 px-5 border-red-200 text-red-600 font-bold"
+                  onClick={stopRecording}
+                  className="bg-gray-900 hover:bg-gray-800 text-white font-black px-6 h-11 rounded-xl flex items-center gap-2"
                 >
-                  <X className="w-4 h-4 mr-1" /> Discard
+                  <StopCircle className="w-5 h-5 text-red-400" />
+                  Stop Recording
                 </Button>
               </div>
-            </div>
-          )}
+            )}
+
+            {recordingState === 'stopped' && recordedPreviewUrl && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
+                  <CheckCircle2 className="w-5 h-5" />
+                  Recording complete — {formatDuration(recordingSeconds)}
+                </div>
+
+                {/* Preview Player */}
+                <audio controls src={recordedPreviewUrl} className="w-full rounded-xl" />
+
+                <div className="flex gap-3 flex-wrap">
+                  <Button
+                    type="button"
+                    onClick={saveRecording}
+                    disabled={savingRecording}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 h-11 rounded-xl flex items-center gap-2 shadow-md"
+                  >
+                    {savingRecording ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Uploading to Cloudinary...</>
+                    ) : (
+                      <><UploadCloud className="w-4 h-4" /> Save Recorded Sermon with Metadata</>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={discardRecording}
+                    disabled={savingRecording}
+                    className="h-11 px-5 border-red-200 text-red-600 font-bold"
+                  >
+                    <X className="w-4 h-4 mr-1" /> Discard
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* New Sermon Form */}
