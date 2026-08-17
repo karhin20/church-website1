@@ -3,14 +3,21 @@ import { LiveEventItem, supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal, LogOut, WifiOff } from 'lucide-react';
+import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal, LogOut, WifiOff, MoreHorizontal, Headphones } from 'lucide-react';
 import AgoraRTC, { IAgoraRTCClient, IRemoteAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from './TemporalLiveChat';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
 
 interface LiveAudioPlayerProps {
   event: LiveEventItem;
+}
+
+interface FloatingReaction {
+  id: string;
+  emoji: string;
+  x: number;
 }
 
 export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
@@ -20,14 +27,15 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(80);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(true);
   const [connecting, setConnecting] = useState(false);
   const [streamEndedByAdmin, setStreamEndedByAdmin] = useState(false);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+  const [listenerCount, setListenerCount] = useState<number>(1);
+  const [floatingReactions, setFloatingReactions] = useState<FloatingReaction[]>([]);
 
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const remoteAudioTrackRef = useRef<IRemoteAudioTrack | null>(null);
-  // Stable per-tab id used as the presence key — lets the same person open
-  // multiple tabs/devices without their listener count colliding/merging.
   const listenerIdRef = useRef<string>(
     (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `listener-${Date.now()}-${Math.random()}`
   );
@@ -47,7 +55,6 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
         (payload) => {
           const updated = payload.new as LiveEventItem;
           if (updated.status === 'ended') {
-            // Admin ended the stream — force everyone out immediately
             leaveStream();
             setStreamEndedByAdmin(true);
           }
@@ -60,22 +67,28 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     };
   }, [event.id]);
 
-  // ── Track presence so the admin panel can show a live listener count ────
+  // ── Track listener presence and count ─────────────────────────────────────
   useEffect(() => {
-    if (!userName) return; // only start counting once someone has joined
+    if (!userName) return;
 
     const presenceChannel = supabase.channel(`live_listeners:${event.id}`, {
       config: { presence: { key: listenerIdRef.current } },
     });
 
-    presenceChannel.subscribe(async (status) => {
-      if (status === 'SUBSCRIBED') {
-        await presenceChannel.track({
-          userName,
-          joined_at: new Date().toISOString(),
-        });
-      }
-    });
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState();
+        const count = Object.keys(state).length;
+        setListenerCount(Math.max(count, 1));
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({
+            userName,
+            joined_at: new Date().toISOString(),
+          });
+        }
+      });
 
     return () => {
       presenceChannel.untrack();
@@ -83,7 +96,41 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     };
   }, [event.id, userName]);
 
-  // ── Register global callback for when browser blocks autoplay ───────────
+  // ── Floating Reactions Realtime Broadcast ───────────────────────────
+  useEffect(() => {
+    const reactionChannel = supabase.channel(`live_reactions:${event.id}`)
+      .on('broadcast', { event: 'reaction' }, (payload) => {
+        if (payload.payload && payload.payload.emoji) {
+          triggerFloatingEmoji(payload.payload.emoji, false);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(reactionChannel);
+    };
+  }, [event.id]);
+
+  const sendReaction = (emoji: string) => {
+    triggerFloatingEmoji(emoji, true);
+    supabase.channel(`live_reactions:${event.id}`).send({
+      type: 'broadcast',
+      event: 'reaction',
+      payload: { emoji, user: userName },
+    });
+  };
+
+  const triggerFloatingEmoji = (emoji: string, isSelf = false) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    const x = isSelf ? 70 + Math.random() * 20 : 60 + Math.random() * 30; // Float on right side
+    setFloatingReactions((prev) => [...prev.slice(-15), { id, emoji, x }]);
+
+    setTimeout(() => {
+      setFloatingReactions((prev) => prev.filter((r) => r.id !== id));
+    }, 2800);
+  };
+
+  // ── Browser Autoplay failure handler ──────────────────────────────
   useEffect(() => {
     const handleAutoplayFailed = () => {
       console.warn("Autoplay blocked by browser policy");
@@ -112,7 +159,6 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     setConnecting(true);
 
     try {
-      // 1. Obtain Agora Token from Express Backend API
       const tokenRes = await fetch(`${API_BASE_URL}/api/agora/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -125,7 +171,6 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
 
       const { appId, token } = await tokenRes.json();
 
-      // 2. Initialize Client & Subscribe using Backend Token
       const client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
       clientRef.current = client;
 
@@ -138,7 +183,6 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
           user.audioTrack.setVolume(volume);
           user.audioTrack.play();
           setIsPlaying(true);
-          // Register with OS Media Session so audio continues on screen lock
           setMediaSession(event.title, event.speaker || 'Church Minister', 'playing');
         }
       });
@@ -179,7 +223,6 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     }
   };
 
-  // Full leave — disconnect and return to name screen
   const handleLeaveStream = async () => {
     await leaveStream();
     localStorage.removeItem('tac_listener_name');
@@ -219,21 +262,30 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
         remoteAudioTrackRef.current.setVolume(0);
         setIsMuted(true);
       }
+    } else {
+      setIsMuted(!isMuted);
     }
   };
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Number(e.target.value);
-    setVolume(val);
+  const handleVolumeChange = (newVol: number) => {
+    setVolume(newVol);
+    if (newVol > 0 && isMuted) {
+      setIsMuted(false);
+    }
     if (remoteAudioTrackRef.current && !isMuted) {
-      remoteAudioTrackRef.current.setVolume(val);
+      remoteAudioTrackRef.current.setVolume(newVol);
     }
   };
 
-  // ── Stream ended by admin — show override screen to all listeners ──────────
+  // ── Format listener count (e.g. 6800 -> 6.8K) ──────────────────────────
+  const formattedCount = listenerCount >= 1000 
+    ? `${(listenerCount / 1000).toFixed(1)}K` 
+    : listenerCount.toString();
+
+  // ── Stream ended by admin view ─────────────────────────────────────────
   if (streamEndedByAdmin) {
     return (
-      <div className="max-w-md mx-auto bg-gradient-to-br from-gray-900 to-church-primary text-white p-8 rounded-xl shadow-xl border border-white/10 text-center">
+      <div className="max-w-md mx-auto bg-gradient-to-br from-gray-900 to-church-primary text-white p-8 rounded-2xl shadow-2xl border border-white/10 text-center">
         <div className="inline-flex items-center justify-center p-4 bg-white/10 rounded-full mb-5">
           <WifiOff className="w-10 h-10 text-red-400" />
         </div>
@@ -252,36 +304,37 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     );
   }
 
+  // ── Name input screen ──────────────────────────────────────────────────
   if (!userName) {
     return (
-      <div className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg border border-church-primary/10">
+      <div className="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center p-3 bg-red-100 rounded-full text-red-600 mb-3">
+          <div className="inline-flex items-center justify-center p-4 bg-red-50 rounded-full text-red-600 mb-4 shadow-inner">
             <Radio className="w-8 h-8 animate-pulse" />
           </div>
-          <h3 className="text-2xl font-bold text-church-primary">Join Live Audio Stream</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Please enter your name to listen and participate in the live event chat. No sign-up required!
+          <h3 className="text-2xl font-bold text-gray-900">Join Live Audio Stream</h3>
+          <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+            Enter your name to start listening and participate in the live event chat.
           </p>
         </div>
 
-        <form onSubmit={handleSaveName} className="space-y-4">
+        <form onSubmit={handleSaveName} className="space-y-5">
           <div>
-            <Label htmlFor="name">Your Name</Label>
-            <div className="relative mt-1">
-              <User className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Label htmlFor="name" className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Your Name</Label>
+            <div className="relative mt-1.5">
+              <User className="w-5 h-5 absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
                 id="name"
                 value={inputName}
                 onChange={(e) => setInputName(e.target.value)}
-                placeholder="e.g. Brother Samuel"
-                className="pl-10"
+                placeholder="e.g. Alex Johnson"
+                className="pl-11 h-12 rounded-xl border-gray-200 focus:border-church-primary text-sm"
                 required
               />
             </div>
           </div>
 
-          <Button type="submit" className="w-full bg-church-secondary text-church-primary font-bold py-3 hover:bg-church-secondary/90 text-base">
+          <Button type="submit" className="w-full h-12 bg-church-primary text-white font-bold rounded-xl hover:bg-church-primary/90 text-base shadow-md transition-all">
             Start Listening Now
           </Button>
         </form>
@@ -289,139 +342,213 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     );
   }
 
+  // ── Reference Design Mobile-First Layout ─────────────────────────────────
   return (
-    <div className="grid md:grid-cols-5 gap-6 max-w-6xl mx-auto">
-      {/* Audio Player Card (3 cols) */}
-      <div className="md:col-span-3 bg-gradient-to-br from-church-primary via-slate-900 to-church-primary text-white rounded-xl shadow-xl p-6 flex flex-col justify-between border border-church-secondary/20">
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-red-400">Live Broadcast</span>
-            </div>
+    <div className="max-w-md mx-auto bg-white rounded-[36px] shadow-2xl overflow-hidden border border-gray-200 relative font-sans text-gray-900">
+      {/* Dynamic Floating Reactions Canvas */}
+      <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
+        <AnimatePresence>
+          {floatingReactions.map((r) => (
+            <motion.div
+              key={r.id}
+              initial={{ opacity: 1, y: 350, scale: 0.8, x: `${r.x}%` }}
+              animate={{
+                opacity: [1, 1, 0],
+                y: [350, 150, -50],
+                scale: [0.8, 1.2, 1.4],
+                x: [`${r.x}%`, `${r.x - 5}%`, `${r.x + 8}%`],
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2.6, ease: "easeOut" }}
+              className="absolute text-2xl drop-shadow-md"
+            >
+              {r.emoji}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
 
-            <div className="text-xs text-gray-300 flex items-center gap-1">
-              <User className="w-3.5 h-3.5 text-church-secondary" />
-              <span>{userName}</span>
-              <button
-                onClick={() => {
-                  localStorage.removeItem('tac_listener_name');
-                  setUserName('');
-                }}
-                className="ml-2 text-[10px] text-church-secondary underline hover:text-white"
-              >
-                Change
-              </button>
+      {/* ── STAGE / PODCAST HEADER ────────────────────────────────────────── */}
+      <div className="p-6 pt-5 pb-4 bg-gradient-to-b from-slate-50 via-white to-gray-50/50 relative">
+        {/* Header Bar */}
+        <div className="flex items-start justify-between mb-3 gap-3">
+          <div className="flex-1 pr-2">
+            <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-tight mb-2">
+              {event.title || 'The Daily Creative: How to Scale Your Ideas'}
+            </h1>
+            
+            {/* Status Pills */}
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 bg-red-100 text-red-600 text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-red-600 animate-ping" />
+                LIVE
+              </span>
+              <span className="bg-gray-200/80 text-gray-700 text-xs font-semibold px-3 py-0.5 rounded-full">
+                {formattedCount} Listening
+              </span>
             </div>
           </div>
 
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold text-church-secondary mb-1">{event.title}</h3>
-            <p className="text-sm text-gray-300 flex items-center gap-2">
-              <MicVocal className="w-4 h-4 text-church-secondary" />
-              <span>Speaker: {event.speaker || 'Church Minister'}</span>
-            </p>
-            {event.description && (
-              <p className="text-xs text-gray-400 mt-2 italic">{event.description}</p>
-            )}
+          {/* Top Right Action Menu & Volume Control */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button 
+              onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+              className={`p-2 rounded-full transition-colors ${showVolumeSlider ? 'bg-gray-200 text-gray-900' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+              title="Toggle Volume Overlay"
+            >
+              {isMuted || volume === 0 ? <VolumeX className="w-5 h-5 text-red-500" /> : <Volume2 className="w-5 h-5 text-gray-800" />}
+            </button>
+            <button 
+              onClick={handleLeaveStream} 
+              className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              title="Leave Stream"
+            >
+              <LogOut className="w-4 h-4 text-gray-600" />
+            </button>
           </div>
         </div>
 
-        {/* Browser Autoplay Block Warning */}
+        {/* Autoplay Warning Banner */}
         {autoplayBlocked && (
-          <div className="mb-3 p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-200 text-xs flex items-center justify-between gap-3 animate-pulse">
-            <span> Click "Play" or "Start Audio" to listen.</span>
+          <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-900 text-xs flex items-center justify-between gap-3 animate-pulse">
+            <span>Click "Start Audio" to listen</span>
             <Button
               size="sm"
-              onClick={() => {
-                if (remoteAudioTrackRef.current) {
-                  remoteAudioTrackRef.current.play();
-                  setIsPlaying(true);
-                  setAutoplayBlocked(false);
-                  setMediaSession(event.title, event.speaker || 'Church Minister', 'playing');
-                }
-              }}
-              className="bg-church-secondary text-church-primary font-bold hover:bg-white h-7 px-3 text-[11px] rounded flex-shrink-0"
+              onClick={togglePlay}
+              className="bg-amber-600 text-white font-bold hover:bg-amber-700 h-7 px-3 text-xs rounded-lg flex-shrink-0"
             >
               Start Audio
             </Button>
           </div>
         )}
 
-        {/* Audio Waveform Visualizer */}
-        <AudioWaveform isPlaying={isPlaying} isMuted={isMuted} connecting={connecting} />
-
-        {/* Player controls */}
-        <div className="bg-white/10 backdrop-blur-md rounded-lg p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={togglePlay}
-                disabled={connecting}
-                className="w-12 h-12 rounded-full bg-church-secondary text-church-primary hover:bg-white transition-transform transform active:scale-95 flex items-center justify-center"
+        {/* Stage Content Container */}
+        <div className="relative my-2 py-4 flex flex-col items-center justify-center">
+          
+          {/* Native Mobile Vertical Volume Slider Overlay (Right Side) */}
+          {showVolumeSlider && (
+            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 flex flex-col items-center bg-gray-200/90 backdrop-blur-md p-2 rounded-full shadow-lg border border-white/40 h-44 w-11 justify-between transition-all">
+              {/* Vertical Range Slider */}
+              <div className="relative flex-1 w-full flex items-center justify-center py-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={isMuted ? 0 : volume}
+                  onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                  className="h-28 w-2 appearance-none bg-gray-300 rounded-full cursor-pointer accent-gray-800 focus:outline-none"
+                  style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
+                />
+              </div>
+              <button 
+                onClick={toggleMute}
+                className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm text-gray-700 hover:text-black transition-colors"
               >
-                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
-              </Button>
+                {isMuted || volume === 0 ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4 text-gray-800" />}
+              </button>
+            </div>
+          )}
 
-              <div>
-                <span className="text-sm font-semibold">
-                  {connecting ? 'Connecting...' : isPlaying ? 'Receiving Live Audio' : 'Audio Paused'}
-                </span>
-                <p className="text-xs text-gray-300">Agora Audio Player</p>
+          {/* Multicolored Audio Waveform Background */}
+          <div className="w-full max-w-xs mb-3 px-4">
+            <GradientAudioWaveform isPlaying={isPlaying} isMuted={isMuted} connecting={connecting} />
+          </div>
+
+          {/* Center Episode Artwork Square */}
+          <div className="relative mb-6">
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-0.5 shadow-xl flex items-center justify-center overflow-hidden">
+              <div className="w-full h-full bg-gradient-to-br from-purple-900 to-slate-900 rounded-[14px] flex flex-col items-center justify-center text-white p-2 text-center">
+                <Radio className="w-6 h-6 text-pink-400 mb-1" />
+                <span className="text-[10px] font-black tracking-widest text-pink-300 uppercase">EPISODE</span>
+                <span className="text-lg font-black leading-none text-white">145</span>
               </div>
             </div>
           </div>
 
-          {/* Volume control */}
-          <div className="flex items-center gap-3">
-            <button onClick={toggleMute} className="text-gray-300 hover:text-white">
-              {isMuted || volume === 0 ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-church-secondary" />}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange}
-              className="w-full accent-church-secondary cursor-pointer h-1.5 bg-gray-600 rounded-lg"
-            />
-            <span className="text-xs font-mono text-gray-300 w-8">{isMuted ? '0%' : `${volume}%`}</span>
+          {/* Host & Speaker Avatars Stage Arrangement */}
+          <div className="w-full max-w-xs flex flex-col items-center">
+            {/* Main Host Avatar (Top Center) */}
+            <div className="flex flex-col items-center mb-4 relative">
+              <div className={`w-16 h-16 rounded-full p-1 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-400 shadow-md relative ${isPlaying ? 'ring-4 ring-emerald-400/30' : ''}`}>
+                <img
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+                  alt="Host Alex"
+                  className="w-full h-full rounded-full object-cover border-2 border-white"
+                />
+                <span className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow">
+                  HOST
+                </span>
+              </div>
+              <span className="text-xs font-bold text-gray-800 mt-2">{event.speaker || 'Alex'}</span>
+            </div>
+
+            {/* Guests (Bottom Left & Right) */}
+            <div className="flex items-center justify-center gap-8 w-full">
+              {/* Guest 1 */}
+              <div className="flex flex-col items-center relative">
+                <div className="w-14 h-14 rounded-full p-1 bg-gradient-to-r from-yellow-400 to-lime-500 shadow-sm relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80"
+                    alt="Guest 1 Maya"
+                    className="w-full h-full rounded-full object-cover border-2 border-white"
+                  />
+                  <span className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 bg-lime-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow whitespace-nowrap">
+                    GUEST 1
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-gray-800 mt-2">Maya</span>
+              </div>
+
+              {/* Guest 2 */}
+              <div className="flex flex-col items-center relative">
+                <div className="w-14 h-14 rounded-full p-1 bg-gradient-to-r from-cyan-400 to-blue-500 shadow-sm relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+                    alt="Guest 2 Ken"
+                    className="w-full h-full rounded-full object-cover border-2 border-white"
+                  />
+                  <span className="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 bg-cyan-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow whitespace-nowrap">
+                    GUEST 2
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-gray-800 mt-2">Ken</span>
+              </div>
+            </div>
           </div>
 
-          {/* Leave Stream */}
-          <button
-            onClick={handleLeaveStream}
-            className="w-full flex items-center justify-center gap-2 text-xs text-red-400 hover:text-red-300 border border-red-400/30 hover:border-red-400/60 rounded-md py-1.5 transition-colors"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Leave Stream
-          </button>
+          {/* Central Play/Pause Toggle Bar */}
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <Button
+              onClick={togglePlay}
+              disabled={connecting}
+              className="h-11 px-6 rounded-full bg-gray-900 text-white hover:bg-gray-800 font-bold flex items-center gap-2 shadow-lg text-xs"
+            >
+              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
+              <span>{connecting ? 'Connecting...' : isPlaying ? 'Pause Audio' : 'Play Live Audio'}</span>
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Live Event Temporal Chat (2 cols) */}
-      <div className="md:col-span-2">
-        <TemporalLiveChat eventId={event.id} userName={userName} />
+      {/* ── LIVE CHAT CARD CONTAINER (Curved Bottom Sheet) ───────────────── */}
+      <div className="bg-white rounded-t-[28px] border-t border-gray-100 shadow-2xl pt-2 relative z-10">
+        <TemporalLiveChat 
+          eventId={event.id} 
+          userName={userName}
+          onSendReaction={sendReaction}
+        />
       </div>
     </div>
   );
 }
 
-// ─── Media Session API helper (background / lock-screen audio) ────────────────
-
-function setMediaSession(
-  title: string,
-  artist: string,
-  state: 'playing' | 'paused' | 'none'
-) {
+// ── Media Session Helper ────────────────────────────────────────────────────
+function setMediaSession(title: string, artist: string, state: 'playing' | 'paused' | 'none') {
   if (!('mediaSession' in navigator)) return;
   navigator.mediaSession.metadata = new MediaMetadata({
     title,
     artist,
-    album: 'TAC Nii Boiman Central — Live Stream',
+    album: 'TAC Live Broadcast',
     artwork: [
       { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
       { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
@@ -430,75 +557,52 @@ function setMediaSession(
   navigator.mediaSession.playbackState = state;
 }
 
-// ─── Audio Waveform Visualizer ───────────────────────────────────────────────
+// ── Multicolored Gradient Audio Waveform ─────────────────────────────────────
+const BARS_COUNT = 34;
+const WAVE_BARS = Array.from({ length: BARS_COUNT }, (_, i) => {
+  const ratio = i / BARS_COUNT;
+  // Multicolored gradient colors: purple -> pink -> orange/yellow
+  let color = 'from-purple-500 to-pink-500';
+  if (ratio > 0.6) color = 'from-pink-500 to-amber-400';
+  else if (ratio > 0.3) color = 'from-indigo-500 to-pink-500';
 
-const BAR_COUNT = 28;
+  return {
+    delay: `${(i * 0.05).toFixed(2)}s`,
+    height: [40, 75, 50, 95, 60, 85, 45, 100, 65, 80, 55, 90][i % 12],
+    color,
+  };
+});
 
-// Each bar gets a random-looking but fixed height pattern and animation delay
-const BARS = Array.from({ length: BAR_COUNT }, (_, i) => ({
-  delay: `${(i * 0.07).toFixed(2)}s`,
-  height: [40, 70, 55, 90, 65, 80, 45, 95, 60, 75, 50, 85, 40, 70, 55, 90, 65, 80, 45, 95, 60, 75, 50, 85, 40, 70, 55, 90][i % 28],
-}));
-
-interface AudioWaveformProps {
-  isPlaying: boolean;
-  isMuted: boolean;
-  connecting: boolean;
-}
-
-function AudioWaveform({ isPlaying, isMuted, connecting }: AudioWaveformProps) {
-  const barColor = isMuted
-    ? 'bg-gray-500'
-    : isPlaying
-    ? 'bg-church-secondary'
-    : 'bg-white/30';
-
+function GradientAudioWaveform({ isPlaying, isMuted, connecting }: { isPlaying: boolean; isMuted: boolean; connecting: boolean }) {
   return (
-    <div className="my-4 px-1">
-      {/* Label */}
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-          {connecting ? 'Connecting…' : isPlaying ? (isMuted ? 'Muted' : '🔴 Receiving Live Audio') : 'Stream Paused'}
-        </span>
-        {isPlaying && !isMuted && (
-          <span className="text-[10px] text-church-secondary animate-pulse font-semibold">● LIVE</span>
-        )}
-      </div>
-
-      {/* Waveform bars */}
-      <div
-        className="flex items-center justify-between gap-px w-full"
-        style={{ height: '52px' }}
-        aria-label="Audio waveform visualizer"
-      >
-        {BARS.map((bar, i) => (
-          <div
-            key={i}
-            className={`flex-1 rounded-full transition-colors duration-300 ${barColor}`}
-            style={{
-              height: isPlaying && !isMuted
-                ? `${bar.height}%`
-                : connecting
-                ? `${20 + Math.sin(i) * 10}%`
-                : '15%',
-              animationName: isPlaying && !isMuted ? 'waveform' : 'none',
-              animationDuration: isPlaying && !isMuted ? `${0.8 + (i % 5) * 0.15}s` : '0s',
-              animationDelay: bar.delay,
-              animationTimingFunction: 'ease-in-out',
-              animationIterationCount: 'infinite',
-              animationDirection: 'alternate',
-              transition: 'height 0.3s ease',
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Inject waveform keyframes once */}
+    <div className="w-full flex items-center justify-center gap-1 h-14 px-2">
+      {WAVE_BARS.map((bar, i) => (
+        <div
+          key={i}
+          className={`flex-1 rounded-full bg-gradient-to-t ${
+            isPlaying && !isMuted ? bar.color : 'from-gray-300 to-gray-200'
+          }`}
+          style={{
+            height: isPlaying && !isMuted 
+              ? `${bar.height}%` 
+              : connecting 
+              ? `${25 + Math.sin(i) * 15}%` 
+              : '20%',
+            animationName: isPlaying && !isMuted ? 'gradientWave' : 'none',
+            animationDuration: isPlaying && !isMuted ? `${0.7 + (i % 4) * 0.15}s` : '0s',
+            animationDelay: bar.delay,
+            animationTimingFunction: 'ease-in-out',
+            animationIterationCount: 'infinite',
+            animationDirection: 'alternate',
+            transition: 'height 0.3s ease',
+          }}
+        />
+      ))}
       <style>{`
-        @keyframes waveform {
-          0%   { transform: scaleY(0.3); }
-          50%  { transform: scaleY(1);   }
-          100% { transform: scaleY(0.4); }
+        @keyframes gradientWave {
+          0%   { transform: scaleY(0.25); }
+          50%  { transform: scaleY(1.0);  }
+          100% { transform: scaleY(0.35); }
         }
       `}</style>
     </div>

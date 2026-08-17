@@ -38,26 +38,10 @@ const ALLOWED_LANGUAGES: Record<string, string> = {
   twi: 'Twi',
 };
 
-// ─── Helper: strip HTML tags from chapter HTML and split into verses ───────────
+// ─── Helper: strip HTML tags to get plain text ────────────────────────────────
 
-function parseVerses(htmlContent: string): Verse[] {
-  // The fetch-bible library emits each verse wrapped in a <p data-v="N"> element.
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlContent, 'text/html');
-  const verses: Verse[] = [];
-  doc.querySelectorAll('[data-v]').forEach((el) => {
-    const num = parseInt(el.getAttribute('data-v') || '0', 10);
-    const text = el.textContent?.trim() || '';
-    if (num > 0 && text) verses.push({ num, text });
-  });
-  // Fallback: if no data-v elements, try splitting by <p> tags
-  if (verses.length === 0) {
-    doc.querySelectorAll('p').forEach((el, i) => {
-      const text = el.textContent?.trim() || '';
-      if (text) verses.push({ num: i + 1, text });
-    });
-  }
-  return verses;
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -139,7 +123,7 @@ export default function AdminBiblePanel({ eventId, userName = 'Admin (Host)' }: 
     if (chapter > chapters.length) setChapter(1);
   }, [selectedBook]);
 
-  // ── Fetch chapter HTML -> parse verses ────────────────────────────────────
+  // ── Fetch chapter -> extract verses via get_list() ────────────────────────
   useEffect(() => {
     if (!collection || !selectedTranslation || !selectedBook) return;
     let cancelled = false;
@@ -148,8 +132,16 @@ export default function AdminBiblePanel({ eventId, userName = 'Admin (Host)' }: 
       setSelectedVerse(null);
       try {
         const book = await collection!.fetch_book(selectedTranslation, selectedBook);
-        const html = book.get_chapter(chapter);
-        if (!cancelled) setVerses(parseVerses(html));
+        // get_list() returns structured {verse, content} objects — no HTML parsing needed
+        const list = book.get_list(chapter, 1, chapter + 1, 0);
+        if (!cancelled) {
+          setVerses(
+            list.map((item: { verse: number; content: string }) => ({
+              num: item.verse,
+              text: stripHtml(item.content),
+            })).filter((v: Verse) => v.text.length > 0)
+          );
+        }
       } catch (err) {
         console.error('Failed to fetch chapter', err);
       } finally {
@@ -159,6 +151,7 @@ export default function AdminBiblePanel({ eventId, userName = 'Admin (Host)' }: 
     load();
     return () => { cancelled = true; };
   }, [collection, selectedTranslation, selectedBook, chapter]);
+
 
   // ── Post selected verse to chat ────────────────────────────────────────────
   const handlePostVerse = async () => {

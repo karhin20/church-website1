@@ -108,12 +108,24 @@ export const LiveServiceSection = () => {
             <LiveAudioPlayer event={activeLiveEvent} />
           </div>
         ) : (
-          <div className="mb-8 p-6 bg-white border rounded-xl shadow-sm text-center max-w-6xl mx-auto space-y-2">
-            <Radio className="w-10 h-10 text-gray-400 mx-auto" />
-            <h3 className="text-xl font-bold text-church-primary">No Live Service Currently Broadcasting</h3>
-            <p className="text-gray-600 text-sm max-w-md mx-auto">
-              Our live audio stream starts when an admin opens the live broadcast. Check back during service times (Sundays at 7:00 AM & 9:00 AM)!
-            </p>
+          <div className="mb-12">
+            <div className="flex items-center justify-between gap-2 mb-4 bg-red-600 text-white px-4 py-2 rounded-xl w-full max-w-md mx-auto font-bold text-sm shadow-md">
+              <div className="flex items-center gap-2">
+                <Radio className="w-5 h-5 animate-pulse" />
+                <span>LIVE AUDIO BROADCAST PREVIEW</span>
+              </div>
+              <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded font-mono">DEMO MODE</span>
+            </div>
+            <LiveAudioPlayer event={activeLiveEvent || {
+              id: 'demo-live-1',
+              title: 'The Daily Creative: How to Scale Your Ideas',
+              speaker: 'Alex',
+              description: 'Live Audio Service & Discussion',
+              status: 'live',
+              agora_channel: 'tac_live_demo',
+              started_at: new Date().toISOString(),
+              created_at: new Date().toISOString(),
+            }} />
           </div>
         )}
 
