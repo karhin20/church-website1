@@ -114,10 +114,9 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     );
   }
 
-  // Combine host, speaker names, and joined listeners
+  // Combine host and joined listeners (no separate speaker avatars)
   const allPeopleOnStream = [
     { name: hostName, role: 'HOST', isHost: true },
-    ...speakerNames.map((s) => ({ name: s, role: 'SPEAKER', isHost: false })),
     ...activeListeners.map((l) => ({ name: l, role: 'LISTENER', isHost: false })),
   ];
 
