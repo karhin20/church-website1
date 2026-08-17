@@ -5,9 +5,8 @@ import { ChatButton } from "@/components/ChatButton";
 import { RedCirclePlayer } from "@/components/RedCirclePlayer";
 import { supabase, SermonItem } from "@/lib/supabase";
 import { getCloudinaryUrl } from "@/lib/cloudinary";
-import { Search, Calendar, Disc3, MicVocal, Loader2, Filter } from "lucide-react";
+import { Search, Calendar, MicVocal, Loader2, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
 
 interface GroupedSermons {
   [yearMonthKey: string]: SermonItem[];
@@ -51,7 +50,7 @@ export default function SermonsPage() {
       return { year: "Archive", month: "Sermons", formatted: dateStr };
     }
     const year = dateObj.getFullYear().toString();
-    const month = dateObj.toLocaleString("en-US", { month: "Long" });
+    const month = dateObj.toLocaleString("en-US", { month: "long" });
     const formatted = dateObj.toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
@@ -101,92 +100,83 @@ export default function SermonsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans pt-20">
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Navigation />
 
-      {/* Hero Banner Header */}
-      <div className="bg-church-primary text-white py-16 px-4 mb-10 border-b border-church-secondary/20">
+      {/* Hero Header */}
+      <section className="bg-church-primary text-white pt-32 pb-16 px-4">
         <div className="container mx-auto max-w-5xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="inline-flex items-center gap-2 bg-church-secondary/20 text-church-secondary text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider mb-4 border border-church-secondary/30">
-              <Disc3 className="w-4 h-4 animate-spin [animation-duration:10s]" />
-              <span>SERMON ARCHIVE</span>
-            </div>
-            <h1 className="text-3xl md:text-5xl font-black mb-4 tracking-tight text-white">
-              Recorded Sermons & Messages
-            </h1>
-            <p className="text-church-accent max-w-xl mx-auto text-sm md:text-base leading-relaxed">
-              Explore and listen to recorded sermons from Nii Boiman Central, sorted by month and year.
-            </p>
-          </motion.div>
-        </div>
-      </div>
+          <h1 className="text-4xl md:text-6xl font-black mb-4 tracking-tight">
+            Sermon Archive
+          </h1>
+          <p className="text-church-accent max-w-xl mx-auto text-base md:text-lg">
+            Search and listen to recorded sermons sorted by month and year.
+          </p>
 
-      {/* Filter & Search Bar Section */}
-      <div className="container mx-auto px-4 max-w-6xl mb-12">
-        <div className="bg-white rounded-3xl p-6 shadow-md border border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between">
-          
-          {/* Search Input */}
-          <div className="relative w-full md:w-1/2">
-            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by sermon title, preacher name, or topic..."
-              className="pl-12 h-12 rounded-2xl border-gray-200 focus:border-church-primary text-sm w-full"
-            />
-          </div>
-
-          {/* Filter Dropdowns (Year & Month) */}
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider flex-shrink-0">
-              <Filter className="w-4 h-4" />
-              <span>Filter:</span>
+          {/* Search & Filter Bar */}
+          <div className="mt-10 bg-white/10 p-4 rounded-3xl backdrop-blur-md border border-white/20 max-w-3xl mx-auto space-y-3 md:space-y-0 md:flex md:items-center md:gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300" />
+              <Input
+                type="text"
+                placeholder="Search title, preacher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-11 bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus:bg-white/20 rounded-xl h-11"
+              />
             </div>
 
-            {/* Year Dropdown */}
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-church-primary text-gray-800"
-            >
-              <option value="all">All Years</option>
-              {uniqueYears.map((yr) => (
-                <option key={yr} value={yr}>{yr}</option>
-              ))}
-            </select>
+            {/* Year Filter */}
+            <div className="flex gap-2">
+              <div className="relative flex-1 md:w-36">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="w-full h-11 bg-white/10 border border-white/20 text-white rounded-xl px-3 text-sm focus:outline-none appearance-none cursor-pointer"
+                >
+                  <option value="all" className="bg-church-primary text-white">All Years</option>
+                  {uniqueYears.map((y) => (
+                    <option key={y} value={y} className="bg-church-primary text-white">
+                      {y}
+                    </option>
+                  ))}
+                </select>
+                <Filter className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
+              </div>
 
-            {/* Month Dropdown */}
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-church-primary text-gray-800"
-            >
-              <option value="all">All Months</option>
-              {monthsList.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
+              {/* Month Filter */}
+              <div className="relative flex-1 md:w-40">
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="w-full h-11 bg-white/10 border border-white/20 text-white rounded-xl px-3 text-sm focus:outline-none appearance-none cursor-pointer"
+                >
+                  <option value="all" className="bg-church-primary text-white">All Months</option>
+                  {monthsList.map((m) => (
+                    <option key={m} value={m} className="bg-church-primary text-white">
+                      {m}
+                    </option>
+                  ))}
+                </select>
+                <Filter className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Sermons Content Container */}
-      <div className="container mx-auto px-4 max-w-6xl mb-20">
+      {/* Main Content Area */}
+      <main className="container mx-auto px-4 py-12 max-w-6xl flex-1">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-church-primary">
-            <Loader2 className="w-8 h-8 animate-spin" />
-            <span className="text-sm font-semibold">Loading recorded sermons...</span>
+          <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+            <Loader2 className="w-10 h-10 animate-spin text-church-primary mb-3" />
+            <p className="font-semibold text-sm">Loading sermon archive...</p>
           </div>
         ) : Object.keys(groupedSermons).length === 0 ? (
-          <div className="bg-white p-12 rounded-3xl shadow-sm border text-center max-w-lg mx-auto">
-            <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-xl font-bold text-gray-800 mb-1">No Sermons Found</h3>
-            <p className="text-xs text-gray-500">
+          <div className="text-center py-20 bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">No Sermons Found</h3>
+            <p className="text-gray-500 text-sm max-w-md mx-auto">
               No recorded sermons matched your search filters. Try clearing the search or selecting a different month/year.
             </p>
           </div>
@@ -217,28 +207,31 @@ export default function SermonsPage() {
                     return (
                       <div
                         key={sermon.id}
-                        className="bg-white rounded-3xl p-6 shadow-md border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-shadow"
+                        className="bg-white rounded-3xl p-4 sm:p-5 shadow-md border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-shadow"
                       >
                         <div>
-                          <span className="text-[11px] font-bold text-church-primary uppercase tracking-wider mb-1 block">
+                          <span className="text-[10px] font-bold text-church-primary uppercase tracking-wider mb-1 block">
                             {formatted}
                           </span>
-                          <h4 className="text-lg font-bold text-gray-900 leading-snug mb-2 line-clamp-2">
+                          <h4 className="text-base font-bold text-gray-900 leading-tight mb-1 line-clamp-1">
                             {sermon.title}
                           </h4>
-                          <p className="text-xs text-gray-600 font-semibold mb-3 flex items-center gap-1.5">
+                          <p className="text-xs text-gray-600 font-semibold mb-2 flex items-center gap-1.5">
                             <MicVocal className="w-3.5 h-3.5 text-church-primary flex-shrink-0" />
                             <span>Preacher: {sermon.preacher}</span>
                           </p>
                           {sermon.description && (
-                            <p className="text-xs text-gray-500 line-clamp-3 leading-relaxed mb-4">
+                            <p className="text-xs text-gray-500 line-clamp-1 leading-normal mb-2">
                               {sermon.description}
                             </p>
                           )}
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-100">
-                          <RedCirclePlayer audioUrl={audioUrl} />
+                        <div className="mt-2 pt-3 border-t border-gray-100">
+                          <RedCirclePlayer 
+                            audioUrl={audioUrl} 
+                            speakerImage={sermon.preacher_image_url}
+                          />
                         </div>
                       </div>
                     );
@@ -248,10 +241,10 @@ export default function SermonsPage() {
             ))}
           </div>
         )}
-      </div>
+      </main>
 
-      <ChatButton />
       <FooterSection />
+      <ChatButton />
     </div>
   );
 }

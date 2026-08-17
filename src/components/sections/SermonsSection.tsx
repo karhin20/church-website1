@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Play, ArrowRight, Disc3 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RedCirclePlayer } from '@/components/RedCirclePlayer';
 import { motion } from "framer-motion";
@@ -9,7 +9,6 @@ import { getCloudinaryUrl } from "@/lib/cloudinary";
 
 export const SermonsSection = () => {
   const [dbSermons, setDbSermons] = useState<SermonItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLatestThreeSermons = async () => {
@@ -26,8 +25,6 @@ export const SermonsSection = () => {
         }
       } catch (err) {
         console.error('Error fetching latest 3 sermons for home section:', err);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -35,14 +32,14 @@ export const SermonsSection = () => {
   }, []);
 
   const fadeInUp = {
-    initial: { opacity: 0, y: 40 },
+    initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: false },
     transition: { 
       type: "spring",
       stiffness: 100,
       damping: 15,
-      duration: 0.6 
+      duration: 0.5 
     }
   };
 
@@ -76,34 +73,22 @@ export const SermonsSection = () => {
   const sermonsToDisplay = dbSermons.length > 0 ? dbSermons.slice(0, 3) : defaultSermons;
 
   return (
-    <section id="sermons" className="py-24 bg-church-primary text-white font-sans">
+    <section id="sermons" className="py-20 bg-church-primary text-white font-sans">
       <div className="container mx-auto px-4">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
-          transition={{ 
-            type: "spring",
-            stiffness: 100,
-            damping: 15,
-            duration: 0.6 
-          }}
-          className="text-center mb-12"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-10"
         >
-          <div className="inline-flex items-center gap-2 bg-church-secondary/20 text-church-secondary text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider mb-3">
-            <Disc3 className="w-4 h-4 animate-spin [animation-duration:8s]" />
-            <span>RECORDED MESSAGES</span>
-          </div>
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-3 tracking-tight">
+          <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
             Latest Sermons
           </h2>
-          <p className="text-church-accent max-w-lg mx-auto text-sm md:text-base">
-            Listen to our 3 most recent recorded messages and spiritual teachings.
-          </p>
         </motion.div>
 
         {/* 3 Latest Sermons Grid */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {sermonsToDisplay.map((sermon, idx) => {
             const title = 'title' in sermon ? sermon.title : '';
             const preacher = 'preacher' in sermon ? sermon.preacher : '';
@@ -111,32 +96,34 @@ export const SermonsSection = () => {
               ? (isNaN(Date.parse(sermon.date)) ? sermon.date : new Date(sermon.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))
               : '';
             const audioUrl = getCloudinaryUrl('audio_url' in sermon ? (sermon as SermonItem).audio_url : (sermon as any).audioUrl);
-            const speakerImage = (sermon as any).speakerImage;
+            const speakerImage = ('preacher_image_url' in sermon && (sermon as SermonItem).preacher_image_url)
+              ? (sermon as SermonItem).preacher_image_url
+              : (sermon as any).speakerImage;
 
             return (
               <motion.div 
                 key={sermon.id}
-                className="bg-white/10 p-6 rounded-3xl backdrop-blur-md border border-white/10 flex flex-col justify-between hover:border-church-secondary/40 transition-all shadow-xl"
+                className="bg-white/10 p-4 sm:p-5 rounded-3xl backdrop-blur-md border border-white/10 flex flex-col justify-between hover:border-church-secondary/40 transition-all shadow-xl"
                 {...fadeInUp}
-                transition={{ duration: 0.5, delay: 0.1 * idx }}
+                transition={{ duration: 0.4, delay: 0.08 * idx }}
               >
                 <div>
-                  <div className="text-[11px] font-bold text-church-secondary uppercase tracking-wider mb-1">
+                  <div className="text-[10px] font-bold text-church-secondary uppercase tracking-wider mb-1">
                     {dateStr || 'Sermon'}
                   </div>
-                  <h4 className="text-xl font-bold mb-2 text-white line-clamp-2 leading-snug">
+                  <h4 className="text-base font-bold text-white leading-tight mb-1 line-clamp-1">
                     {title}
                   </h4>
-                  <p className="text-church-accent mb-4 text-xs font-semibold">
+                  <p className="text-church-accent text-[11px] font-semibold mb-2">
                     By {preacher}
                   </p> 
                   {'description' in sermon && sermon.description && (
-                    <p className="text-gray-300 text-xs mb-4 line-clamp-2 leading-relaxed">
+                    <p className="text-gray-300 text-[11px] mb-2 line-clamp-1 leading-normal">
                       {sermon.description}
                     </p>
                   )}
                 </div>
-                <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="mt-2 pt-3 border-t border-white/10">
                   <RedCirclePlayer 
                     audioUrl={audioUrl}
                     speakerImage={speakerImage}
@@ -149,15 +136,15 @@ export const SermonsSection = () => {
 
         {/* More Sermons Button */}
         <motion.div 
-          className="flex justify-center mt-12"
-          initial={{ opacity: 0, y: 20 }}
+          className="flex justify-center mt-10"
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.4 }}
         >
           <Link to="/sermons">
             <Button 
-              className="bg-church-secondary text-church-primary hover:bg-white font-bold px-8 py-6 text-base rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
+              className="bg-church-secondary text-church-primary hover:bg-white font-bold px-8 py-5 text-sm md:text-base rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
             >
               <span>More Sermons</span>
               <ArrowRight className="w-5 h-5" />

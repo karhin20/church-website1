@@ -12,6 +12,7 @@ export interface SermonItem {
   date: string;
   description: string;
   audio_url: string;
+  preacher_image_url?: string;
   is_hidden?: boolean;
   recording_duration?: number;
   created_at?: string;

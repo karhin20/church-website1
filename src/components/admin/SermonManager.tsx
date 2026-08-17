@@ -30,6 +30,8 @@ export default function SermonManager() {
   const [description, setDescription] = useState('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [cloudinaryUrlInput, setCloudinaryUrlInput] = useState('');
+  const [preacherImageUrl, setPreacherImageUrl] = useState('');
+  const [preacherImageFile, setPreacherImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [sermons, setSermons] = useState<SermonItem[]>([]);
   const { toast } = useToast();
@@ -170,7 +172,9 @@ export default function SermonManager() {
     setDate(sermon.date || '');
     setDescription(sermon.description || '');
     setCloudinaryUrlInput(sermon.audio_url || '');
+    setPreacherImageUrl(sermon.preacher_image_url || '');
     setAudioFile(null);
+    setPreacherImageFile(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -182,19 +186,22 @@ export default function SermonManager() {
     setDescription('');
     setAudioFile(null);
     setCloudinaryUrlInput('');
+    setPreacherImageUrl('');
+    setPreacherImageFile(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!editingSermon && !audioFile && !cloudinaryUrlInput.trim()) {
-      toast({ variant: 'destructive', title: 'Media required', description: 'Select a file or enter a Cloudinary URL.' });
+      toast({ variant: 'destructive', title: 'Media required', description: 'Select an audio file or enter a Cloudinary URL.' });
       return;
     }
 
     setLoading(true);
     try {
       let audio_url = cloudinaryUrlInput.trim();
+      let final_preacher_image_url = preacherImageUrl.trim();
 
       if (audioFile) {
         try {
@@ -207,12 +214,21 @@ export default function SermonManager() {
         }
       }
 
+      if (preacherImageFile) {
+        try {
+          final_preacher_image_url = await uploadToCloudinary(preacherImageFile, 'image');
+        } catch (imgErr: any) {
+          console.warn('Preacher avatar upload warning:', imgErr);
+        }
+      }
+
       if (editingSermon) {
         const { error } = await supabase.from('sermons').update({
           title, preacher,
           date: date || new Date().toISOString().split('T')[0],
           description,
           audio_url: audio_url || editingSermon.audio_url,
+          preacher_image_url: final_preacher_image_url,
         }).eq('id', editingSermon.id);
         if (error) throw error;
         toast({ title: 'Sermon updated successfully!' });
@@ -220,7 +236,9 @@ export default function SermonManager() {
         const { error } = await supabase.from('sermons').insert([{
           title, preacher,
           date: date || new Date().toISOString().split('T')[0],
-          description, audio_url, is_hidden: false,
+          description, audio_url,
+          preacher_image_url: final_preacher_image_url,
+          is_hidden: false,
         }]);
         if (error) throw error;
         toast({ title: 'Sermon saved to Cloudinary!' });
@@ -418,6 +436,17 @@ export default function SermonManager() {
             <div>
               <Label>Or Cloudinary Audio URL</Label>
               <Input value={cloudinaryUrlInput} onChange={e => setCloudinaryUrlInput(e.target.value)} placeholder="https://res.cloudinary.com/.../sermon.mp3" />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+            <div>
+              <Label>Preacher Image (Tiny Avatar Beside Player)</Label>
+              <Input type="file" accept="image/*" onChange={e => setPreacherImageFile(e.target.files?.[0] || null)} />
+            </div>
+            <div>
+              <Label>Or Preacher Image URL</Label>
+              <Input value={preacherImageUrl} onChange={e => setPreacherImageUrl(e.target.value)} placeholder="https://res.cloudinary.com/.../preacher.jpg" />
             </div>
           </div>
 
