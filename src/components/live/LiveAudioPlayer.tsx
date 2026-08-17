@@ -122,146 +122,152 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   ];
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-[36px] shadow-2xl overflow-hidden border border-gray-200 relative font-sans text-gray-900">
-      
-      {/* ── STAGE / PLAYER HEADER ────────────────────────────────────────── */}
-      <div className="p-6 pt-5 pb-4 bg-gradient-to-b from-slate-50 via-white to-gray-50/50">
+    <div className="max-w-md md:max-w-6xl mx-auto font-sans text-gray-900 px-1 md:px-0">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-stretch">
         
-        {/* Status Badges */}
-        <div className="mb-4 flex items-center justify-center gap-2">
-          <span className="inline-flex items-center gap-1.5 bg-red-100 text-red-600 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-red-600 animate-ping" />
-            LIVE
-          </span>
-          <span className="bg-gray-200/80 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full">
-            {formattedCount} Listening
-          </span>
-        </div>
+        {/* Left Card: Audio Player Stage Controls */}
+        <div className="md:col-span-7 bg-white rounded-[36px] shadow-2xl overflow-hidden border border-gray-200 flex flex-col justify-between md:h-[550px]">
+          <div className="p-6 pt-5 pb-6 bg-gradient-to-b from-slate-50 via-white to-gray-50/50 flex-1 flex flex-col justify-between h-full">
+            <div>
+              {/* Status Badges */}
+              <div className="mb-4 flex items-center justify-center gap-2">
+                <span className="inline-flex items-center gap-1.5 bg-red-100 text-red-600 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-red-600 animate-ping" />
+                  LIVE
+                </span>
+                <span className="bg-gray-200/80 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full">
+                  {formattedCount} Listening
+                </span>
+              </div>
 
-        {/* Autoplay Warning */}
-        {autoplayBlocked && (
-          <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-900 text-xs flex items-center justify-between gap-3 animate-pulse">
-            <span>Click "Start Audio" to listen</span>
-            <Button
-              size="sm"
-              onClick={togglePlay}
-              className="bg-amber-600 text-white font-bold hover:bg-amber-700 h-7 px-3 text-xs rounded-lg flex-shrink-0"
-            >
-              Start Audio
-            </Button>
-          </div>
-        )}
-
-        {/* Multicolored Audio Waveform Visualizer */}
-        <div className="w-full max-w-xs mx-auto my-3">
-          <GradientAudioWaveform isPlaying={isPlaying} isMuted={isMuted} connecting={connecting} />
-        </div>
-
-        {/* Lower Card showing Event/Sermon Title & Speaker */}
-        <div className="my-5 flex items-center justify-center">
-          <div className="w-full max-w-xs rounded-2xl bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 p-4 text-white text-center shadow-xl border border-white/10">
-            <h2 className="text-base font-bold leading-snug text-white line-clamp-2 mb-1">
-              {event.title}
-            </h2>
-            {event.speaker && (
-              <p className="text-xs text-purple-200 flex items-center justify-center gap-1">
-                <MicVocal className="w-3.5 h-3.5 text-pink-400" />
-                <span>{event.speaker}</span>
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Dynamic & Scrollable Silhouette Avatars for Host, Speakers & Joined Listeners */}
-        <div className="my-4">
-          <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400 text-center mb-2">
-            ON THE STREAM
-          </p>
-          
-          <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2 px-3 max-w-full justify-start">
-            {allPeopleOnStream.map((person, index) => {
-              const borderGradients = [
-                'from-emerald-400 to-teal-500',
-                'from-yellow-400 to-amber-500',
-                'from-cyan-400 to-blue-500',
-                'from-purple-400 to-pink-500',
-              ];
-              const gradientClass = person.isHost 
-                ? 'from-emerald-400 to-teal-500' 
-                : borderGradients[index % borderGradients.length];
-
-              return (
-                <div key={`${person.name}-${index}`} className="flex flex-col items-center flex-shrink-0">
-                  <div className={`w-14 h-14 rounded-full p-1 bg-gradient-to-r ${gradientClass} shadow-md relative flex items-center justify-center ${isPlaying && person.isHost ? 'ring-2 ring-emerald-400/50' : ''}`}>
-                    <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center border-2 border-white overflow-hidden text-gray-600">
-                      <User className="w-7 h-7 text-gray-500 stroke-[1.75]" />
-                    </div>
-                    <span className="absolute -bottom-1.5 bg-gray-900 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow whitespace-nowrap">
-                      {person.role}
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-bold text-gray-800 mt-2 text-center max-w-[84px] truncate">
-                    {person.name}
-                  </span>
+              {/* Autoplay Warning */}
+              {autoplayBlocked && (
+                <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-900 text-xs flex items-center justify-between gap-3 animate-pulse">
+                  <span>Click "Start Audio" to listen</span>
+                  <Button
+                    size="sm"
+                    onClick={togglePlay}
+                    className="bg-amber-600 text-white font-bold hover:bg-amber-700 h-7 px-3 text-xs rounded-lg flex-shrink-0"
+                  >
+                    Start Audio
+                  </Button>
                 </div>
-              );
-            })}
+              )}
+
+              {/* Multicolored Audio Waveform Visualizer */}
+              <div className="w-full max-w-xs mx-auto my-3 md:my-5">
+                <GradientAudioWaveform isPlaying={isPlaying} isMuted={isMuted} connecting={connecting} />
+              </div>
+
+              {/* Lower Card showing Event/Sermon Title & Speaker */}
+              <div className="my-5 flex items-center justify-center">
+                <div className="w-full max-w-sm rounded-2xl bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 p-4 md:p-6 text-white text-center shadow-xl border border-white/10">
+                  <h2 className="text-base md:text-lg font-bold leading-snug text-white line-clamp-2 mb-1.5">
+                    {event.title}
+                  </h2>
+                  {event.speaker && (
+                    <p className="text-xs md:text-sm text-purple-200 flex items-center justify-center gap-1.5">
+                      <MicVocal className="w-3.5 h-3.5 md:w-4 md:h-4 text-pink-400" />
+                      <span>{event.speaker}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Dynamic & Scrollable Silhouette Avatars for Host, Speakers & Joined Listeners */}
+              <div className="my-4">
+                <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400 text-center mb-2">
+                  ON THE STREAM
+                </p>
+                
+                <div className="flex items-center gap-4 overflow-x-auto no-scrollbar py-2 px-3 max-w-full justify-start">
+                  {allPeopleOnStream.map((person, index) => {
+                    const borderGradients = [
+                      'from-emerald-400 to-teal-500',
+                      'from-yellow-400 to-amber-500',
+                      'from-cyan-400 to-blue-500',
+                      'from-purple-400 to-pink-500',
+                    ];
+                    const gradientClass = person.isHost 
+                      ? 'from-emerald-400 to-teal-500' 
+                      : borderGradients[index % borderGradients.length];
+
+                    return (
+                      <div key={`${person.name}-${index}`} className="flex flex-col items-center flex-shrink-0">
+                        <div className={`w-14 h-14 rounded-full p-1 bg-gradient-to-r ${gradientClass} shadow-md relative flex items-center justify-center ${isPlaying && person.isHost ? 'ring-2 ring-emerald-400/50' : ''}`}>
+                          <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center border-2 border-white overflow-hidden text-gray-600">
+                            <User className="w-7 h-7 text-gray-500 stroke-[1.75]" />
+                          </div>
+                          <span className="absolute -bottom-1.5 bg-gray-900 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow whitespace-nowrap">
+                            {person.role}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-bold text-gray-800 mt-2 text-center max-w-[84px] truncate">
+                          {person.name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Controls Row: Prominent Mute/Sound, Play/Pause, and Leave Buttons */}
+            <div className="mt-6 flex items-center justify-center gap-2 flex-nowrap w-full">
+              {/* Prominent Mute/Sound Button */}
+              <button
+                onClick={toggleMute}
+                className={`h-10 px-3 rounded-full font-bold flex items-center gap-1.5 transition-all shadow-sm flex-shrink-0 ${
+                  isMuted 
+                    ? 'bg-red-100 text-red-600 border border-red-200 hover:bg-red-200' 
+                    : 'bg-gray-100 text-gray-800 border border-gray-200 hover:bg-gray-200'
+                }`}
+                title={isMuted ? 'Unmute sound' : 'Mute sound'}
+              >
+                {isMuted ? (
+                  <>
+                    <VolumeX className="w-4 h-4 text-red-600 flex-shrink-0" />
+                    <span className="text-xs whitespace-nowrap">Muted</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="w-4 h-4 text-gray-900 flex-shrink-0" />
+                    <span className="text-xs whitespace-nowrap">Sound On</span>
+                  </>
+                )}
+              </button>
+
+              {/* Center Play/Pause Button */}
+              <Button
+                onClick={togglePlay}
+                disabled={connecting}
+                className="h-10 px-3.5 rounded-full bg-gray-900 text-white hover:bg-gray-800 font-bold flex items-center gap-1.5 shadow-md text-xs flex-shrink-0 whitespace-nowrap"
+              >
+                {isPlaying ? <Pause className="w-4 h-4 flex-shrink-0" /> : <Play className="w-4 h-4 fill-current flex-shrink-0" />}
+                <span>{connecting ? 'Connecting...' : isPlaying ? 'Pause' : 'Play Live'}</span>
+              </Button>
+
+              {/* Prominent Leave Icon Button */}
+              <button
+                onClick={handleLeaveStream}
+                className="h-10 px-3 rounded-full bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 font-bold flex items-center gap-1.5 transition-all shadow-sm flex-shrink-0"
+                title="Leave Stream"
+              >
+                <LogOut className="w-4 h-4 text-red-600 flex-shrink-0" />
+                <span className="text-xs whitespace-nowrap">Leave</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Controls Row: Prominent Mute/Sound, Play/Pause, and Leave Buttons */}
-        <div className="mt-6 flex items-center justify-center gap-3">
-          {/* Prominent Mute/Sound Button */}
-          <button
-            onClick={toggleMute}
-            className={`h-12 px-4 rounded-full font-bold flex items-center gap-2 transition-all shadow-md ${
-              isMuted 
-                ? 'bg-red-100 text-red-600 border border-red-200 hover:bg-red-200' 
-                : 'bg-gray-100 text-gray-800 border border-gray-200 hover:bg-gray-200'
-            }`}
-            title={isMuted ? 'Unmute sound' : 'Mute sound'}
-          >
-            {isMuted ? (
-              <>
-                <VolumeX className="w-6 h-6 text-red-600" />
-                <span className="text-xs">Muted</span>
-              </>
-            ) : (
-              <>
-                <Volume2 className="w-6 h-6 text-gray-900" />
-                <span className="text-xs">Sound On</span>
-              </>
-            )}
-          </button>
-
-          {/* Center Play/Pause Button */}
-          <Button
-            onClick={togglePlay}
-            disabled={connecting}
-            className="h-12 px-6 rounded-full bg-gray-900 text-white hover:bg-gray-800 font-bold flex items-center gap-2 shadow-lg text-sm"
-          >
-            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
-            <span>{connecting ? 'Connecting...' : isPlaying ? 'Pause' : 'Play Live'}</span>
-          </Button>
-
-          {/* Prominent Leave Icon Button */}
-          <button
-            onClick={handleLeaveStream}
-            className="h-12 px-4 rounded-full bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 font-bold flex items-center gap-2 transition-all shadow-md"
-            title="Leave Stream"
-          >
-            <LogOut className="w-5 h-5 text-red-600" />
-            <span className="text-xs">Leave</span>
-          </button>
+        {/* Right Side: Chat Container (Responsive Sidebar or Mobile Slide-up Bottom Panel) */}
+        <div className="md:col-span-5 bg-white rounded-t-[28px] md:rounded-[36px] border-t md:border border-gray-100 md:border-gray-200 shadow-2xl relative z-10 overflow-hidden flex flex-col md:h-[550px]">
+          <TemporalLiveChat 
+            eventId={event.id} 
+            userName={userName}
+          />
         </div>
-      </div>
 
-      {/* ── LIVE CHAT CONTAINER ───────────────────────────────────────────── */}
-      <div className="bg-white rounded-t-[28px] border-t border-gray-100 shadow-2xl pt-2 relative z-10">
-        <TemporalLiveChat 
-          eventId={event.id} 
-          userName={userName}
-        />
       </div>
     </div>
   );

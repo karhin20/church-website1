@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { VitePWA } from 'vite-plugin-pwa'
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,6 +14,24 @@ export default defineConfig({
       injectRegister: 'auto',
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+        runtimeCaching: [
+          {
+            // Always fetch /live page and live API calls NetworkFirst
+            urlPattern: ({ url }) => 
+              url.pathname.startsWith('/live') || 
+              url.pathname.includes('/api/agora') || 
+              url.pathname.includes('/live_events'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'live-page-network-first',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60, // 1 minute max cache duration
+              },
+            },
+          },
+        ],
       },
       manifest: {
         name: 'TAC-NBC',

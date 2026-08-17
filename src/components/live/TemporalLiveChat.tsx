@@ -181,21 +181,29 @@ export default function TemporalLiveChat({ eventId, userName, readOnly }: Tempor
   };
 
   const containerClasses = isExpanded
-    ? "fixed inset-0 z-50 bg-white flex flex-col p-4 shadow-2xl animate-in fade-in zoom-in-95 font-sans"
-    : "flex flex-col h-[400px] bg-white rounded-t-[28px] relative overflow-hidden font-sans";
+    ? "fixed inset-0 z-[100] bg-white flex flex-col p-4 shadow-2xl animate-in fade-in zoom-in-95 font-sans"
+    : "flex flex-col h-[400px] md:h-full bg-white rounded-t-[28px] md:rounded-[36px] relative overflow-hidden font-sans";
 
   return (
     <div className={containerClasses}>
-      {/* Floating Reduce Chat button when enlarged */}
+      {/* Prominent Top Close/Reduce Banner when enlarged */}
       {isExpanded && (
-        <button
-          onClick={() => setIsExpanded(false)}
-          className="fixed top-4 right-4 z-[60] bg-purple-600 text-white rounded-full px-4 py-2 font-bold text-xs shadow-2xl hover:bg-purple-700 flex items-center gap-2 transition-all active:scale-95 border-2 border-white"
-          title="Reduce Chat Area"
-        >
-          <Minimize2 className="w-4 h-4" />
-          <span>Reduce Chat</span>
-        </button>
+        <div className="bg-purple-700 text-white px-4 py-3 rounded-2xl mb-2 flex items-center justify-between shadow-lg flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="font-black text-xs tracking-wider uppercase bg-purple-900/60 px-2.5 py-1 rounded-full text-purple-200">
+              FULL CHAT MODE
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsExpanded(false)}
+            className="bg-white text-purple-800 hover:bg-purple-50 font-black text-xs px-4 py-2 rounded-full shadow-md flex items-center gap-1.5 transition-transform active:scale-95 cursor-pointer"
+            title="Reduce Chat"
+          >
+            <Minimize2 className="w-4 h-4 text-purple-700" />
+            <span>REDUCE / CLOSE FULL CHAT</span>
+          </button>
+        </div>
       )}
 
       {/* Drag Handle Pill & Title Header with Full-Surface Toggle */}

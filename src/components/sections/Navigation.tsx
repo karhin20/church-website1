@@ -51,12 +51,7 @@ export const Navigation = () => {
             <Link to="/" className="text-white hover:text-church-secondary transition-colors">Home</Link>
             <Link to="/bible" className="text-white hover:text-church-secondary transition-colors">BIBLE</Link>
             <Link to="/hymns" className="text-white hover:text-church-secondary transition-colors">TAC Hymns</Link>
-            <button 
-              onClick={() => handleNavigation('sermons')} 
-              className="text-white hover:text-church-secondary transition-colors"
-            >
-              Sermons
-            </button>
+            <Link to="/sermons" className="text-white hover:text-church-secondary transition-colors">Sermons</Link>
             <button 
               onClick={() => handleNavigation('events')} 
               className="text-white hover:text-church-secondary transition-colors"
@@ -149,12 +144,13 @@ export const Navigation = () => {
             >
               TAC Hymns
             </Link>
-            <button 
-              onClick={() => handleNavigation('sermons')} 
-              className="text-white hover:text-church-secondary transition-colors text-left"
+            <Link 
+              to="/sermons" 
+              className="text-white hover:text-church-secondary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
             >
               Sermons
-            </button>
+            </Link>
             <button 
               onClick={() => handleNavigation('events')} 
               className="text-white hover:text-church-secondary transition-colors text-left"

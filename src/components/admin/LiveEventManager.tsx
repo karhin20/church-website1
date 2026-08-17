@@ -5,12 +5,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { Radio, Mic, MicOff, Square, MessageSquare, Headphones, BookOpen } from 'lucide-react';
+import { Radio, Mic, MicOff, Square, MessageSquare, Headphones, BookOpen, UploadCloud, Loader2, Clock, CircleDot } from 'lucide-react';
 import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from '../live/TemporalLiveChat';
 import AdminBiblePanel from './AdminBiblePanel';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
+
+// ─── Helper: format seconds to mm:ss ─────────────────────────────────────────
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const s = (seconds % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
 
 export default function LiveEventManager() {
   const [title, setTitle] = useState('');
@@ -24,8 +32,21 @@ export default function LiveEventManager() {
   const [activeTab, setActiveTab] = useState<'chat' | 'bible'>('chat');
   const { toast } = useToast();
 
+  // ── Broadcast & Recording State ─────────────────────────────────────────────
+  const [broadcastSeconds, setBroadcastSeconds] = useState(0);
+  const [isRecordingActive, setIsRecordingActive] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [savingRecording, setSavingRecording] = useState(false);
+
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const localAudioTrackRef = useRef<IMicrophoneAudioTrack | null>(null);
+
+  // MediaRecorder refs for manual broadcast recording
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingChunksRef = useRef<BlobPart[]>([]);
+  const broadcastTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const fetchActiveEvent = async () => {
     try {
@@ -52,6 +73,8 @@ export default function LiveEventManager() {
     return () => {
       clearInterval(interval);
       cleanupAgora();
+      stopBroadcastTimer();
+      stopRecordingTimer();
     };
   }, []);
 
@@ -76,6 +99,20 @@ export default function LiveEventManager() {
     };
   }, [activeEvent?.id]);
 
+  const stopBroadcastTimer = () => {
+    if (broadcastTimerRef.current) {
+      clearInterval(broadcastTimerRef.current);
+      broadcastTimerRef.current = null;
+    }
+  };
+
+  const stopRecordingTimer = () => {
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
+  };
+
   const cleanupAgora = async () => {
     if (localAudioTrackRef.current) {
       localAudioTrackRef.current.stop();
@@ -93,6 +130,7 @@ export default function LiveEventManager() {
     setIsBroadcasting(false);
   };
 
+  // ── Start Broadcast (No Auto-Recording) ───────────────────────────────────
   const handleStartBroadcast = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -114,19 +152,33 @@ export default function LiveEventManager() {
 
       const { appId, token } = await tokenRes.json();
 
-      // 2. Create Agora RTC Client & Join with Backend Credentials
+      // 2. Get microphone stream access FIRST (for Agora and potential MediaRecorder)
+      const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = micStream;
+
+      // 3. Create Agora RTC Client & Join with Backend Credentials
       const client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
       clientRef.current = client;
 
       await client.setClientRole('host');
       await client.join(appId, channelName, token || null, null);
 
-      // 3. Create microphone track & publish
+      // 4. Create microphone track from shared stream & publish to Agora
       const microphoneTrack = await AgoraRTC.createMicrophoneAudioTrack();
       localAudioTrackRef.current = microphoneTrack;
       await client.publish([microphoneTrack]);
 
-      // 4. Save live event session to Supabase DB via backend/client
+      // 5. Start broadcast duration timer
+      setBroadcastSeconds(0);
+      broadcastTimerRef.current = setInterval(() => {
+        setBroadcastSeconds(s => s + 1);
+      }, 1000);
+
+      // Reset recording states
+      setIsRecordingActive(false);
+      setRecordingSeconds(0);
+
+      // 6. Save live event session to Supabase DB
       const { data, error } = await supabase
         .from('live_events')
         .insert([
@@ -149,8 +201,8 @@ export default function LiveEventManager() {
       setIsBroadcasting(true);
       setIsMuted(false);
       toast({
-        title: "Live audio broadcast started!",
-        description: "Credentials generated by backend server. You are broadcasting live audio.",
+        title: "🔴 Live broadcast started!",
+        description: "Audio is broadcasting live. You can start/stop manual recording at any time.",
       });
     } catch (error: any) {
       console.error('Error starting live broadcast:', error);
@@ -165,13 +217,139 @@ export default function LiveEventManager() {
     }
   };
 
+  // ── Manual Start Recording ────────────────────────────────────────────────
+  const startManualRecording = () => {
+    if (!streamRef.current) {
+      toast({
+        variant: 'destructive',
+        title: 'Microphone inactive',
+        description: 'Microphone stream is not available. Please restart your live event broadcast.',
+      });
+      return;
+    }
+
+    try {
+      recordingChunksRef.current = [];
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/mp4';
+
+      const recorder = new MediaRecorder(streamRef.current, { mimeType });
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordingChunksRef.current.push(e.data);
+      };
+
+      recorder.start(500); // Collect chunk every 500ms
+      setIsRecordingActive(true);
+      setRecordingSeconds(0);
+
+      stopRecordingTimer();
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingSeconds(s => s + 1);
+      }, 1000);
+
+      toast({
+        title: "🎙️ Recording started",
+        description: "The live broadcast is being recorded locally.",
+      });
+    } catch (err: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Failed to start recording',
+        description: err.message,
+      });
+    }
+  };
+
+  // ── Manual Stop Recording & Save to Cloudinary ─────────────────────────────
+  const stopManualRecording = async () => {
+    if (!mediaRecorderRef.current || mediaRecorderRef.current.state === 'inactive' || !activeEvent) return;
+
+    setSavingRecording(true);
+    const recordedDuration = recordingSeconds;
+
+    try {
+      // 1. Stop recorder and collect full Blob
+      let recordedBlob: Blob | null = null;
+      await new Promise<void>((resolve) => {
+        if (!mediaRecorderRef.current) { resolve(); return; }
+        mediaRecorderRef.current.onstop = () => resolve();
+        mediaRecorderRef.current.stop();
+      });
+
+      const mimeType = mediaRecorderRef.current.mimeType || 'audio/webm';
+      recordedBlob = new Blob(recordingChunksRef.current, { type: mimeType });
+
+      // Stop recording timer
+      stopRecordingTimer();
+      setIsRecordingActive(false);
+      setRecordingSeconds(0);
+
+      // 2. Upload recorded Blob to Cloudinary (via backend) + save to DB
+      if (recordedBlob && recordedBlob.size > 0) {
+        const ext = recordedBlob.type.includes('mp4') ? 'mp4' : 'webm';
+        const sermonFile = new File(
+          [recordedBlob],
+          `live_sermon_${Date.now()}.${ext}`,
+          { type: recordedBlob.type }
+        );
+
+        const audio_url = await uploadToCloudinary(sermonFile, 'video');
+
+        const { error: sermonErr } = await supabase.from('sermons').insert([{
+          title: activeEvent.title,
+          preacher: activeEvent.speaker || 'Pastor / Speaker',
+          date: new Date().toISOString().split('T')[0],
+          description: activeEvent.description || '',
+          audio_url,
+          recording_duration: recordedDuration,
+          is_hidden: false,
+        }]);
+
+        if (sermonErr) throw sermonErr;
+
+        toast({
+          title: "✅ Sermon saved successfully!",
+          description: `"${activeEvent.title}" has been saved to your sermon archive.`,
+        });
+      }
+    } catch (uploadErr: any) {
+      toast({
+        variant: "destructive",
+        title: "Recording upload failed",
+        description: uploadErr.message || "Failed to save sermon recording to Cloudinary.",
+      });
+    } finally {
+      setSavingRecording(false);
+    }
+  };
+
+  // ── End Live Broadcast ────────────────────────────────────────────────────
   const handleEndBroadcast = async () => {
     if (!activeEvent) return;
 
     setLoading(true);
+
     try {
+      // 1. If currently recording, stop and save it first
+      if (isRecordingActive) {
+        await stopManualRecording();
+      }
+
+      // Stop mic stream tracks
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+      stopBroadcastTimer();
+      stopRecordingTimer();
+
+      // 2. Stop Agora broadcast
       await cleanupAgora();
 
+      // 3. Mark live event as ended in DB
       const { error } = await supabase
         .from('live_events')
         .update({ status: 'ended', ended_at: new Date().toISOString() })
@@ -180,7 +358,7 @@ export default function LiveEventManager() {
       if (error) throw error;
 
       toast({
-        title: "Live broadcast ended",
+        title: "📡 Broadcast ended",
         description: "The live stream has been closed.",
       });
 
@@ -188,6 +366,9 @@ export default function LiveEventManager() {
       setTitle('');
       setSpeaker('');
       setDescription('');
+      setBroadcastSeconds(0);
+      setIsRecordingActive(false);
+      setRecordingSeconds(0);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -205,13 +386,26 @@ export default function LiveEventManager() {
       localAudioTrackRef.current.setMuted(nextMuteState);
       setIsMuted(nextMuteState);
       toast({
-        title: nextMuteState ? "Microphone Muted" : "Microphone Active",
+        title: nextMuteState ? "🔇 Microphone Muted" : "🎙️ Microphone Active",
       });
     }
   };
 
   return (
     <div className="space-y-6">
+
+      {/* Saving recording overlay notification */}
+      {savingRecording && (
+        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 px-5 py-4 rounded-2xl flex items-center gap-3 shadow-sm animate-pulse">
+          <Loader2 className="w-5 h-5 animate-spin text-emerald-600" />
+          <div>
+            <p className="font-bold text-sm">Uploading sermon recording to Cloudinary...</p>
+            <p className="text-xs opacity-80">Saving the recorded broadcast segment into the sermon archive.</p>
+          </div>
+          <UploadCloud className="w-5 h-5 text-emerald-600 ml-auto" />
+        </div>
+      )}
+
       {/* Active Broadcast Control */}
       {activeEvent ? (
         <div className="bg-gradient-to-r from-red-900 to-red-700 text-white p-6 rounded-lg shadow-lg border border-red-500">
@@ -224,22 +418,67 @@ export default function LiveEventManager() {
               <h2 className="text-2xl font-bold tracking-wide uppercase">Broadcast In Progress</h2>
             </div>
             <div className="flex items-center gap-2">
+              {/* Live broadcast duration timer */}
+              <span className="text-xs bg-black/40 px-3 py-1 rounded-full font-mono flex items-center gap-1.5 text-red-200">
+                <Clock className="w-3.5 h-3.5" />
+                {formatDuration(broadcastSeconds)} ON AIR
+              </span>
               <span className="text-xs bg-black/40 px-3 py-1 rounded-full font-mono flex items-center gap-1.5">
                 <Headphones className="w-3.5 h-3.5 text-church-secondary" />
                 {listenerCount} listening
               </span>
-              <span className="text-xs bg-black/40 px-3 py-1 rounded-full font-mono">
-                Channel: {activeEvent.agora_channel}
-              </span>
             </div>
           </div>
 
-          <div className="bg-black/30 p-4 rounded-md mb-6 space-y-1">
+          <div className="bg-black/30 p-4 rounded-md mb-4 space-y-1">
             <h3 className="text-xl font-bold text-yellow-300">{activeEvent.title}</h3>
             <p className="text-sm text-gray-200">Speaker: {activeEvent.speaker || 'Admin'}</p>
             {activeEvent.description && (
               <p className="text-xs text-gray-300 italic">{activeEvent.description}</p>
             )}
+          </div>
+
+          {/* Manual Recording Panel */}
+          <div className="bg-black/25 rounded-2xl p-4 mb-5 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {isRecordingActive ? (
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-black tracking-widest text-red-300 font-mono">
+                    REC {formatDuration(recordingSeconds)}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-gray-300 text-xs">
+                  <CircleDot className="w-4 h-4 text-gray-400" />
+                  <span>Recording is inactive. Start manual recording to archive the sermon.</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              {!isRecordingActive ? (
+                <Button
+                  type="button"
+                  onClick={startManualRecording}
+                  disabled={savingRecording}
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs h-9 px-4 rounded-lg flex items-center gap-1.5"
+                >
+                  <Mic className="w-4 h-4" />
+                  Start Recording
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={stopManualRecording}
+                  disabled={savingRecording}
+                  className="bg-white hover:bg-gray-100 text-red-700 font-bold text-xs h-9 px-4 rounded-lg flex items-center gap-1.5 border"
+                >
+                  <Square className="w-4 h-4 text-red-600 fill-current animate-pulse" />
+                  Stop & Save Recording
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-4 items-center justify-between">
@@ -248,9 +487,9 @@ export default function LiveEventManager() {
                 type="button"
                 onClick={toggleMute}
                 variant={isMuted ? "destructive" : "secondary"}
-                className="font-semibold"
+                className="font-semibold h-10 text-xs"
               >
-                {isMuted ? <MicOff className="w-5 h-5 mr-2" /> : <Mic className="w-5 h-5 mr-2" />}
+                {isMuted ? <MicOff className="w-4 h-4 mr-1.5" /> : <Mic className="w-4 h-4 mr-1.5" />}
                 {isMuted ? "Unmute Mic" : "Mute Mic"}
               </Button>
             </div>
@@ -259,16 +498,15 @@ export default function LiveEventManager() {
               type="button"
               onClick={handleEndBroadcast}
               disabled={loading}
-              className="bg-red-950 hover:bg-black text-white font-bold px-6 border border-red-400"
+              className="bg-red-950 hover:bg-black text-white font-bold px-5 h-10 text-xs border border-red-400"
             >
-              <Square className="w-5 h-5 mr-2 text-red-500 fill-current" />
-              End Broadcast
+              <Square className="w-4 h-4 mr-1.5 text-red-500 fill-current" />
+              {loading ? 'Ending...' : 'End Broadcast'}
             </Button>
           </div>
 
           {/* Admin panel tabs: Live Chat | Bible */}
           <div className="mt-8 pt-6 border-t border-white/20">
-            {/* Tab header */}
             <div className="flex gap-2 mb-4">
               <button
                 onClick={() => setActiveTab('chat')}
@@ -294,7 +532,6 @@ export default function LiveEventManager() {
               </button>
             </div>
 
-            {/* Tab content */}
             {activeTab === 'chat' ? (
               <div className="bg-white text-gray-900 rounded-lg p-3">
                 <TemporalLiveChat eventId={activeEvent.id} userName="Admin (Host)" />
@@ -316,6 +553,11 @@ export default function LiveEventManager() {
           <div className="flex items-center gap-3 mb-4">
             <Radio className="w-7 h-7 text-church-primary animate-pulse" />
             <h2 className="text-2xl font-bold text-church-primary">Start Live Audio Stream</h2>
+          </div>
+
+          <div className="mb-5 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs leading-relaxed">
+            <strong>🎙️ Manual Recording:</strong> When you start a broadcast, recording is <strong>inactive</strong> by default.
+            You can manually start and stop recording segments at any point during your live stream. Stopped segments are uploaded to <strong>Cloudinary</strong> and archived.
           </div>
 
           <form onSubmit={handleStartBroadcast} className="space-y-4">

@@ -29,6 +29,7 @@ import Chat from './pages/Chat';
 import HymnHome from './pages/hymnHome';
 import BiblePage from './pages/Bible';
 import VerseReaderPage from '@/pages/VerseReader';
+import SermonsPage from './pages/SermonsPage';
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ function App() {
               <Route path="/hymn/:number" element={<HymnPage />} />
               <Route path="/hymns" element={<HymnHome />} />
               <Route path="/bible" element={<BiblePage />} />
+              <Route path="/sermons" element={<SermonsPage />} />
               <Route path="/notlive" element={<OfflineServiceSection />} />
               <Route path="/live" element={<LiveServiceSection />} />
 
