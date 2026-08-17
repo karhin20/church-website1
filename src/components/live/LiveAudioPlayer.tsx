@@ -1,36 +1,33 @@
-import { useState, useEffect, useRef } from 'react';
-import { LiveEventItem, supabase } from '@/lib/supabase';
+import { useState } from 'react';
+import { LiveEventItem } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Volume2, VolumeX, Play, Pause, Radio, User, MicVocal, LogOut, WifiOff } from 'lucide-react';
-import AgoraRTC, { IAgoraRTCClient, IRemoteAudioTrack } from 'agora-rtc-sdk-ng';
 import TemporalLiveChat from './TemporalLiveChat';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://backend-church.vercel.app');
+import { useLiveAudioContext } from '@/contexts/LiveAudioContext';
 
 interface LiveAudioPlayerProps {
   event: LiveEventItem;
 }
 
 export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
-  const [userName, setUserName] = useState(() => localStorage.getItem('tac_listener_name') || '');
-  const [inputName, setInputName] = useState('');
-  const [hasJoined, setHasJoined] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume] = useState(100);
-  const [connecting, setConnecting] = useState(false);
-  const [streamEndedByAdmin, setStreamEndedByAdmin] = useState(false);
-  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
-  const [listenerCount, setListenerCount] = useState<number>(1);
-  const [activeListeners, setActiveListeners] = useState<string[]>([]);
+  const {
+    userName,
+    setUserName,
+    isPlaying,
+    isMuted,
+    connecting,
+    listenerCount,
+    activeListeners,
+    autoplayBlocked,
+    streamEndedByAdmin,
+    leaveStream,
+    togglePlay,
+    toggleMute,
+  } = useLiveAudioContext();
 
-  const clientRef = useRef<IAgoraRTCClient | null>(null);
-  const remoteAudioTrackRef = useRef<IRemoteAudioTrack | null>(null);
-  const listenerIdRef = useRef<string>(
-    (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `listener-${Date.now()}-${Math.random()}`
-  );
+  const [inputName, setInputName] = useState('');
 
   // Dynamic speaker names parsed from event speaker field
   const speakerNames = event.speaker 
@@ -40,161 +37,10 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   // Host name as requested: TAC-GH, NBC
   const hostName = 'TAC-GH, NBC';
 
-  // ── Watch for admin ending stream ───────────────────────────────────────
-  useEffect(() => {
-    const channel = supabase
-      .channel(`live_event_status:${event.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'live_events',
-          filter: `id=eq.${event.id}`,
-        },
-        (payload) => {
-          const updated = payload.new as LiveEventItem;
-          if (updated.status === 'ended') {
-            leaveStream();
-            setStreamEndedByAdmin(true);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [event.id]);
-
-  // ── Track listener presence & active listener names ──────────────────────
-  useEffect(() => {
-    if (!userName) return;
-
-    const presenceChannel = supabase.channel(`live_listeners:${event.id}`, {
-      config: { presence: { key: listenerIdRef.current } },
-    });
-
-    presenceChannel
-      .on('presence', { event: 'sync' }, () => {
-        const state = presenceChannel.presenceState();
-        const namesList: string[] = [];
-        Object.values(state).forEach((presences: any) => {
-          presences.forEach((p: any) => {
-            if (p.userName && !namesList.includes(p.userName)) {
-              namesList.push(p.userName);
-            }
-          });
-        });
-        setActiveListeners(namesList);
-        setListenerCount(Math.max(namesList.length, 1));
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await presenceChannel.track({
-            userName,
-            joined_at: new Date().toISOString(),
-          });
-        }
-      });
-
-    return () => {
-      presenceChannel.untrack();
-      supabase.removeChannel(presenceChannel);
-    };
-  }, [event.id, userName]);
-
-  // ── Browser Autoplay handler ──────────────────────────────────────────────
-  useEffect(() => {
-    const handleAutoplayFailed = () => {
-      console.warn("Autoplay blocked by browser policy");
-      setAutoplayBlocked(true);
-      setIsPlaying(false);
-    };
-
-    AgoraRTC.onAutoplayFailed = handleAutoplayFailed;
-
-    return () => {
-      AgoraRTC.onAutoplayFailed = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (userName) {
-      joinStream();
-    }
-    return () => {
-      leaveStream();
-    };
-  }, [event.agora_channel, userName]);
-
-  const joinStream = async () => {
-    if (clientRef.current) return;
-    setConnecting(true);
-
-    try {
-      const tokenRes = await fetch(`${API_BASE_URL}/api/agora/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ channelName: event.agora_channel, role: 'audience' }),
-      });
-
-      if (!tokenRes.ok) {
-        throw new Error('Failed to fetch Agora token from backend');
-      }
-
-      const { appId, token } = await tokenRes.json();
-
-      const client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
-      clientRef.current = client;
-
-      await client.setClientRole('audience');
-
-      client.on('user-published', async (user, mediaType) => {
-        await client.subscribe(user, mediaType);
-        if (mediaType === 'audio' && user.audioTrack) {
-          remoteAudioTrackRef.current = user.audioTrack;
-          user.audioTrack.setVolume(isMuted ? 0 : volume);
-          user.audioTrack.play();
-          setIsPlaying(true);
-          setMediaSession(event.title, event.speaker || 'Church Minister', 'playing');
-        }
-      });
-
-      client.on('user-unpublished', (user, mediaType) => {
-        if (mediaType === 'audio') {
-          setIsPlaying(false);
-          setMediaSession(event.title, event.speaker || 'Church Minister', 'paused');
-        }
-      });
-
-      await client.join(appId, event.agora_channel, token || null, null);
-      setHasJoined(true);
-    } catch (err) {
-      console.error('Error joining live audio stream via backend token:', err);
-    } finally {
-      setConnecting(false);
-    }
-  };
-
-  const leaveStream = async () => {
-    if (remoteAudioTrackRef.current) {
-      remoteAudioTrackRef.current.stop();
-      remoteAudioTrackRef.current = null;
-    }
-    if (clientRef.current) {
-      try {
-        await clientRef.current.leave();
-      } catch (e) {
-        // ignore leave error
-      }
-      clientRef.current = null;
-    }
-    setHasJoined(false);
-    setIsPlaying(false);
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.playbackState = 'none';
-    }
+  const handleSaveName = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputName.trim()) return;
+    setUserName(inputName.trim());
   };
 
   const handleLeaveStream = async () => {
@@ -204,37 +50,6 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
     setInputName('');
   };
 
-  const handleSaveName = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputName.trim()) return;
-    const name = inputName.trim();
-    localStorage.setItem('tac_listener_name', name);
-    setUserName(name);
-  };
-
-  const togglePlay = () => {
-    if (remoteAudioTrackRef.current) {
-      if (isPlaying) {
-        remoteAudioTrackRef.current.stop();
-        setIsPlaying(false);
-        setMediaSession(event.title, event.speaker || 'Church Minister', 'paused');
-      } else {
-        remoteAudioTrackRef.current.play();
-        setIsPlaying(true);
-        setAutoplayBlocked(false);
-        setMediaSession(event.title, event.speaker || 'Church Minister', 'playing');
-      }
-    }
-  };
-
-  const toggleMute = () => {
-    const nextMuted = !isMuted;
-    setIsMuted(nextMuted);
-    if (remoteAudioTrackRef.current) {
-      remoteAudioTrackRef.current.setVolume(nextMuted ? 0 : 100);
-    }
-  };
-
   const formattedCount = listenerCount >= 1000 
     ? `${(listenerCount / 1000).toFixed(1)}K` 
     : listenerCount.toString();
@@ -242,7 +57,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   // ── Stream ended view ──────────────────────────────────────────────────
   if (streamEndedByAdmin) {
     return (
-      <div className="max-w-md mx-auto bg-gradient-to-br from-gray-900 to-church-primary text-white p-8 rounded-3xl shadow-2xl border border-white/10 text-center">
+      <div className="max-w-md mx-auto bg-gradient-to-br from-gray-900 to-church-primary text-white p-8 rounded-3xl shadow-2xl border border-white/10 text-center font-sans">
         <div className="inline-flex items-center justify-center p-4 bg-white/10 rounded-full mb-5">
           <WifiOff className="w-10 h-10 text-red-400" />
         </div>
@@ -264,7 +79,7 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
   // ── Name prompt ──────────────────────────────────────────────────────────
   if (!userName) {
     return (
-      <div className="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+      <div className="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-xl border border-gray-100 font-sans">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center p-4 bg-red-50 rounded-full text-red-600 mb-4 shadow-inner">
             <Radio className="w-8 h-8 animate-pulse" />
@@ -450,21 +265,6 @@ export default function LiveAudioPlayer({ event }: LiveAudioPlayerProps) {
       </div>
     </div>
   );
-}
-
-// ── Media Session Helper ────────────────────────────────────────────────────
-function setMediaSession(title: string, artist: string, state: 'playing' | 'paused' | 'none') {
-  if (!('mediaSession' in navigator)) return;
-  navigator.mediaSession.metadata = new MediaMetadata({
-    title,
-    artist,
-    album: 'TAC Live Broadcast',
-    artwork: [
-      { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-      { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
-    ],
-  });
-  navigator.mediaSession.playbackState = state;
 }
 
 // ── Multicolored Gradient Audio Waveform ─────────────────────────────────────

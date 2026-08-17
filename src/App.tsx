@@ -8,6 +8,8 @@ import Loading from '@/admin/auth/Loading';
 import { PWAPrompt } from '@/components/PWAPrompt';
 import { LiveServiceSection } from "@/components/sections/LiveServiceSection";
 import { OfflineServiceSection } from "@/components/sections/OfflineServiceSection";
+import { LiveAudioProvider } from '@/contexts/LiveAudioContext';
+import { MiniFloatingLivePlayer } from '@/components/live/MiniFloatingLivePlayer';
 
 // Lazy load admin components
 const AuthProvider = lazy(() => import('@/admin/auth/useAuth').then(module => ({ default: module.AuthProvider })));
@@ -36,41 +38,44 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <ChatProviderLazy>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/chat" element={<Chat />} />            
-            <Route path="/hymn/:number" element={<HymnPage />} />
-            <Route path="/hymns" element={<HymnHome />} />
-            <Route path="/bible" element={<BiblePage />} />
-            <Route path="/notlive" element={<OfflineServiceSection />} />
-            <Route path="/live" element={<LiveServiceSection />} />
+        <LiveAudioProvider>
+          <ChatProviderLazy>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/chat" element={<Chat />} />            
+              <Route path="/hymn/:number" element={<HymnPage />} />
+              <Route path="/hymns" element={<HymnHome />} />
+              <Route path="/bible" element={<BiblePage />} />
+              <Route path="/notlive" element={<OfflineServiceSection />} />
+              <Route path="/live" element={<LiveServiceSection />} />
 
-            {/* Protected routes */}
-            <Route path="/admin/*" element={
-              <Suspense fallback={<Loading />}>
-                <AuthProvider>
-                  <AdminLayout />
-                </AuthProvider>
-              </Suspense>
-            }>
-              <Route index element={<DashboardOverview />} />
-              <Route path="live-events" element={<LiveEventManager />} />
-              <Route path="sermons" element={<SermonManager />} />
-              <Route path="announcements" element={<AnnouncementManager />} />
-              <Route path="gallery" element={<GalleryManager />} />
-            </Route>
+              {/* Protected routes */}
+              <Route path="/admin/*" element={
+                <Suspense fallback={<Loading />}>
+                  <AuthProvider>
+                    <AdminLayout />
+                  </AuthProvider>
+                </Suspense>
+              }>
+                <Route index element={<DashboardOverview />} />
+                <Route path="live-events" element={<LiveEventManager />} />
+                <Route path="sermons" element={<SermonManager />} />
+                <Route path="announcements" element={<AnnouncementManager />} />
+                <Route path="gallery" element={<GalleryManager />} />
+              </Route>
 
-            {/* Catch all route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+              {/* Catch all route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
 
-            <Route path="/verse-reader" element={<VerseReaderPage />} />
-          </Routes>
-          <PWAPrompt />
-        </ChatProviderLazy>
+              <Route path="/verse-reader" element={<VerseReaderPage />} />
+            </Routes>
+            <MiniFloatingLivePlayer />
+            <PWAPrompt />
+          </ChatProviderLazy>
+        </LiveAudioProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
